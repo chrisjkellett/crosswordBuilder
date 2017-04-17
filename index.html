@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/main.css">
+    </head>
+    
+    <body>
+        <div class="container fully">
+        <div class="wrapper">
+        <div class="divider"></div>
+        </div>
+
+            <!--START HEADER -->
+            <header>
+                <nav class="navbar navbar-default">
+                    <div class="container-fluid">
+                        <!-- Brand and toggle get grouped for better mobile display -->
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                                <span class="sr-only">Toggle navigation</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                        <a class="navbar-brand" id="title-link" href="">      
+                            <span class="poiret">crossword</span>
+                            <span class="raleway font-heavy"><strong>Builder</strong></span>
+                            <span class="raleway font-small">v1.0</span>
+                        </a>
+                        </div>
+                        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                            <ul class="nav navbar-nav navbar-right raleway font-small">
+                                <!--<li><a href="#" id="toolBoxEvent">toolbox</a></li>
+                                <li><a href="#" id="aboutEvent">about</a></li>
+                                <!--<li><a href="#" id="loginEvent">login</a></li>-->
+                            </ul>
+                        </div>
+                    </div>
+            </header>
+            <!--END header -->
+
+
+            <!--START wrapper-->
+            <div id="content-wrap"> 
+                
+    
+                <!--START 1. INPUT -->
+                <div id="holdsCross" class="form-group">
+                    <p class="raleway font-small sub-heading">Add your crossword</p>
+                    <div>
+                    <div id="crosswordWrapper">
+                        <div id="crossword"></div>
+                        <div id="toolbar">
+                        <button class="btn btn-default flex-btn" id="submitBtn">Submit</button>
+                            <button class="rounded" id="rowMinus"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button>
+                            <button class="rounded" id="rowPlus"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                        <span id="errorMessage">You must add a text of between 10 and 200 words.</span>
+                        </div>
+                    </div>
+                    </div>
+                </div><!--END 1 INPUT -->
+
+
+
+
+
+
+        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+        <script src="js/validate.js"></script>
+        <script src="js/script.js"></script>
+    </body>
+</html>

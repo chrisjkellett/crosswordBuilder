@@ -1,0 +1,316 @@
+
+/*imports*/
+@import url('https://fonts.googleapis.com/css?family=Raleway:300,600,800');
+@import url('https://fonts.googleapis.com/css?family=Poiret+One');
+
+
+/*main layout*/
+html{
+  height: 100%;
+}
+
+body {
+  height: 100%;
+}
+
+.fully{
+    min-height: 100%;
+}
+
+header{
+    margin-top:50px;
+    position: relative;
+}
+
+.sub-heading{
+    margin: 0;
+    line-height: 11px;
+    border-bottom: 1px solid #5b5b5b;
+    display: inline-block;
+}
+
+#title-link{
+    text-decoration: none;
+    color:inherit;
+}
+
+.wrapper{
+    position:relative;
+}
+
+.divider{
+    border-top: 1px solid #A9A9A9;
+    margin:0;
+    padding:0;
+    transition: 5s ease-in;
+    width: 100%;
+    animation-name: lineDraw;
+    animation-duration: 1s;
+    position:absolute;
+    top:80px;
+}
+
+.menu-buttons{
+    display:inline;
+    line-height: 2.9;
+    position:absolute;
+    right:0;
+}
+
+/*edited bootstrap themes*/
+.navbar-default, .navbar-toggle{
+    background:0;
+    border:0;
+}
+
+.navbar-toggle:hover, .navbar-toggle:focus{
+    background-color:white !important;
+}
+
+.navbar-toggle{
+    margin-right:5px;
+    position: absolute;
+    right: 0px;
+    margin: 0;
+    padding: 0;
+    bottom: 25px
+}
+
+.navbar{
+    margin-bottom:0;
+}
+
+.navbar-nav>li{
+    max-width:80%;
+}
+
+.navbar-brand{
+    padding: 7px 1px;
+}
+
+.navbar-collapse{
+    border-top:0;
+}
+
+
+/*body styles*/
+#content-wrap{
+    padding-top:10px;
+    position: relative; 
+    margin-bottom:45px;
+}
+
+#crosswordWrapper{
+    display:inline-block;
+}
+
+#crossword{
+    margin-top:5px;
+    margin-bottom: 10px;
+}
+
+
+.crossBox{
+    -webkit-appearance: none;
+    outline:0;
+    display:inline-block;
+    width:45px;
+    height:45px;
+    text-align:center;
+    border:1px solid grey;
+    margin:-1px;
+}
+
+.crossFont{
+    font-family: Raleway, sans-serif;
+    font-size:28px;
+}
+
+.cross-row{
+    margin-bottom:4px;
+}
+
+
+#errorMessage{
+    display: none;
+    font-family: Raleway;
+    font-size: 14.44px;
+    font-weight:600;  
+}
+
+.myWord{
+    margin:0px 0px 22px 0px;
+    display:inline-block;
+}
+
+/*buttons and forms*/
+.btn-default{
+    border-radius:0px;
+    font-family: 'Raleway';
+    font-weight: 600;
+    border-color: #A9A9A9;
+}
+
+.myInput{
+    margin:0px 0px 8px 0px;
+    max-width:100px;
+}
+
+.flex-btn{
+    width: initial;
+}
+
+select.form-control{
+    border-radius:1px;
+    display: inline;
+}
+
+select.form-control:focus{
+    outline: none;
+    box-shadow: none;
+}
+
+
+.not-pad-left{
+    padding-left:0;
+}
+
+.rounded{
+    border: 0;
+    background: white;
+    outline:0;
+}
+
+.rounded:hover{
+    color:gray;
+}
+
+
+/*menu styles*/
+.boxes{
+    border:1px solid #A9A9A9;
+    position: absolute;
+    height: 300px;    
+    background: rgb(238,238,238);
+    top:-15px;
+    right:0;
+    display: none;
+}
+
+.box-content{
+    padding: 10px;
+    display:flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.box-content-grow{
+    flex-grow: 2;
+}
+
+.form-content{
+    padding: 51px 10px;
+}
+
+.col-bottom-right{
+    text-align:right;
+}
+
+#loginForm, #toolBox{
+    min-width: 300px;
+    max-width: 300px;
+}
+
+#aboutBox{
+    max-width: 600px;
+}
+
+.closeBox{
+    position: absolute;
+    right: 0;
+    padding: 2px;
+    color: #A9A9A9;
+    cursor: pointer;
+}
+
+.closeBox:hover{
+    color:lightblue;
+}
+
+.loginForm{
+    width:100%;
+    margin-bottom: 10px;
+}
+
+.fakeA{
+    color:#337ab7;
+    cursor: pointer;
+}
+
+.fakeA:hover,
+.fakeA:focus {
+  color: #23527c;
+  text-decoration: underline;
+}
+
+
+
+/*FONT STYLES*/
+.raleway{
+    font-family: 'Raleway';
+    font-size: 32px;
+}
+
+.poiret{
+    font-family: 'Poiret One';
+    font-size:34px;
+}
+
+.blue{
+    color:#4c66b2;
+}
+
+.font-heavy{
+    font-size: 38px;
+}
+
+.font-small{
+    font-size: 14.44px;
+    font-weight: 600;
+}
+
+.grey{
+    color:#A9A9A9;
+}
+
+
+
+
+/*media and animation*/
+@media screen and (max-width: 440px) {
+    .flex-btn {
+        width: 100%;
+        margin-bottom: 2px;
+    }
+}
+
+@media screen and (max-width: 650px) {
+    #loginForm, #toolBox {
+        min-width: initial;
+        max-width: initial;
+        width: 100%;
+        position: relative;
+    }
+    .boxes{
+        top: 0px;
+        margin-bottom: 20px;
+    }
+    #textArea{
+        height:300px;
+    }
+}
+
+@keyframes lineDraw{
+    from{ width:0% }
+    to{ width: 100% }
+}
