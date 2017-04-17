@@ -31,7 +31,7 @@ function addToColumns(rowSize){
     for (var j=1; j<rowSize; j++){
         var getRow = document.querySelector('#r-' + j);
             getRow.insertAdjacentHTML('beforeend', 
-            `<input type="text" maxlength="1" id="${rowSize}.${j}" class="crossBox crossFont" />`);
+            `<input type="text" maxlength="1" id="${j}.${rowSize}" class="crossBox crossFont" />`);
             };
 }
 
@@ -69,13 +69,36 @@ minusRows.addEventListener('click', function(){
 
 
 //adds listener to children of getCrossword
-getCrossword.addEventListener('click', getBox, false);
+initWordId = [];
+initWord =[];
+getCrossword.addEventListener('keypress', getBox, false);
 function getBox(el) {
     if (el.target !== el.currentTarget) {
         var clickedItem = el.target;
-        console.log(el.target.id);
-    }
+        clickedItem.className += ' selected';
+        id = parseFloat(el.target.id);
+        if (!initWordId.includes(id)){
+        initWordId.push(id);
+        validateCrossword(el.target.id);
+        }
+   };
     el.stopPropagation();
+}
+
+function validateCrossword(id){
+    allCells = document.querySelectorAll('.crossBox');
+    var selectedIdRef = id.split(".");
+    var col = selectedIdRef[0];
+    var row = selectedIdRef[1];
+    console.log("col=" + col, "row=" + row)
+    for(cell of allCells){
+        var loopIdRef = cell.id.split(".");
+        var loopCol = loopIdRef[0];
+        var loopRow = loopIdRef[1];
+        if (row != loopRow){
+            cell.disabled = true;
+        };//#001 fix boolean logic here
+    };
 }
 
 
