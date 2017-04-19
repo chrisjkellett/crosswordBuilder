@@ -22,7 +22,8 @@ function makeCells(rowSize){
         var getRow = document.querySelector('#r-' + i);
         gridinit = rowSize + 1;
         for (var j=1; j<rowSize + 1; j++){
-            getRow.innerHTML += `<input type="text" maxlength="1" id="${i}.${j}" class="crossBox crossFont" />`;
+            getRow.innerHTML += `<div class="cell-wrapper">
+            <input type="text" maxlength="1" id="${i}.${j}" class="crossBox crossFont" /></div>`;
             };
         };
 }
@@ -31,8 +32,9 @@ function addToColumns(rowSize){
     for (var j=1; j<rowSize; j++){
         var getRow = document.querySelector('#r-' + j);
             getRow.insertAdjacentHTML('beforeend', 
-            `<input type="text" maxlength="1" id="${j}.${rowSize}" class="crossBox crossFont" />`);
-            };
+            `<div class="cell-wrapper">
+            <input type="text" maxlength="1" id="${j}.${rowSize}" class="crossBox crossFont" /></div>`);
+        };
 }
 
 
@@ -44,9 +46,10 @@ addRows.addEventListener('click', function(){
         var addNewRow = getCrossword.insertAdjacentHTML('beforeend', `<div id="r-${rowSize}" class="crossRow"></div>`);
         makeCells(rowSize);
         addToColumns(rowSize);
+        for (var i=0; i<initWordId.length; i++){
+            validateCrossword(initWordId[i]);
+        };
     };
-    console.log('rowSize = ' + rowSize);
-    console.log('gridinit = ' + gridinit);
 });
 
 //decrease grid size
@@ -62,21 +65,22 @@ minusRows.addEventListener('click', function(){
         rowSize -= 1;
         gridinit -=1;
     };
-    
-    console.log('rowSize = ' + rowSize);
-    console.log('gridinit = ' + gridinit);
 });
 
 
 //adds listener to children of getCrossword
 initWordId = [];
-initWord =[];
-getCrossword.addEventListener('keypress', getBox, false);
+getCrossword.addEventListener('keyup', getBox, false);
 function getBox(el) {
     if (el.target !== el.currentTarget) {
         var clickedItem = el.target;
-        clickedItem.className += ' selected';
-        id = parseFloat(el.target.id);
+        if (!clickedItem.className.includes('selected')){
+            clickedItem.className += ' selected';
+        };
+        if(clickedItem.value == '' && clickedItem.className.includes('selected')){
+            clickedItem.classList.remove('selected'); 
+        };
+        id = el.target.id;
         if (!initWordId.includes(id)){
         initWordId.push(id);
         validateCrossword(el.target.id);
@@ -86,18 +90,18 @@ function getBox(el) {
 }
 
 function validateCrossword(id){
-    allCells = document.querySelectorAll('.crossBox');
     var selectedIdRef = id.split(".");
     var col = selectedIdRef[0];
     var row = selectedIdRef[1];
-    console.log("col=" + col, "row=" + row)
+    console.log(col, row);
+    var allCells = document.querySelectorAll('.crossBox');
     for(cell of allCells){
         var loopIdRef = cell.id.split(".");
         var loopCol = loopIdRef[0];
         var loopRow = loopIdRef[1];
-        if (row != loopRow){
+        if (!(row == loopRow || col == loopCol)){
             cell.disabled = true;
-        };//#001 fix boolean logic here
+        };
     };
 }
 

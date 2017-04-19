@@ -113,12 +113,10 @@ header{
 .crossBox{
     -webkit-appearance: none;
     outline:0;
-    display:inline-block;
-    width:45px;
-    height:45px;
+    max-width:45px;
+    max-height:45px;
     text-align:center;
-    border:1px solid grey;
-    margin:-1px;
+    border:0;
 }
 
 .crossFont{
@@ -129,6 +127,13 @@ header{
 .cross-row{
     margin-bottom:4px;
 }
+
+.cell-wrapper{
+    display:inline-block;
+    border: 1px solid grey;
+    margin:-1px;
+}
+
 
 
 #errorMessage{
