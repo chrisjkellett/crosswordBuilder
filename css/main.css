@@ -163,6 +163,7 @@ header{
 
 .flex-btn{
     width: initial;
+    margin-bottom:5px;
 }
 
 select.form-control{
