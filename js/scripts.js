@@ -1,7 +1,6 @@
 var getCrossword = document.querySelector('#crossword');
 var getBoxes = document.querySelectorAll('.crossBox');
 var reduceRows = document.querySelector('#rowMinus');
-var listBox = [];
 let rowSize = 6;
 let gridinit = 1;
 const maxSize = 10;
@@ -69,7 +68,7 @@ minusRows.addEventListener('click', function(){
 
 
 //adds listener to children of getCrossword
-initWordId = [];
+var initWordId = [];
 getCrossword.addEventListener('keyup', getBox, false);
 function getBox(el) {
     if (el.target !== el.currentTarget) {
@@ -81,19 +80,28 @@ function getBox(el) {
             clickedItem.classList.remove('selected'); 
         };
         id = el.target.id;
-        if (!initWordId.includes(id)){
+        if (!initWordId.includes(id) && el.target.className.includes('selected')){
         initWordId.push(id);
         validateCrossword(el.target.id);
         }
    };
     el.stopPropagation();
+    for (let id of initWordId){
+        var el = document.getElementById(id);
+        if (!el.className.includes('selected')){
+            initWordId.pop(id);
+            };
+        };
+    initWordId.sort();
+    console.log(initWordId);
 }
+
+
 
 function validateCrossword(id){
     var selectedIdRef = id.split(".");
     var col = selectedIdRef[0];
     var row = selectedIdRef[1];
-    console.log(col, row);
     var allCells = document.querySelectorAll('.crossBox');
     for(cell of allCells){
         var loopIdRef = cell.id.split(".");
@@ -106,12 +114,50 @@ function validateCrossword(id){
 }
 
 
-//adds box ids to list
-for (box of getBoxes){
-    boxId = parseFloat(box.id);
-    if (boxId){
-        listBox.push(boxId);
-    }; 
+//4a. add word button listener
+var addWordBtn = document.querySelector('#addWord');
+addWordBtn.addEventListener('click', function(){
+    validateWord(initWordId);
+});
+
+//4b. save word if 4bi and 4bii return true
+function validateWord(ids){
+    if(!word_length(ids) && validateWord_gaps(ids)){
+        console.log("passed validation");
+    };
+}
+
+//4bi. check word length and return false if too short
+function word_length(ids){
+    if (ids.length < 2){
+        console.log("too short");
+    }
 };
+
+
+//4bii. make sure there are no gaps in words and return false if there is
+function validateWord_gaps(ids){
+    var col_list = [];
+    var row_list = [];
+    for (id of ids){
+        var splitId = id.split(".");
+        col_list.push(parseInt(splitId[0]));
+        row_list.push(parseInt(splitId[1]));
+    };
+    console.log("column:" + col_list + ", row: " + row_list);
+    for (var i=col_list.length - 1; i > 0; i--){
+        var j = i - 1;
+        if (col_list[i] - col_list[j] > 1){
+            console.log("failed validation as col_list greater than 1");
+        }else if (row_list[i] - row_list[j] > 1){
+            console.log("failed validation as row_list greater than 1");
+        }else if (col_list[i] - col_list[j] == 0){
+            console.log("set up clue for row");
+        }else if (row_list[i] - row_list[j] == 0){
+            console.log("set up clue for col");
+        };
+    };
+}
+
 
 
