@@ -100,6 +100,7 @@ function getBox(el) {
 
 function validateCrossword(id){
     var selectedIdRef = id.split(".");
+    console.log(selectedIdRef);
     var col = selectedIdRef[0];
     var row = selectedIdRef[1];
     var allCells = document.querySelectorAll('.crossBox');
@@ -117,21 +118,22 @@ function validateCrossword(id){
 //4a. add word button listener
 var addWordBtn = document.querySelector('#addWord');
 addWordBtn.addEventListener('click', function(){
-    validateWord(initWordId);
+    word_length(initWordId);
+    if (len_test){
+        console.log('passed length test');
+    }else{
+        console.log('failed length test');
+    };
 });
 
-//4b. save word if 4bi and 4bii return true
-function validateWord(ids){
-    if(!word_length(ids) && validateWord_gaps(ids)){
-        console.log("passed validation");
-    };
-}
 
 //4bi. check word length and return false if too short
 function word_length(ids){
     if (ids.length < 2){
-        console.log("too short");
-    }
+        len_test = false;
+    }else{
+        len_test = true;
+    };
 };
 
 
