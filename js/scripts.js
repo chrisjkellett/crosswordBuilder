@@ -82,8 +82,8 @@ function getBox(el) {
         id = el.target.id;
         if (!initWordId.includes(id) && el.target.className.includes('selected')){
         initWordId.push(id);
-        validateCrossword(el.target.id);
-        }
+        validateCrossword(initWordId);
+        };
    };
     el.stopPropagation();
     for (let id of initWordId){
@@ -94,70 +94,75 @@ function getBox(el) {
         };
     initWordId.sort();
     console.log(initWordId);
+    word_length(initWordId);
+    check_gaps(initWordId);
+    
 }
 
 
 
-function validateCrossword(id){
-    var selectedIdRef = id.split(".");
-    console.log(selectedIdRef);
-    var col = selectedIdRef[0];
-    var row = selectedIdRef[1];
+function validateCrossword(ids){
     var allCells = document.querySelectorAll('.crossBox');
-    for(cell of allCells){
-        var loopIdRef = cell.id.split(".");
-        var loopCol = loopIdRef[0];
-        var loopRow = loopIdRef[1];
-        if (!(row == loopRow || col == loopCol)){
-            cell.disabled = true;
+    for (id of ids){
+        var selectedIdRef = id.split(".");
+        var col = selectedIdRef[0];
+        var row = selectedIdRef[1];
+        for(cell of allCells){
+            var loopIdRef = cell.id.split(".");
+            var loopCol = loopIdRef[0];
+            var loopRow = loopIdRef[1];
+            if (!(row == loopRow || col == loopCol)){
+                cell.disabled = true;
+            };
         };
     };
 }
 
 
+
 //4a. add word button listener
 var addWordBtn = document.querySelector('#addWord');
 addWordBtn.addEventListener('click', function(){
-    word_length(initWordId);
-    if (len_test){
-        console.log('passed length test');
-    }else{
-        console.log('failed length test');
-    };
+    //save word
 });
 
 
 //4bi. check word length and return false if too short
 function word_length(ids){
     if (ids.length < 2){
-        len_test = false;
+        addWordBtn.disabled = true;
     }else{
-        len_test = true;
+        addWordBtn.disabled = false;
     };
 };
 
 
 //4bii. make sure there are no gaps in words and return false if there is
-function validateWord_gaps(ids){
-    var col_list = [];
-    var row_list = [];
+function check_gaps(ids){
+    let col_list = [];
+    let row_list = [];
+    let fail;
     for (id of ids){
-        var splitId = id.split(".");
+        let splitId = id.split(".");
         col_list.push(parseInt(splitId[0]));
         row_list.push(parseInt(splitId[1]));
     };
-    console.log("column:" + col_list + ", row: " + row_list);
-    for (var i=col_list.length - 1; i > 0; i--){
-        var j = i - 1;
+    for (let i=col_list.length - 1; i > 0; i--){
+        let j = i - 1;
         if (col_list[i] - col_list[j] > 1){
             console.log("failed validation as col_list greater than 1");
+            fail = true;
         }else if (row_list[i] - row_list[j] > 1){
             console.log("failed validation as row_list greater than 1");
+            fail = true;
         }else if (col_list[i] - col_list[j] == 0){
             console.log("set up clue for row");
         }else if (row_list[i] - row_list[j] == 0){
             console.log("set up clue for col");
         };
+    };
+    if(fail){
+        addWordBtn.disabled = true;
     };
 }
 
