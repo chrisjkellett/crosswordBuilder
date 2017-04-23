@@ -1,8 +1,9 @@
 var getCrossword = document.querySelector('#crossword');
-var getBoxes = document.querySelectorAll('.crossBox');
 var reduceRows = document.querySelector('#rowMinus');
 let rowSize = 6;
 let gridinit = 1;
+let orientation;
+let counter = 0;
 const maxSize = 10;
 const minSize = 4;
 
@@ -14,6 +15,7 @@ function generateGrid(rowSize){
         makeCells(rowSize);
     };
 generateGrid(rowSize);
+var allCells = document.querySelectorAll('.crossBox');
 
 
 function makeCells(rowSize){
@@ -82,7 +84,7 @@ function getBox(el) {
         id = el.target.id;
         if (!initWordId.includes(id) && el.target.className.includes('selected')){
         initWordId.push(id);
-        validateCrossword(initWordId);
+        validateCrossword(id);
         };
    };
     el.stopPropagation();
@@ -93,27 +95,31 @@ function getBox(el) {
             };
         };
     initWordId.sort();
-    console.log(initWordId);
     word_length(initWordId);
     check_gaps(initWordId);
-    
+    if(initWordId.length <= 1){
+        let getCells = document.querySelectorAll('.crossBox');
+        for (cell of getCells){
+            cell.disabled = false;
+        };
+        if (initWordId.length == 1){
+        validateCrossword(initWordId[0]);
+        };
+    };   
 }
 
 
 
-function validateCrossword(ids){
-    var allCells = document.querySelectorAll('.crossBox');
-    for (id of ids){
-        var selectedIdRef = id.split(".");
-        var col = selectedIdRef[0];
-        var row = selectedIdRef[1];
-        for(cell of allCells){
-            var loopIdRef = cell.id.split(".");
-            var loopCol = loopIdRef[0];
-            var loopRow = loopIdRef[1];
-            if (!(row == loopRow || col == loopCol)){
-                cell.disabled = true;
-            };
+function validateCrossword(id){
+    var selectedIdRef = id.split(".");
+    var col = selectedIdRef[0];
+    var row = selectedIdRef[1];
+    for(cell of allCells){
+        var loopIdRef = cell.id.split(".");
+        var loopCol = loopIdRef[0];
+        var loopRow = loopIdRef[1];
+        if (!(row == loopRow || col == loopCol)){
+            cell.disabled = true;
         };
     };
 }
@@ -123,7 +129,25 @@ function validateCrossword(ids){
 //4a. add word button listener
 var addWordBtn = document.querySelector('#addWord');
 addWordBtn.addEventListener('click', function(){
-    //save word
+    let getLetters = document.querySelectorAll('.selected');
+    let clue = '';
+    for (let cell of allCells){
+            cell.disabled = true;
+        };
+    for (let letter of getLetters){
+        clue += letter.value;
+        letter.style.background = 'white';  
+    };
+    addWordBtn.disabled = true;
+    let cluebox = document.querySelector('.cluebox');
+    let insertClue = document.querySelector('#insertClue');
+    insertClue.textContent = clue;
+    counter += 1;
+    let insertLocation = document.querySelector('#insertLocation');
+    insertLocation.textContent = counter + " " + orientation;
+    cluebox.style.display = 'block';
+    makeClue(clue);
+    
 });
 
 
@@ -141,7 +165,7 @@ function word_length(ids){
 function check_gaps(ids){
     let col_list = [];
     let row_list = [];
-    let fail;
+    let fail, row, column;
     for (id of ids){
         let splitId = id.split(".");
         col_list.push(parseInt(splitId[0]));
@@ -150,21 +174,30 @@ function check_gaps(ids){
     for (let i=col_list.length - 1; i > 0; i--){
         let j = i - 1;
         if (col_list[i] - col_list[j] > 1){
-            console.log("failed validation as col_list greater than 1");
             fail = true;
         }else if (row_list[i] - row_list[j] > 1){
-            console.log("failed validation as row_list greater than 1");
             fail = true;
         }else if (col_list[i] - col_list[j] == 0){
-            console.log("set up clue for row");
+            row = true;
         }else if (row_list[i] - row_list[j] == 0){
-            console.log("set up clue for col");
+            column = true;
         };
     };
     if(fail){
         addWordBtn.disabled = true;
+    }else if(row){
+        orientation = 'across';
+    }else if(column){
+        orientation = 'down';
     };
+
 }
+//5a. make clue
+function makeClue(clue){
+    console.log(clue);
+}
+
+
 
 
 
