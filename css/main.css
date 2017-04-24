@@ -150,6 +150,16 @@ header{
     display:none;
 }
 
+.savedWord{
+    -webkit-appearance: none;
+    outline:0;
+    max-width:45px;
+    max-height:45px;
+    text-align:center;
+    border:0;
+    background: coral;
+}
+
 
 #errorMessage{
     display: none;

@@ -5,6 +5,7 @@ let rowSize = 6;
 let gridinit = 1;
 let orientation;
 let counter = 0;
+let answers = [];
 const maxSize = 10;
 const minSize = 4;
 
@@ -139,7 +140,7 @@ addWordBtn.addEventListener('click', function(){
         };
     for (let letter of getLetters){
         clue += letter.value.toLowerCase();
-        letter.style.background = 'white';  
+        letter.style.background = 'palegoldenrod';  
     };
     addWordBtn.disabled = true;
     let insertClue = document.querySelector('#insertClue');
@@ -148,8 +149,7 @@ addWordBtn.addEventListener('click', function(){
     let insertLocation = document.querySelector('#insertLocation');
     insertLocation.textContent = counter + " " + orientation;
     cluebox.style.display = 'block';
-    makeClue(clue);
-    
+    answers.push(clue);
 });
 
 
@@ -194,19 +194,17 @@ function check_gaps(ids){
     };
 
 }
-//5a. make clue
-function makeClue(clue){
-    console.log(clue);
-}
 
-//5b. confirm clue
+
+//5a. confirm clue
 let confirmClueBtn = document.querySelector('#confirmClue');
 confirmClueBtn.addEventListener('click', function(){  
     let initLetterId = document.getElementById(initWordId[0]);
     for (let letter of initWordId){
-        let getCell = document.getElementById(letter)
-        getCell.classList += ` savedWord ${counter}-${orientation}`
+        let getCell = document.getElementById(letter);
+        getCell.classList += ` savedWord ${counter}-${orientation}`;
         getCell.classList.remove('selected');
+        getCell.classList.remove('crossBox');
     };
     initLetterId.insertAdjacentHTML('beforeBegin', 
             `<div class="number-wrapper">${counter}</div>`);
@@ -220,9 +218,21 @@ confirmClueBtn.addEventListener('click', function(){
     getClueList.insertAdjacentHTML('afterEnd', 
             `<p>${counter}: ${getFormInput}</p>`);
     console.log(getFormInput);
+    resetGrid();
 });
 
-//5c. cancel clue
+
+//5b.reset grid
+function resetGrid(){
+    //validateWithClues(initWordId);
+    initWordId = [];
+    let getCells = document.querySelectorAll('.crossBox');
+        for (cell of getCells){
+            cell.disabled = false;
+        };
+}
+
+//5b. cancel clue
 let cancelClueBtn = document.querySelector('#cancelClue');
 cancelClueBtn.addEventListener('click', function(){  
     cluebox.style.display = 'none';
