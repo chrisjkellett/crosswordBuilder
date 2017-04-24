@@ -1,5 +1,6 @@
 var getCrossword = document.querySelector('#crossword');
 var reduceRows = document.querySelector('#rowMinus');
+let cluebox = document.querySelector('.cluebox');
 let rowSize = 6;
 let gridinit = 1;
 let orientation;
@@ -47,6 +48,7 @@ addRows.addEventListener('click', function(){
         var addNewRow = getCrossword.insertAdjacentHTML('beforeend', `<div id="r-${rowSize}" class="crossRow"></div>`);
         makeCells(rowSize);
         addToColumns(rowSize);
+        allCells = document.querySelectorAll('.crossBox');
         for (var i=0; i<initWordId.length; i++){
             validateCrossword(initWordId[i]);
         };
@@ -63,6 +65,7 @@ minusRows.addEventListener('click', function(){
             var row = document.querySelector('#r-' + j);
             row.lastElementChild.remove();
         };
+        allCells = document.querySelectorAll('.crossBox');
         rowSize -= 1;
         gridinit -=1;
     };
@@ -135,11 +138,10 @@ addWordBtn.addEventListener('click', function(){
             cell.disabled = true;
         };
     for (let letter of getLetters){
-        clue += letter.value;
+        clue += letter.value.toLowerCase();
         letter.style.background = 'white';  
     };
     addWordBtn.disabled = true;
-    let cluebox = document.querySelector('.cluebox');
     let insertClue = document.querySelector('#insertClue');
     insertClue.textContent = clue;
     counter += 1;
@@ -196,6 +198,16 @@ function check_gaps(ids){
 function makeClue(clue){
     console.log(clue);
 }
+
+//5b. confirm clue
+
+//5c. cancel clue
+let cancelClueBtn = document.querySelector('#cancelClue');;
+cancelClueBtn.addEventListener('click', function(){  
+    cluebox.style.display = 'none';
+    insertClue = '';
+    insertLocation ='';
+});
 
 
 

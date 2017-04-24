@@ -109,6 +109,10 @@ header{
     margin-bottom: 10px;
 }
 
+.crossRow{
+    display:flex;
+}
+
 
 .crossBox{
     -webkit-appearance: none;
@@ -122,6 +126,7 @@ header{
 .crossFont{
     font-family: Raleway, sans-serif;
     font-size:28px;
+    text-transform: lowercase;
 }
 
 .cross-row{
@@ -133,7 +138,6 @@ header{
     border: 1px solid grey;
     margin:-1px;
 }
-
 
 
 #errorMessage{
@@ -175,7 +179,6 @@ select.form-control:focus{
     outline: none;
     box-shadow: none;
 }
-
 
 .not-pad-left{
     padding-left:0;
