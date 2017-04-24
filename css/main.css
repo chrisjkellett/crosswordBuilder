@@ -137,6 +137,17 @@ header{
     display:inline-block;
     border: 1px solid grey;
     margin:-1px;
+    position:relative;
+}
+
+.number-wrapper{
+    position:absolute;
+    left: 2px;
+    line-height:18px;
+}
+
+#clueList{
+    display:none;
 }
 
 

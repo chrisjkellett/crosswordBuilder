@@ -200,9 +200,30 @@ function makeClue(clue){
 }
 
 //5b. confirm clue
+let confirmClueBtn = document.querySelector('#confirmClue');
+confirmClueBtn.addEventListener('click', function(){  
+    let initLetterId = document.getElementById(initWordId[0]);
+    for (let letter of initWordId){
+        let getCell = document.getElementById(letter)
+        getCell.classList += ` savedWord ${counter}-${orientation}`
+        getCell.classList.remove('selected');
+    };
+    initLetterId.insertAdjacentHTML('beforeBegin', 
+            `<div class="number-wrapper">${counter}</div>`);
+    let getClueList = document.getElementById(`${orientation}`);
+    let getFormInput = document.getElementById('clueEntry').value;
+    cluebox.style.display = 'none';
+    if (counter == 1){
+        let clueListBlock = document.querySelector('#clueList');
+        clueListBlock.style.display = 'block';
+    };
+    getClueList.insertAdjacentHTML('afterEnd', 
+            `<p>${counter}: ${getFormInput}</p>`);
+    console.log(getFormInput);
+});
 
 //5c. cancel clue
-let cancelClueBtn = document.querySelector('#cancelClue');;
+let cancelClueBtn = document.querySelector('#cancelClue');
 cancelClueBtn.addEventListener('click', function(){  
     cluebox.style.display = 'none';
     insertClue = '';
