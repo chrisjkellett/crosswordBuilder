@@ -73,6 +73,18 @@ minusRows.addEventListener('click', function(){
 });
 
 
+function validateLoop(initWordId){
+if(initWordId.length <= 1){
+        let getCells = document.querySelectorAll('.crossBox');
+        for (cell of getCells){
+            cell.disabled = false;
+        };
+        if (initWordId.length == 1){
+        validateCrossword(initWordId[0]);
+        };
+    };
+}
+
 //adds listener to children of getCrossword
 var initWordId = [];
 getCrossword.addEventListener('keyup', getBox, false);
@@ -86,7 +98,7 @@ function getBox(el) {
             clickedItem.classList.remove('selected'); 
         };
         id = el.target.id;
-        if (!initWordId.includes(id) && el.target.className.includes('selected')){
+        if (!initWordId.includes(id) && el.target.className.includes('selected')){7
         initWordId.push(id);
         validateCrossword(id);
         };
@@ -101,17 +113,23 @@ function getBox(el) {
     initWordId.sort();
     word_length(initWordId);
     check_gaps(initWordId);
-    if(initWordId.length <= 1){
-        let getCells = document.querySelectorAll('.crossBox');
-        for (cell of getCells){
-            cell.disabled = false;
-        };
-        if (initWordId.length == 1){
-        validateCrossword(initWordId[0]);
-        };
-    };   
+    validateLoop(initWordId);
 }
 
+getCrossword.addEventListener('click', getSavedBox, false);
+function getSavedBox(el) {
+    let clickedItem = el.target;
+    let id = el.target.id;
+    if (clickedItem.className.includes('savedWord') && !(clickedItem.className.includes('selected')) && initWordId.length == 0){
+        clickedItem.className += ' selected';
+        initWordId.push(id);
+    }else if(clickedItem.className.includes('selected')){
+        clickedItem.classList.remove('selected');
+        initWordId.pop(id);
+        };
+    el.stopPropagation();
+    validateLoop(initWordId);
+    }
 
 
 function validateCrossword(id){
@@ -140,7 +158,7 @@ addWordBtn.addEventListener('click', function(){
         };
     for (let letter of getLetters){
         clue += letter.value.toLowerCase();
-        letter.style.background = 'palegoldenrod';  
+        letter.style.background = 'white';  
     };
     addWordBtn.disabled = true;
     let insertClue = document.querySelector('#insertClue');
@@ -217,7 +235,6 @@ confirmClueBtn.addEventListener('click', function(){
     };
     getClueList.insertAdjacentHTML('afterEnd', 
             `<p>${counter}: ${getFormInput}</p>`);
-    console.log(getFormInput);
     resetGrid();
 });
 

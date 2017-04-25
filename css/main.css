@@ -157,7 +157,7 @@ header{
     max-height:45px;
     text-align:center;
     border:0;
-    background: coral;
+    cursor: pointer !important;
 }
 
 
@@ -218,6 +218,14 @@ select.form-control:focus{
 #clueEntry{
     margin-bottom:5px;
     width:100%;
+}
+
+input[disabled]{
+    background: #505050;
+}
+
+.selected{
+    background: #ffff99 !important;
 }
 
 
