@@ -163,7 +163,9 @@ addWordBtn.addEventListener('click', function(){
     addWordBtn.disabled = true;
     let insertClue = document.querySelector('#insertClue');
     insertClue.textContent = clue;
-    counter += 1;
+    if (!document.getElementById(initWordId[0]).previousElementSibling){
+        counter += 1;
+    };
     let insertLocation = document.querySelector('#insertLocation');
     insertLocation.textContent = counter + " " + orientation;
     cluebox.style.display = 'block';
