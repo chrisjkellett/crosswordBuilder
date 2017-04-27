@@ -135,7 +135,6 @@ function getSavedBox(el) {
 
 
 function validateCrossword(id){
-    let deadCells = document.querySelectorAll('.deadCell');
     let selectedIdRef = id.split(".");
     let col = selectedIdRef[0];
     let row = selectedIdRef[1];
@@ -143,7 +142,7 @@ function validateCrossword(id){
         let loopIdRef = cell.id.split(".");
         let loopCol = loopIdRef[0];
         let loopRow = loopIdRef[1];
-        if (!(row == loopRow || col == loopCol)){
+        if (!(row == loopRow || col == loopCol) || cell.className.includes('dead')){
             cell.disabled = true;
         };
     };
@@ -193,12 +192,12 @@ function check_gaps(ids){
 
 //F.reset grid
 function resetGrid(){
-    //validateWithClues(initWordId);
-    initWordId = [];
+    //i. enable all cells except savedWord
     let getCells = document.querySelectorAll('.crossBox');
         for (cell of getCells){
             cell.disabled = false;
         };
+    initWordId = [];
 }
 
 
@@ -255,6 +254,21 @@ confirmClueBtn.addEventListener('click', function(){
         getCell.classList.remove('selected');
         getCell.classList.remove('crossBox');
     };
+
+    //ia. remove crossBox for deadCells
+    let x = initWordId.length;
+    let lastCell = document.getElementById(initWordId[x - 1]);
+    if(orientation == 'across' && x != rowSize){
+        let row = initWordId[0][0];
+        let lastCellId = row + "." + rowSize;
+        let checkLastCell = document.getElementById(lastCellId);
+        if (checkLastCell.value == ""){
+            let deadCell = lastCell.parentElement.nextElementSibling.firstElementChild;
+            deadCell.classList.remove('crossBox');
+            deadCell.classList += ' deadCell';
+        };
+    };
+
     //ii. adds number to firstLetter
     initLetterId.insertAdjacentHTML('beforeBegin', 
             `<div class="number-wrapper">${counter}</div>`);
