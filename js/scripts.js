@@ -216,9 +216,10 @@ function check_gaps(ids){
 }
 
 
-//5a. confirm clue
+//5a. confirm clue and add to clueList
 let confirmClueBtn = document.querySelector('#confirmClue');
-confirmClueBtn.addEventListener('click', function(){  
+confirmClueBtn.addEventListener('click', function(){
+    //5ai. adds and removes classe  
     let initLetterId = document.getElementById(initWordId[0]);
     for (let letter of initWordId){
         let getCell = document.getElementById(letter);
@@ -226,8 +227,11 @@ confirmClueBtn.addEventListener('click', function(){
         getCell.classList.remove('selected');
         getCell.classList.remove('crossBox');
     };
+    //5aii. adds number to firstLetter
     initLetterId.insertAdjacentHTML('beforeBegin', 
             `<div class="number-wrapper">${counter}</div>`);
+
+    //5aiii. adds clues to clueList
     let getClueList = document.getElementById(`${orientation}`);
     const getInput = document.getElementById('clueEntry');
     let getInputVal = getInput.value;
@@ -237,8 +241,13 @@ confirmClueBtn.addEventListener('click', function(){
         let clueListBlock = document.querySelector('#clueList');
         clueListBlock.style.display = 'block';
     };
-    getClueList.insertAdjacentHTML('afterEnd', 
-            `<p>${counter}: ${getInputVal}</p>`);
+    el = document.createElement('p');
+    el.className = 'font-clue';
+    el.textContent = `${counter}. ${getInputVal}`;
+    console.log(el);
+    getClueList.appendChild(el);
+
+    //5aiv. resets grid for next clue
     resetGrid();
 });
 
