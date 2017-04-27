@@ -100,9 +100,6 @@ header{
     margin-bottom:45px;
 }
 
-#crosswordWrapper{
-    display:inline-block;
-}
 
 #crossword{
     margin-top:5px;
@@ -147,7 +144,7 @@ header{
 }
 
 #clueList{
-    display:none;
+    display:block;
 }
 
 .savedWord{

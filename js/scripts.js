@@ -229,14 +229,16 @@ confirmClueBtn.addEventListener('click', function(){
     initLetterId.insertAdjacentHTML('beforeBegin', 
             `<div class="number-wrapper">${counter}</div>`);
     let getClueList = document.getElementById(`${orientation}`);
-    let getFormInput = document.getElementById('clueEntry').value;
+    const getInput = document.getElementById('clueEntry');
+    let getInputVal = getInput.value;
     cluebox.style.display = 'none';
+    getInput.value = '';    
     if (counter == 1){
         let clueListBlock = document.querySelector('#clueList');
         clueListBlock.style.display = 'block';
     };
     getClueList.insertAdjacentHTML('afterEnd', 
-            `<p>${counter}: ${getFormInput}</p>`);
+            `<p>${counter}: ${getInputVal}</p>`);
     resetGrid();
 });
 
