@@ -268,13 +268,17 @@ confirmClueBtn.addEventListener('click', function(){
             let deadCell = lastCell.parentElement.nextElementSibling.firstElementChild;
             deadCell.classList.remove('crossBox');
             deadCell.classList += ' deadCell';
+        }else{
+            invalids.push(deadCell.id);
         };
 
-        let firstCellId = row + "." + 1;
-        let firstCell = document.getElementById(firstCellId);
-        if (firstCell.value == ""){
-            firstCell.classList.remove('crossBox');
-            firstCell.classList += ' deadCell';
+        let col = initWordId[0][2];
+        let precedingCellId = row + "." + (col - 1);
+        console.log(precedingCellId);
+        let precedingCell = document.getElementById(precedingCellId);
+        if (precedingCell.value == ""){
+            precedingCell.classList.remove('crossBox');
+            precedingCell.classList += ' deadCell';
         };
     };
 
@@ -308,30 +312,113 @@ confirmClueBtn.addEventListener('click', function(){
     allIds.sort();
     };
     
+    function id1(x){
+        let id1 = (x[0] - 1) + "." + (x[1] - 1);
+        let id1_s = id1.toString();
+        if (!id1_s.includes(0) && id1 < rowSize){
+            let deadCell = document.getElementById(id1);
+            deadCell.classList.remove('crossBox');
+            deadCell.classList += ' deadCell';
+        }else if (!id1_s.includes(0) && id1 > rowSize){
+            if(!invalids.includes(id1)){
+                invalids.push[id1];
+            };
+            console.log(invalids);
+        }else{
+            console.log(id1 + ' is invalid as contains 0');
+            };
+        }
+
+    function id2(x){
+        let id2 = (x[0] - 1) + "." + (parseInt(x[1]) + 1);
+        let id2_s = id2.toString();
+        if (!id2_s.includes(0) && id2 < rowSize){
+            let deadCell = document.getElementById(id2);
+            deadCell.classList.remove('crossBox');
+            deadCell.classList += ' deadCell';
+        }else if (!id2_s.includes(0) && id2 > rowSize){
+            if(!invalids.includes(id2)){
+                invalids.push[id2];
+            };
+            console.log(invalids);
+        }else{
+            console.log(id2 + ' is invalid as contains 0');
+            };
+        }
+
+    function id3(x){
+        let id3 = (parseInt(x[0]) + 1) + "." + (x[1] - 1);
+        let id3_s = id3.toString();
+        if (!id3_s.includes(0) && id3 < rowSize){
+            let deadCell = document.getElementById(id3);
+            deadCell.classList.remove('crossBox');
+            deadCell.classList += ' deadCell';
+        }else if (!id3_s.includes(0) && id3 > rowSize){
+            if(!invalids.includes(id3)){
+                invalids.push[id3];
+            };
+            console.log(invalids);
+        }else{
+            console.log(id3 + ' is invalid as contains 0');
+            };
+        }
+
+    function id4(x){
+        let id4 = (parseInt(x[0]) + 1) + "." + (parseInt(x[1]) + 1);
+        let id4_s = id4.toString();
+        if (!id4_s.includes(0) && id4 < rowSize){
+            let deadCell = document.getElementById(id4);
+            deadCell.classList.remove('crossBox');
+            deadCell.classList += ' deadCell';
+        }else if (!id4_s.includes(0) && id4 > rowSize){
+            if(!invalids.includes(id4)){
+                invalids.push[id4];
+            };
+            console.log(invalids);
+        }else{
+            console.log(id2 + ' is invalid as contains 0');
+            };
+        }
+
     if(crossPoints.length > 0){
         for (let i = 0; i < crossPoints.length; i++){
-            if(!crossPoints[i].includes('t')){
-                let x1 = crossPoints[i].split(".");
-                let id1 = (x1[0] - 1) + "." + (x1[1]-1);
-                let id1_s = id1.toString();
-                if (!id1_s.includes(0) && id1 < rowSize){
-                    let deadCell = document.getElementById(id1);
-                    deadCell.classList.remove('crossBox');
-                    deadCell.classList += ' deadCell';
-                }else if (!id1_s.includes(0) && id1 > rowSize){
-                    if(!invalids.includes(id1)){
-                        invalids.push[id1];
-                    };
-                    console.log(invalids);
+            let x = crossPoints[i].split(".");
+            if(orientation == 'down'){
+                if(crossPoints[i].includes('b')){
+                    console.log('model 1');
+                    id1(x);
+                    id2(x);
+                }else if(crossPoints[i].includes('t')){
+                    console.log('model 2');
+                    id3(x);
+                    id4(x);
                 }else{
-                    console.log(id1 + ' is invalid as contains 0');
-                    };
-            }else{
-                console.log('Not run as id contains t');
+                    console.log('model 5a');
+                    id1(x);
+                    id2(x);
+                    id3(x);
+                    id4(x);
+                };
             };
-        };
-    };
-
+            if(orientation == 'across'){
+                if(crossPoints[i].includes('b')){
+                    console.log('model 3');
+                    id1(x);
+                    id3(x);
+                }else if(crossPoints[i].includes('t')){
+                    console.log('model 4');
+                    id2(x);
+                    id4(x);
+                }else{
+                    console.log('model 5a');
+                    id1(x);
+                    id2(x);
+                    id3(x);
+                    id4(x);
+                        };
+                    };
+                };
+            };
 
     //ii. adds number to firstLetter
     initLetterId.insertAdjacentHTML('beforeBegin', 
