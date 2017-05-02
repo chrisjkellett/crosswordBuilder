@@ -2,6 +2,9 @@ const getCrossword = document.querySelector('#crossword');
 const reduceRows = document.querySelector('#rowMinus');
 const cluebox = document.querySelector('.cluebox');
 const answers = [];
+const allIds = [];
+const crossPoints = [];
+const invalids = [];
 const maxSize = 10;
 const minSize = 4;
 let rowSize = 6;
@@ -89,22 +92,22 @@ if(initWordId.length <= 1){
 //adds listener to children of getCrossword
 let initWordId = [];
 getCrossword.addEventListener('keyup', getBox, false);
-function getBox(el) {
-    if (el.target !== el.currentTarget) {
-        let clickedItem = el.target;
+function getBox(event) {
+    if (event.target !== event.currentTarget) {
+        let clickedItem = event.target;
         if (!clickedItem.className.includes('selected')){
             clickedItem.className += ' selected';
         };
         if(clickedItem.value == '' && clickedItem.className.includes('selected')){
             clickedItem.classList.remove('selected'); 
         };
-        id = el.target.id;
-        if (!initWordId.includes(id) && el.target.className.includes('selected')){
+        let id = event.target.id;
+        if (!initWordId.includes(id) && event.target.className.includes('selected')){
         initWordId.push(id);
         validateCrossword(id);
         };
    };
-    el.stopPropagation();
+    event.stopPropagation();
     for (let id of initWordId){
         let el = document.getElementById(id);
         if (!el.className.includes('selected')){
@@ -115,7 +118,6 @@ function getBox(el) {
     word_length(initWordId);
     check_gaps(initWordId);
     validateLoop(initWordId);
-    //validatedeadCells
 }
 
 getCrossword.addEventListener('click', getSavedBox, false);
@@ -255,7 +257,7 @@ confirmClueBtn.addEventListener('click', function(){
         getCell.classList.remove('crossBox');
     };
 
-    //ia. remove crossBox for deadCells
+    //ia - 1. remove crossBox for deadCells
     let x = initWordId.length;
     let lastCell = document.getElementById(initWordId[x - 1]);
     if(orientation == 'across' && x != rowSize){
@@ -267,7 +269,69 @@ confirmClueBtn.addEventListener('click', function(){
             deadCell.classList.remove('crossBox');
             deadCell.classList += ' deadCell';
         };
+
+        let firstCellId = row + "." + 1;
+        let firstCell = document.getElementById(firstCellId);
+        if (firstCell.value == ""){
+            firstCell.classList.remove('crossBox');
+            firstCell.classList += ' deadCell';
+        };
     };
+
+    //ia - 2. vertical validation for deadCells //#001 fix
+     if(orientation == 'down' && x != rowSize){
+        let col = initWordId[0][2];
+        let lastCellId = rowSize + "." + col;
+        let checkLastCell = document.getElementById(lastCellId);
+        if (checkLastCell.value == ""){
+            let deadCellId = (initWordId.length + 1) + '.' + col;
+            let deadCell = document.getElementById(deadCellId);
+            deadCell.classList.remove('crossBox');
+            deadCell.classList += ' deadCell';
+        };
+     };
+        
+
+    //ia - 3. crossPoint validation for deadCells
+    for (id of initWordId){
+        if(!allIds.includes(id)){
+        allIds.push(id);
+    }else{
+        if(id == initWordId[0]){
+            crossPoints.push(id + '.t');
+        }else if(id == initWordId[initWordId.length - 1]){
+            crossPoints.push(id + '.b');
+        }else{
+            crossPoints.push(id);
+            };
+        };
+    allIds.sort();
+    };
+    
+    if(crossPoints.length > 0){
+        for (let i = 0; i < crossPoints.length; i++){
+            if(!crossPoints[i].includes('t')){
+                let x1 = crossPoints[i].split(".");
+                let id1 = (x1[0] - 1) + "." + (x1[1]-1);
+                let id1_s = id1.toString();
+                if (!id1_s.includes(0) && id1 < rowSize){
+                    let deadCell = document.getElementById(id1);
+                    deadCell.classList.remove('crossBox');
+                    deadCell.classList += ' deadCell';
+                }else if (!id1_s.includes(0) && id1 > rowSize){
+                    if(!invalids.includes(id1)){
+                        invalids.push[id1];
+                    };
+                    console.log(invalids);
+                }else{
+                    console.log(id1 + ' is invalid as contains 0');
+                    };
+            }else{
+                console.log('Not run as id contains t');
+            };
+        };
+    };
+
 
     //ii. adds number to firstLetter
     initLetterId.insertAdjacentHTML('beforeBegin', 
@@ -286,7 +350,6 @@ confirmClueBtn.addEventListener('click', function(){
     el = document.createElement('p');
     el.className = 'font-clue';
     el.textContent = `${counter}. ${getInputVal}`;
-    console.log(el);
     getClueList.appendChild(el);
 
     //iv. resets grid for next clue
@@ -301,6 +364,7 @@ cancelClueBtn.addEventListener('click', function(){
     insertClue = '';
     insertLocation ='';
 });
+
 
 
 
