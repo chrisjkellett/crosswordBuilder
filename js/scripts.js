@@ -44,6 +44,16 @@ function addToColumns(rowSize){
         };
 }
 
+function checkInvalids(){
+    for (id of invalids){
+        let deadCell = document.getElementById(id);
+        deadCell.classList.remove('crossBox');
+        deadCell.classList += ' deadCell';
+        deadCell.disabled = true;
+        invalids.pop(id);
+        console.log(deadCell);
+    };
+}
 
 //increase grid rowSize
 const addRows = document.querySelector('#rowPlus');
@@ -54,9 +64,10 @@ addRows.addEventListener('click', function(){
         makeCells(rowSize);
         addToColumns(rowSize);
         allCells = document.querySelectorAll('.crossBox');
+        checkInvalids();
         for (let i=0; i<initWordId.length; i++){
             validateCrossword(initWordId[i]);
-        };
+        }
     };
 });
 
