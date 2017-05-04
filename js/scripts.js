@@ -257,26 +257,25 @@ confirmClueBtn.addEventListener('click', function(){
         getCell.classList.remove('crossBox');
     };
 
-    //ia - 1. remove crossBox for deadCells
-    let x = initWordId.length;
-    let lastCell = document.getElementById(initWordId[x - 1]);
-    if(orientation == 'across' && x != rowSize){
+    //ia - 1. endPoint validation
+    let len = initWordId.length;
+    let lastCell = document.getElementById(initWordId[len - 1]);
+    if(orientation == 'across' && len != rowSize){
         let row = initWordId[0][0];
-        let lastCellId = row + "." + rowSize;
-        let checkLastCell = document.getElementById(lastCellId);
-        if (checkLastCell.value == ""){
-            let deadCell = lastCell.parentElement.nextElementSibling.firstElementChild;
+        let lastCol = (parseInt(initWordId[len - 1][2])) + 1;
+        let endPointCellId = row + '.' + lastCol;
+        if (lastCol <= rowSize){
+            let deadCell = document.getElementById(endPointCellId);
             deadCell.classList.remove('crossBox');
             deadCell.classList += ' deadCell';
-        }else{
-            invalids.push(deadCell.id);
-        };
+            }else{
+                invalids.push(endPointCellId);
+            };
 
-        let col = initWordId[0][2];
-        let precedingCellId = row + "." + (col - 1);
-        console.log(precedingCellId);
-        let precedingCell = document.getElementById(precedingCellId);
-        if (precedingCell.value == ""){
+        let firstCol = initWordId[0][2];
+        let precedingCellId = row + "." + (firstCol - 1);
+        if (!precedingCellId.includes(0)){
+            let precedingCell = document.getElementById(precedingCellId);
             precedingCell.classList.remove('crossBox');
             precedingCell.classList += ' deadCell';
         };
