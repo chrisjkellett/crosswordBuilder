@@ -293,6 +293,15 @@ confirmClueBtn.addEventListener('click', function(){
             }else if (!endPointCellId.includes(0)){
                 invalids.push(endPointCellId);
             };
+
+        let firstCol = initWordId[0][2];
+        let precedingCellId = (parseInt(initWordId[0][0]) - 1) + '.' + col;
+        console.log(precedingCellId);
+        if (!precedingCellId.includes(0)){
+            let precedingCell = document.getElementById(precedingCellId);
+            precedingCell.classList.remove('crossBox');
+            precedingCell.classList += ' deadCell';
+        };
      };
         
 
