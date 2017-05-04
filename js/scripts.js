@@ -5,7 +5,7 @@ const answers = [];
 const allIds = [];
 const crossPoints = [];
 const invalids = [];
-const maxSize = 10;
+const maxSize = 9;
 const minSize = 4;
 let rowSize = 6;
 let gridinit = 1;
@@ -264,11 +264,12 @@ confirmClueBtn.addEventListener('click', function(){
         let row = initWordId[0][0];
         let lastCol = (parseInt(initWordId[len - 1][2])) + 1;
         let endPointCellId = row + '.' + lastCol;
+        console.log(endPointCellId);
         if (lastCol <= rowSize){
             let deadCell = document.getElementById(endPointCellId);
             deadCell.classList.remove('crossBox');
             deadCell.classList += ' deadCell';
-            }else{
+            }else if (!endPointCellId.includes(0)){
                 invalids.push(endPointCellId);
             };
 
@@ -282,16 +283,16 @@ confirmClueBtn.addEventListener('click', function(){
     };
 
     //ia - 2. vertical validation for deadCells //#001 fix
-     if(orientation == 'down' && x != rowSize){
+     if(orientation == 'down' && len != rowSize){
         let col = initWordId[0][2];
-        let lastCellId = rowSize + "." + col;
-        let checkLastCell = document.getElementById(lastCellId);
-        if (checkLastCell.value == ""){
-            let deadCellId = (initWordId.length + 1) + '.' + col;
-            let deadCell = document.getElementById(deadCellId);
+        let endPointCellId = (parseInt(initWordId[len - 1][0]) + 1) + '.' + col;
+        if (endPointCellId < (rowSize + 1)){
+            let deadCell = document.getElementById(endPointCellId);
             deadCell.classList.remove('crossBox');
             deadCell.classList += ' deadCell';
-        };
+            }else if (!endPointCellId.includes(0)){
+                invalids.push(endPointCellId);
+            };
      };
         
 
