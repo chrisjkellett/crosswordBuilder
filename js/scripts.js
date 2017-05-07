@@ -30,7 +30,7 @@ function makeCells(rowSize){
         gridinit = rowSize + 1;
         for (let j=1; j<rowSize + 1; j++){
             getRow.innerHTML += `<div class="cell-wrapper">
-            <input type="text" maxlength="1" id="${i}.${j}" class="crossBox crossFont" /></div>`;
+            <input type="text" maxlength="1" id="${i}.${j}" class="crossBox crossFont row-${i} col-${j}" /></div>`;
             };
         };
 }
@@ -97,6 +97,23 @@ if(initWordId.length <= 1){
         if (initWordId.length == 1){
         validateCrossword(initWordId[0]);
         };
+        if (savedBoxList.length == 1){
+            let splitter = savedBoxList[0].split(".");
+            let col = splitter[1];
+            let row = splitter[0];
+            let el = document.getElementById(savedBoxList[0]);
+            if(el.className.includes('across')){
+                console.log('invalidates the row');
+                let els = document.querySelectorAll('.row-' + row);
+                for (el of els){
+                    if (el.className.includes('crossBox')){
+                        el.disabled = true;
+                    };
+                };
+            }else{
+                console.log('invalidates the column');
+            };
+        };
     };
 }
 
@@ -144,6 +161,7 @@ function getSavedBox(el) {
     }else if(clickedItem.className.includes('selected')){
         clickedItem.classList.remove('selected');
         initWordId.pop(id);
+        savedBoxList.pop(id);
         };
     el.stopPropagation();
     validateLoop(initWordId);
@@ -266,7 +284,7 @@ confirmClueBtn.addEventListener('click', function(){
     let initLetterId = document.getElementById(initWordId[0]);
     for (let letter of initWordId){
         let getCell = document.getElementById(letter);
-        getCell.classList += ` savedWord ${counter}-${orientation}`;
+        getCell.classList += ` savedWord ${counter}-${orientation} ${orientation}`;
         getCell.classList.remove('selected');
         getCell.classList.remove('crossBox');
     };
