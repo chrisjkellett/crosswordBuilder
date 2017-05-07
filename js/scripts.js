@@ -47,11 +47,11 @@ function addToColumns(rowSize){
 function checkInvalids(){
     for (id of invalids){
         let deadCell = document.getElementById(id);
+        console.log(deadCell);
         deadCell.classList.remove('crossBox');
         deadCell.classList += ' deadCell';
         deadCell.disabled = true;
-        invalids.pop(id);
-        console.log(deadCell);
+        // invalids.pop(id);
     };
 }
 
@@ -104,7 +104,6 @@ if(initWordId.length <= 1){
             let row = splitter[0];
             let el = document.getElementById(savedBoxList[0]);
             if(el.className.includes('across')){
-                console.log('invalidates the row');
                 let els = document.querySelectorAll('.row-' + row);
                 for (el of els){
                     if (el.className.includes('crossBox')){
@@ -112,7 +111,6 @@ if(initWordId.length <= 1){
                     };
                 };
             }else{
-                console.log('invalidates the column');
                 let els = document.querySelectorAll('.col-' + col);
                 for (el of els){
                     if (el.className.includes('crossBox')){
@@ -164,7 +162,6 @@ function getSavedBox(el) {
         clickedItem.className += ' selected';
         initWordId.push(id);
         savedBoxList.push(id);
-        console.log(savedBoxList);
     }else if(clickedItem.className.includes('savedWord') && clickedItem.className.includes('selected')){
         clickedItem.classList.remove('selected');
         initWordId.pop(id);
@@ -290,11 +287,16 @@ let confirmClueBtn = document.querySelector('#confirmClue');
 confirmClueBtn.addEventListener('click', function(){
     //i. adds and removes classes  
     let initLetterId = document.getElementById(initWordId[0]);
-    for (let letter of initWordId){
-        let getCell = document.getElementById(letter);
+    for (let i=0; i<initWordId.length; i++){
+        let getCell = document.getElementById(initWordId[i]);
         getCell.classList += ` savedWord ${counter}-${orientation} ${orientation}`;
         getCell.classList.remove('selected');
         getCell.classList.remove('crossBox');
+        if(i == 0){
+            getCell.classList += ' clue-start';
+        }else if (i == initWordId.length - 1){
+            getCell.classList += ' end-point';
+        };
     };
 
     //ia - 1. endPoint validation
@@ -344,21 +346,22 @@ confirmClueBtn.addEventListener('click', function(){
      };
         
 
-    //ia - 3. crossPoint validation for deadCells
+    // //ia - 3. crossPoint validation for deadCells
     // for (id of initWordId){
     //     if(!allIds.includes(id)){
     //     allIds.push(id);
-    // }else{
-    //     if(id == initWordId[0]){
-    //         crossPoints.push(id + '.t');
-    //     }else if(id == initWordId[initWordId.length - 1]){
-    //         crossPoints.push(id + '.b');
     //     }else{
-    //         crossPoints.push(id);
+    //         if(id == initWordId[0]){
+    //             crossPoints.push(id + '.t');
+    //         }else if(id == initWordId[initWordId.length - 1]){
+    //             crossPoints.push(id + '.b');
+    //         }else{
+    //             crossPoints.push(id);
+    //             };
     //         };
-    //     };
     // allIds.sort();
     // };
+
     
     // function id1(x){
     //     let id1 = (x[0] - 1) + "." + (x[1] - 1);
@@ -395,36 +398,37 @@ confirmClueBtn.addEventListener('click', function(){
     //     }
 
     // function id3(x){
-    //     let id3 = (parseInt(x[0]) + 1) + "." + (x[1] - 1);
+    //     let row = (parseInt(x[0]) + 1);
+    //     let col = x[1] - 1;
+    //     let id3 =  row + "." + col;
     //     let id3_s = id3.toString();
-    //     if (!id3_s.includes(0) && id3 < rowSize){
+    //     if (!id3_s.includes(0) && rowSize > col){
     //         let deadCell = document.getElementById(id3);
     //         deadCell.classList.remove('crossBox');
     //         deadCell.classList += ' deadCell';
-    //     }else if (!id3_s.includes(0) && id3 > rowSize){
+    //     }else if (!id3_s.includes(0)){
     //         if(!invalids.includes(id3)){
-    //             invalids.push[id3];
+    //             invalids.push(id3);
     //         };
-    //         console.log(invalids);
-    //     }else{
-    //         console.log(id3 + ' is invalid as contains 0');
-    //         };
-    //     }
+    //     };
+    // }
 
     // function id4(x){
-    //     let id4 = (parseInt(x[0]) + 1) + "." + (parseInt(x[1]) + 1);
+    //     let row = (parseInt(x[0]) + 1);
+    //     let col = (parseInt(x[1]) + 1);
+    //     let id4 =  row + "." + col;
     //     let id4_s = id4.toString();
-    //     if (!id4_s.includes(0) && id4 < rowSize){
+    //     console.log(id4_s);
+    //     if (!(id4_s.includes(0)) && rowSize > col){
     //         let deadCell = document.getElementById(id4);
     //         deadCell.classList.remove('crossBox');
     //         deadCell.classList += ' deadCell';
-    //     }else if (!id4_s.includes(0) && id4 > rowSize){
+    //     }else if (!id4_s.includes(0)){
     //         if(!invalids.includes(id4)){
-    //             invalids.push[id4];
+    //             invalids.push(id4);
     //         };
-    //         console.log(invalids);
     //     }else{
-    //         console.log(id2 + ' is invalid as contains 0');
+    //         console.log('is invalid as contains 0');
     //         };
     //     }
 
@@ -433,11 +437,12 @@ confirmClueBtn.addEventListener('click', function(){
     //         let x = crossPoints[i].split(".");
     //         if(orientation == 'down'){
     //             if(crossPoints[i].includes('b')){
-    //                 console.log('model 1');
+    //                 console.log('model 1 - clue across + going up');
     //                 id1(x);
     //                 id2(x);
     //             }else if(crossPoints[i].includes('t')){
-    //                 console.log('model 2');
+    //                 console.log(crossPoints);
+    //                 console.log('model 2 - clue across + going down');
     //                 id3(x);
     //                 id4(x);
     //             }else{
@@ -458,7 +463,7 @@ confirmClueBtn.addEventListener('click', function(){
     //                 id2(x);
     //                 id4(x);
     //             }else{
-    //                 console.log('model 5a');
+    //                 console.log('model 5b');
     //                 id1(x);
     //                 id2(x);
     //                 id3(x);
