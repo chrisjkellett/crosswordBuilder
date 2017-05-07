@@ -65,6 +65,7 @@ addRows.addEventListener('click', function(){
         addToColumns(rowSize);
         allCells = document.querySelectorAll('.crossBox');
         checkInvalids();
+        validateLoop(initWordId);
         for (let i=0; i<initWordId.length; i++){
             validateCrossword(initWordId[i]);
         }
@@ -112,6 +113,12 @@ if(initWordId.length <= 1){
                 };
             }else{
                 console.log('invalidates the column');
+                let els = document.querySelectorAll('.col-' + col);
+                for (el of els){
+                    if (el.className.includes('crossBox')){
+                        el.disabled = true;
+                    };
+                };
             };
         };
     };
@@ -148,17 +155,17 @@ function getBox(event) {
     validateLoop(initWordId);
 }
 
-const savedBoxList = [];
+let savedBoxList = [];
 getCrossword.addEventListener('click', getSavedBox, false);
 function getSavedBox(el) {
     let clickedItem = el.target;
     let id = el.target.id;
-    if (clickedItem.className.includes('savedWord') && !(clickedItem.className.includes('selected')) && savedBoxList.length == 0){
+    if (clickedItem.className.includes('savedWord') && !(clickedItem.className.includes('selected')) && savedBoxList.length == 0 ){
         clickedItem.className += ' selected';
         initWordId.push(id);
         savedBoxList.push(id);
         console.log(savedBoxList);
-    }else if(clickedItem.className.includes('selected')){
+    }else if(clickedItem.className.includes('savedWord') && clickedItem.className.includes('selected')){
         clickedItem.classList.remove('selected');
         initWordId.pop(id);
         savedBoxList.pop(id);
@@ -232,6 +239,7 @@ function resetGrid(){
             cell.disabled = false;
         };
     initWordId = [];
+    savedBoxList = [];
 }
 
 
