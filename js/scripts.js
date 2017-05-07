@@ -131,13 +131,16 @@ function getBox(event) {
     validateLoop(initWordId);
 }
 
+const savedBoxList = [];
 getCrossword.addEventListener('click', getSavedBox, false);
 function getSavedBox(el) {
     let clickedItem = el.target;
     let id = el.target.id;
-    if (clickedItem.className.includes('savedWord') && !(clickedItem.className.includes('selected')) && initWordId.length == 0){
+    if (clickedItem.className.includes('savedWord') && !(clickedItem.className.includes('selected')) && savedBoxList.length == 0){
         clickedItem.className += ' selected';
         initWordId.push(id);
+        savedBoxList.push(id);
+        console.log(savedBoxList);
     }else if(clickedItem.className.includes('selected')){
         clickedItem.classList.remove('selected');
         initWordId.pop(id);
@@ -275,7 +278,6 @@ confirmClueBtn.addEventListener('click', function(){
         let row = initWordId[0][0];
         let lastCol = (parseInt(initWordId[len - 1][2])) + 1;
         let endPointCellId = row + '.' + lastCol;
-        console.log(endPointCellId);
         if (lastCol <= rowSize){
             let deadCell = document.getElementById(endPointCellId);
             deadCell.classList.remove('crossBox');
@@ -317,128 +319,128 @@ confirmClueBtn.addEventListener('click', function(){
         
 
     //ia - 3. crossPoint validation for deadCells
-    for (id of initWordId){
-        if(!allIds.includes(id)){
-        allIds.push(id);
-    }else{
-        if(id == initWordId[0]){
-            crossPoints.push(id + '.t');
-        }else if(id == initWordId[initWordId.length - 1]){
-            crossPoints.push(id + '.b');
-        }else{
-            crossPoints.push(id);
-            };
-        };
-    allIds.sort();
-    };
+    // for (id of initWordId){
+    //     if(!allIds.includes(id)){
+    //     allIds.push(id);
+    // }else{
+    //     if(id == initWordId[0]){
+    //         crossPoints.push(id + '.t');
+    //     }else if(id == initWordId[initWordId.length - 1]){
+    //         crossPoints.push(id + '.b');
+    //     }else{
+    //         crossPoints.push(id);
+    //         };
+    //     };
+    // allIds.sort();
+    // };
     
-    function id1(x){
-        let id1 = (x[0] - 1) + "." + (x[1] - 1);
-        let id1_s = id1.toString();
-        if (!id1_s.includes(0) && id1 < rowSize){
-            let deadCell = document.getElementById(id1);
-            deadCell.classList.remove('crossBox');
-            deadCell.classList += ' deadCell';
-        }else if (!id1_s.includes(0) && id1 > rowSize){
-            if(!invalids.includes(id1)){
-                invalids.push[id1];
-            };
-            console.log(invalids);
-        }else{
-            console.log(id1 + ' is invalid as contains 0');
-            };
-        }
+    // function id1(x){
+    //     let id1 = (x[0] - 1) + "." + (x[1] - 1);
+    //     let id1_s = id1.toString();
+    //     if (!id1_s.includes(0) && id1 < rowSize){
+    //         let deadCell = document.getElementById(id1);
+    //         deadCell.classList.remove('crossBox');
+    //         deadCell.classList += ' deadCell';
+    //     }else if (!id1_s.includes(0) && id1 > rowSize){
+    //         if(!invalids.includes(id1)){
+    //             invalids.push[id1];
+    //         };
+    //         console.log(invalids);
+    //     }else{
+    //         console.log(id1 + ' is invalid as contains 0');
+    //         };
+    //     }
 
-    function id2(x){
-        let id2 = (x[0] - 1) + "." + (parseInt(x[1]) + 1);
-        let id2_s = id2.toString();
-        if (!id2_s.includes(0) && id2 < rowSize){
-            let deadCell = document.getElementById(id2);
-            deadCell.classList.remove('crossBox');
-            deadCell.classList += ' deadCell';
-        }else if (!id2_s.includes(0) && id2 > rowSize){
-            if(!invalids.includes(id2)){
-                invalids.push[id2];
-            };
-            console.log(invalids);
-        }else{
-            console.log(id2 + ' is invalid as contains 0');
-            };
-        }
+    // function id2(x){
+    //     let id2 = (x[0] - 1) + "." + (parseInt(x[1]) + 1);
+    //     let id2_s = id2.toString();
+    //     if (!id2_s.includes(0) && id2 < rowSize){
+    //         let deadCell = document.getElementById(id2);
+    //         deadCell.classList.remove('crossBox');
+    //         deadCell.classList += ' deadCell';
+    //     }else if (!id2_s.includes(0) && id2 > rowSize){
+    //         if(!invalids.includes(id2)){
+    //             invalids.push[id2];
+    //         };
+    //         console.log(invalids);
+    //     }else{
+    //         console.log(id2 + ' is invalid as contains 0');
+    //         };
+    //     }
 
-    function id3(x){
-        let id3 = (parseInt(x[0]) + 1) + "." + (x[1] - 1);
-        let id3_s = id3.toString();
-        if (!id3_s.includes(0) && id3 < rowSize){
-            let deadCell = document.getElementById(id3);
-            deadCell.classList.remove('crossBox');
-            deadCell.classList += ' deadCell';
-        }else if (!id3_s.includes(0) && id3 > rowSize){
-            if(!invalids.includes(id3)){
-                invalids.push[id3];
-            };
-            console.log(invalids);
-        }else{
-            console.log(id3 + ' is invalid as contains 0');
-            };
-        }
+    // function id3(x){
+    //     let id3 = (parseInt(x[0]) + 1) + "." + (x[1] - 1);
+    //     let id3_s = id3.toString();
+    //     if (!id3_s.includes(0) && id3 < rowSize){
+    //         let deadCell = document.getElementById(id3);
+    //         deadCell.classList.remove('crossBox');
+    //         deadCell.classList += ' deadCell';
+    //     }else if (!id3_s.includes(0) && id3 > rowSize){
+    //         if(!invalids.includes(id3)){
+    //             invalids.push[id3];
+    //         };
+    //         console.log(invalids);
+    //     }else{
+    //         console.log(id3 + ' is invalid as contains 0');
+    //         };
+    //     }
 
-    function id4(x){
-        let id4 = (parseInt(x[0]) + 1) + "." + (parseInt(x[1]) + 1);
-        let id4_s = id4.toString();
-        if (!id4_s.includes(0) && id4 < rowSize){
-            let deadCell = document.getElementById(id4);
-            deadCell.classList.remove('crossBox');
-            deadCell.classList += ' deadCell';
-        }else if (!id4_s.includes(0) && id4 > rowSize){
-            if(!invalids.includes(id4)){
-                invalids.push[id4];
-            };
-            console.log(invalids);
-        }else{
-            console.log(id2 + ' is invalid as contains 0');
-            };
-        }
+    // function id4(x){
+    //     let id4 = (parseInt(x[0]) + 1) + "." + (parseInt(x[1]) + 1);
+    //     let id4_s = id4.toString();
+    //     if (!id4_s.includes(0) && id4 < rowSize){
+    //         let deadCell = document.getElementById(id4);
+    //         deadCell.classList.remove('crossBox');
+    //         deadCell.classList += ' deadCell';
+    //     }else if (!id4_s.includes(0) && id4 > rowSize){
+    //         if(!invalids.includes(id4)){
+    //             invalids.push[id4];
+    //         };
+    //         console.log(invalids);
+    //     }else{
+    //         console.log(id2 + ' is invalid as contains 0');
+    //         };
+    //     }
 
-    if(crossPoints.length > 0){
-        for (let i = 0; i < crossPoints.length; i++){
-            let x = crossPoints[i].split(".");
-            if(orientation == 'down'){
-                if(crossPoints[i].includes('b')){
-                    console.log('model 1');
-                    id1(x);
-                    id2(x);
-                }else if(crossPoints[i].includes('t')){
-                    console.log('model 2');
-                    id3(x);
-                    id4(x);
-                }else{
-                    console.log('model 5a');
-                    id1(x);
-                    id2(x);
-                    id3(x);
-                    id4(x);
-                };
-            };
-            if(orientation == 'across'){
-                if(crossPoints[i].includes('b')){
-                    console.log('model 3');
-                    id1(x);
-                    id3(x);
-                }else if(crossPoints[i].includes('t')){
-                    console.log('model 4');
-                    id2(x);
-                    id4(x);
-                }else{
-                    console.log('model 5a');
-                    id1(x);
-                    id2(x);
-                    id3(x);
-                    id4(x);
-                        };
-                    };
-                };
-            };
+    // if(crossPoints.length > 0){
+    //     for (let i = 0; i < crossPoints.length; i++){
+    //         let x = crossPoints[i].split(".");
+    //         if(orientation == 'down'){
+    //             if(crossPoints[i].includes('b')){
+    //                 console.log('model 1');
+    //                 id1(x);
+    //                 id2(x);
+    //             }else if(crossPoints[i].includes('t')){
+    //                 console.log('model 2');
+    //                 id3(x);
+    //                 id4(x);
+    //             }else{
+    //                 console.log('model 5a');
+    //                 id1(x);
+    //                 id2(x);
+    //                 id3(x);
+    //                 id4(x);
+    //             };
+    //         };
+    //         if(orientation == 'across'){
+    //             if(crossPoints[i].includes('b')){
+    //                 console.log('model 3');
+    //                 id1(x);
+    //                 id3(x);
+    //             }else if(crossPoints[i].includes('t')){
+    //                 console.log('model 4');
+    //                 id2(x);
+    //                 id4(x);
+    //             }else{
+    //                 console.log('model 5a');
+    //                 id1(x);
+    //                 id2(x);
+    //                 id3(x);
+    //                 id4(x);
+    //                     };
+    //                 };
+    //             };
+    //         };
 
     //ii. adds number to firstLetter
     initLetterId.insertAdjacentHTML('beforeBegin', 
