@@ -1,6 +1,6 @@
 
 /*imports*/
-@import url('https://fonts.googleapis.com/css?family=Raleway:300,600,800');
+@import url('https://fonts.googleapis.com/css?family=Raleway:300,500,600,800');
 @import url('https://fonts.googleapis.com/css?family=Poiret+One');
 
 
@@ -24,6 +24,7 @@ header{
 
 .sub-heading{
     margin: 0;
+    padding:0;
     line-height: 11px;
     border-bottom: 1px solid #5b5b5b;
     display: inline-block;
@@ -100,9 +101,6 @@ header{
     margin-bottom:45px;
 }
 
-#crosswordWrapper{
-    display:inline-block;
-}
 
 #crossword{
     margin-top:5px;
@@ -127,6 +125,7 @@ header{
     font-family: Raleway, sans-serif;
     font-size:28px;
     text-transform: lowercase;
+    font-weight:300;
 }
 
 .cross-row{
@@ -158,6 +157,15 @@ header{
     text-align:center;
     border:0;
     cursor: pointer !important;
+}
+
+.deadCell{
+    -webkit-appearance: none;
+    outline:0;
+    max-width:45px;
+    max-height:45px;
+    text-align:center;
+    border:0;
 }
 
 
@@ -332,6 +340,10 @@ input[disabled]{
 .font-small{
     font-size: 14.44px;
     font-weight: 600;
+}
+
+.font-clue{
+    font-weight:500;
 }
 
 .grey{
