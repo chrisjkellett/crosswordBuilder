@@ -47,7 +47,6 @@ function addToColumns(rowSize){
 function checkInvalids(){
     for (id of invalids){
         let deadCell = document.getElementById(id);
-        console.log(deadCell);
         deadCell.classList.remove('crossBox');
         deadCell.classList += ' deadCell';
         deadCell.disabled = true;
@@ -289,13 +288,13 @@ confirmClueBtn.addEventListener('click', function(){
     let initLetterId = document.getElementById(initWordId[0]);
     for (let i=0; i<initWordId.length; i++){
         let getCell = document.getElementById(initWordId[i]);
-        getCell.classList += ` savedWord ${counter}-${orientation} ${orientation}`;
+        getCell.classList += ` savedWord ${orientation}`;
         getCell.classList.remove('selected');
         getCell.classList.remove('crossBox');
         if(i == 0){
-            getCell.classList += ' clue-start';
+            getCell.classList += ' sp';
         }else if (i == initWordId.length - 1){
-            getCell.classList += ' end-point';
+            getCell.classList += ' ep';
         };
     };
 
@@ -337,7 +336,6 @@ confirmClueBtn.addEventListener('click', function(){
 
         let firstCol = initWordId[0][2];
         let precedingCellId = (parseInt(initWordId[0][0]) - 1) + '.' + col;
-        console.log(precedingCellId);
         if (!precedingCellId.includes(0)){
             let precedingCell = document.getElementById(precedingCellId);
             precedingCell.classList.remove('crossBox');
@@ -346,21 +344,23 @@ confirmClueBtn.addEventListener('click', function(){
      };
         
 
-    // //ia - 3. crossPoint validation for deadCells
-    // for (id of initWordId){
-    //     if(!allIds.includes(id)){
-    //     allIds.push(id);
-    //     }else{
-    //         if(id == initWordId[0]){
-    //             crossPoints.push(id + '.t');
-    //         }else if(id == initWordId[initWordId.length - 1]){
-    //             crossPoints.push(id + '.b');
-    //         }else{
-    //             crossPoints.push(id);
-    //             };
-    //         };
-    // allIds.sort();
-    // };
+    //ia - 3. crossPoint validation for deadCells
+    for (id of initWordId){
+        if(!allIds.includes(id)){
+        allIds.push(id);
+        }else{
+            let crossPointCell = document.getElementById(id).className;
+            console.log(crossPointCell);
+            if(id == initWordId[0]){
+                crossPoints.push(id + '.sp');
+            }else if(id == initWordId[initWordId.length - 1]){
+                crossPoints.push(id + '.ep');
+            }else{
+                crossPoints.push(id);;
+                };
+            };
+    allIds.sort();
+    };
 
     
     // function id1(x){
@@ -372,12 +372,9 @@ confirmClueBtn.addEventListener('click', function(){
     //         deadCell.classList += ' deadCell';
     //     }else if (!id1_s.includes(0) && id1 > rowSize){
     //         if(!invalids.includes(id1)){
-    //             invalids.push[id1];
+    //             invalids.push(id1);
     //         };
-    //         console.log(invalids);
-    //     }else{
-    //         console.log(id1 + ' is invalid as contains 0');
-    //         };
+    //       };
     //     }
 
     // function id2(x){
@@ -432,46 +429,46 @@ confirmClueBtn.addEventListener('click', function(){
     //         };
     //     }
 
-    // if(crossPoints.length > 0){
-    //     for (let i = 0; i < crossPoints.length; i++){
-    //         let x = crossPoints[i].split(".");
-    //         if(orientation == 'down'){
-    //             if(crossPoints[i].includes('b')){
-    //                 console.log('model 1 - clue across + going up');
-    //                 id1(x);
-    //                 id2(x);
-    //             }else if(crossPoints[i].includes('t')){
-    //                 console.log(crossPoints);
-    //                 console.log('model 2 - clue across + going down');
-    //                 id3(x);
-    //                 id4(x);
-    //             }else{
-    //                 console.log('model 5a');
-    //                 id1(x);
-    //                 id2(x);
-    //                 id3(x);
-    //                 id4(x);
-    //             };
-    //         };
-    //         if(orientation == 'across'){
-    //             if(crossPoints[i].includes('b')){
-    //                 console.log('model 3');
-    //                 id1(x);
-    //                 id3(x);
-    //             }else if(crossPoints[i].includes('t')){
-    //                 console.log('model 4');
-    //                 id2(x);
-    //                 id4(x);
-    //             }else{
-    //                 console.log('model 5b');
-    //                 id1(x);
-    //                 id2(x);
-    //                 id3(x);
-    //                 id4(x);
-    //                     };
-    //                 };
-    //             };
-    //         };
+    if(crossPoints.length > 0){
+        for (let i = 0; i < crossPoints.length; i++){
+            let x = crossPoints[i].split(".");
+            if(orientation == 'down'){
+                if(crossPoints[i].includes('ep')){
+                    console.log('model 1 - clue across + going up');
+                    id1(x);
+                    id2(x);
+                }else if(crossPoints[i].includes('sp')){
+                    console.log(crossPoints);
+                    console.log('model 2 - clue across + going down');
+                    id3(x);
+                    id4(x);
+                }else{
+                    console.log('model 5a');
+                    id1(x);
+                    id2(x);
+                    id3(x);
+                    id4(x);
+                };
+            };
+            if(orientation == 'across'){
+                if(crossPoints[i].includes('ep')){
+                    console.log('model 3');
+                    id1(x);
+                    id3(x);
+                }else if(crossPoints[i].includes('sp')){
+                    console.log('model 4');
+                    id2(x);
+                    id4(x);
+                }else{
+                    console.log('model 5b');
+                    id1(x);
+                    id2(x);
+                    id3(x);
+                    id4(x);
+                        };
+                    };
+                };
+            };
 
     //ii. adds number to firstLetter
     initLetterId.insertAdjacentHTML('beforeBegin', 
