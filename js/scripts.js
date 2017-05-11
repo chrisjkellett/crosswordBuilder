@@ -289,13 +289,17 @@ confirmClueBtn.addEventListener('click', function(){
     let initLetterId = document.getElementById(initWordId[0]);
     for (let i=0; i<initWordId.length; i++){
         let getCell = document.getElementById(initWordId[i]);
-        getCell.classList += ` savedWord ${counter}-${orientation} ${orientation}`;
+        getCell.classList += ` savedWord ${orientation}`;
         getCell.classList.remove('selected');
         getCell.classList.remove('crossBox');
         if(i == 0){
-            getCell.classList += ' clue-start';
+            if(!getCell.hasAttribute('data-ep')){
+                getCell.setAttribute('data-ep', 'sp');
+            };
         }else if (i == initWordId.length - 1){
-            getCell.classList += ' end-point';
+            if(!getCell.hasAttribute('data-ep')){
+            getCell.setAttribute('data-ep', 'ep');
+            };
         };
     };
 
@@ -346,21 +350,28 @@ confirmClueBtn.addEventListener('click', function(){
      };
         
 
-    // //ia - 3. crossPoint validation for deadCells
-    // for (id of initWordId){
-    //     if(!allIds.includes(id)){
-    //     allIds.push(id);
-    //     }else{
-    //         if(id == initWordId[0]){
-    //             crossPoints.push(id + '.t');
-    //         }else if(id == initWordId[initWordId.length - 1]){
-    //             crossPoints.push(id + '.b');
-    //         }else{
-    //             crossPoints.push(id);
-    //             };
-    //         };
-    // allIds.sort();
-    // };
+    //ia - 3. crossPoint validation for deadCells
+    for (id of initWordId){
+        if(!allIds.includes(id)){
+        allIds.push(id);
+    }else{
+        let ep = document.getElementById(id).getAttribute('data-ep');
+        if(id == initWordId[0]){
+            if (ep == 'sp'){
+                console.log('top left L shaped clue - model 1');
+            };
+        }else if(id == initWordId[initWordId.length - 1]){
+            if (ep == 'sp'){
+                console.log('top right L shaped clue- model 2');
+            };
+        }else{
+            if (ep == 'sp'){
+                console.log('top T shaped clue - model 3');
+                };
+            };
+        };
+    allIds.sort();
+    };
 
     
     // function id1(x){
