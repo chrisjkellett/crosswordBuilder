@@ -345,7 +345,6 @@ confirmClueBtn.addEventListener('click', function(){
 
         let firstCol = initWordId[0][2];
         let precedingCellId = (parseInt(initWordId[0][0]) - 1) + '.' + col;
-        console.log(precedingCellId);
         if (!precedingCellId.includes(0)){
             let precedingCell = document.getElementById(precedingCellId);
             precedingCell.classList.remove('crossBox');
@@ -359,9 +358,10 @@ confirmClueBtn.addEventListener('click', function(){
         if(!allIds.includes(id)){
         allIds.push(id);
     }else{
+        console.log(id);
+        let ep = document.getElementById(id).getAttribute('data-ep');
+        let x = id.split(".");
         if (orientation == 'across'){
-            let ep = document.getElementById(id).getAttribute('data-ep');
-            let x = id.split(".");
             if(id == initWordId[0]){
                 if (ep == 'sp'){
                     bottomRight(x);
@@ -395,6 +395,48 @@ confirmClueBtn.addEventListener('click', function(){
                     topLeft(x);
                     topRight(x);
                    //bottom mid T - model 6
+                }else{
+                    bottomLeft(x);
+                    bottomRight(x);
+                    topLeft(x);
+                    topRight(x);
+                   //center - model 5'
+                    };
+                };
+        }else if (orientation == 'down'){
+            if(id == initWordId[0]){
+                if (ep == 'sp'){
+                    bottomRight(x);
+                    //top left L shaped clue - model 1
+                }else if(ep == 'fp'){
+                    bottomLeft(x);
+                    //top-right L - model 7
+                }else{
+                    bottomLeft(x);
+                    bottomRight(x);
+                    //top mid T - model 4
+                };
+            }else if(id == initWordId[initWordId.length - 1]){
+                if (ep == 'sp'){
+                    topRight(x);
+                    //bottom left L - model 3
+                }else if(ep == 'fp'){
+                    topLeft(x);
+                    //bottom right L - model 9
+                }else{
+                    topRight(x);
+                    topLeft(x);
+                    //bottom mid T - model 8
+                };
+            }else{
+                if (ep == 'sp'){
+                    topRight(x);
+                    bottomRight(x);
+                    //left mid T - model 2
+                }else if(ep == 'fp'){
+                    topLeft(x);
+                    bottomLeft(x);
+                   //right mid T - model 8
                 }else{
                     bottomLeft(x);
                     bottomRight(x);
