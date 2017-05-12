@@ -298,7 +298,11 @@ confirmClueBtn.addEventListener('click', function(){
             };
         }else if (i == initWordId.length - 1){
             if(!getCell.hasAttribute('data-ep')){
-            getCell.setAttribute('data-ep', 'ep');
+            getCell.setAttribute('data-ep', 'fp');
+            };
+        }else{
+            if(!getCell.hasAttribute('data-ep')){
+            getCell.setAttribute('data-ep', 'mp');
             };
         };
     };
@@ -355,21 +359,35 @@ confirmClueBtn.addEventListener('click', function(){
         if(!allIds.includes(id)){
         allIds.push(id);
     }else{
-        let ep = document.getElementById(id).getAttribute('data-ep');
-        if(id == initWordId[0]){
-            if (ep == 'sp'){
-                console.log('top left L shaped clue - model 1');
-            };
-        }else if(id == initWordId[initWordId.length - 1]){
-            if (ep == 'sp'){
-                console.log('top right L shaped clue- model 2');
-            };
-        }else{
-            if (ep == 'sp'){
-                console.log('top T shaped clue - model 3');
+        if (orientation == 'across'){
+            let ep = document.getElementById(id).getAttribute('data-ep');
+            if(id == initWordId[0]){
+                if (ep == 'sp'){
+                    console.log('top left L shaped clue - model 1');
+                }else if(ep == 'fp'){
+                    console.log('bottom left L - model 3');
+                }else{
+                    console.log('mid left T - model 2');
                 };
-            };
-        };
+            }else if(id == initWordId[initWordId.length - 1]){
+                if (ep == 'sp'){
+                    console.log('top right L - model 7');
+                }else if(ep == 'fp'){
+                    console.log('bottom right L - model 9');
+                }else{
+                    console.log('mid right T - model 8');
+                };
+            }else{
+                if (ep == 'sp'){
+                    console.log('top mid T - model 4');
+                }else if(ep == 'fp'){
+                    console.log('bottom mid T - model 6');
+                }else{
+                    console.log('center - model 5');
+                };
+                    };
+                };
+             };
     allIds.sort();
     };
 
