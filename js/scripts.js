@@ -136,6 +136,7 @@ function getBox(event) {
         let id = event.target.id;
         if (!initWordId.includes(id) && event.target.className.includes('selected')){
         initWordId.push(id);
+        initWordId.sort();
         validateCrossword(id);
         };
    };
@@ -158,9 +159,11 @@ function getSavedBox(el) {
     let clickedItem = el.target;
     let id = el.target.id;
     let isCrossPoint = clickedItem.className.includes('cross-point');
-    if (clickedItem.className.includes('savedWord') && !(clickedItem.className.includes('selected')) && !isCrossPoint){
+    let isNoReinit = clickedItem.className.includes('no-reinit');
+    if (clickedItem.className.includes('savedWord') && !(clickedItem.className.includes('selected')) && !(isCrossPoint || isNoReinit)){
         clickedItem.className += ' selected';
         initWordId.push(id);
+        initWordId.sort();
         savedBoxList.push(id);
     }else if(clickedItem.className.includes('savedWord') && clickedItem.className.includes('selected')){
         clickedItem.classList.remove('selected');
@@ -293,8 +296,7 @@ confirmClueBtn.addEventListener('click', function(){
             getCell.classList += ` savedWord ${orientation}`;
         }else{
             getCell.classList += ' cross-point';
-            getCell.style.backgroundColor = 'lightgrey';
-            getCell.style.cursor = 'none !important';
+            getCell.style.backgroundColor = '#e4e4e4';
         };
         getCell.classList.remove('selected');
         getCell.classList.remove('crossBox');
@@ -395,6 +397,7 @@ confirmClueBtn.addEventListener('click', function(){
                 if (ep == 'sp'){
                     bottomLeft(x);
                     bottomRight(x);
+                    reinit_Model4(x);
                     //top mid T - model 4
                 }else if(ep == 'fp'){
                     topLeft(x);
@@ -405,6 +408,7 @@ confirmClueBtn.addEventListener('click', function(){
                     bottomRight(x);
                     topLeft(x);
                     topRight(x);
+                    reinit_Model5(x);
                    //center - model 5'
                     };
                 };
@@ -419,6 +423,7 @@ confirmClueBtn.addEventListener('click', function(){
                 }else{
                     bottomLeft(x);
                     bottomRight(x);
+                    reinit_Model4(x);
                     //top mid T - model 4
                 };
             }else if(id == initWordId[initWordId.length - 1]){
@@ -447,6 +452,7 @@ confirmClueBtn.addEventListener('click', function(){
                     bottomRight(x);
                     topLeft(x);
                     topRight(x);
+                    reinit_Model5(x);
                    //center - model 5'
                     };
                 };
@@ -490,9 +496,45 @@ confirmClueBtn.addEventListener('click', function(){
         let deadCell = document.getElementById(id);
         deadCell.classList.remove('crossBox');
         deadCell.classList += ' deadCell';
-        }
+    }
+    
+    function reinit_Model5(x){
+        console.log('running reinit model');
+        let col = x[0];
+        let row = x[1];
+        let t = (col - 1) + "." + row;
+        let l = col + "." + (row - 1);
+        let r = col + "." + (parseInt(row) + 1);
+        let d = (parseInt(col) + 1) + "." + row;
+        let tlrd = [t, l, r, d];
+        for (let id of tlrd){
+            let el = document.getElementById(id); 
+            el.classList += ' no-reinit';
+        };
+    }
 
 
+    function reinit_Model4(x){
+        console.log('running reinit model 2.4');
+        let col = x[0];
+        let row = x[1];
+        let t = (col - 1) + "." + row;
+        let l = col + "." + (row - 1);
+        let r = col + "." + (parseInt(row) + 1);
+        let d = (parseInt(col) + 1) + "." + row;
+        let lUp = (parseInt(col) - 1) + "." + (row - 1);
+        let rUp = (parseInt(col) - 1) + "." + (parseInt(row) + 1);
+        let tlrd = [d];
+        if (lUp < 1){
+            tlrd.push(l);
+            tlrd.push(r);
+        };
+        for (let id of tlrd){
+            let el = document.getElementById(id); 
+            el.classList += ' no-reinit';
+            el.style.backgroundColor = '#e4e4e4';
+        };
+    }
     //ii. adds number to firstLetter
     initLetterId.insertAdjacentHTML('beforeBegin', 
             `<div class="number-wrapper">${counter}</div>`);

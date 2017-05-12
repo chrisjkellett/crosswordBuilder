@@ -236,7 +236,7 @@ input[disabled]{
     background: #ffff99 !important;
 }
 
-.cross-point{
+.cross-point, .no-reinit{
     background: #e4e4e4;
      -webkit-appearance: none;
     outline:0;
