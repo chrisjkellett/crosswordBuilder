@@ -361,146 +361,126 @@ confirmClueBtn.addEventListener('click', function(){
     }else{
         if (orientation == 'across'){
             let ep = document.getElementById(id).getAttribute('data-ep');
+            let x = id.split(".");
             if(id == initWordId[0]){
                 if (ep == 'sp'){
-                    console.log('top left L shaped clue - model 1');
+                    bottomRight(x);
+                    //top left L shaped clue - model 1
                 }else if(ep == 'fp'){
-                    console.log('bottom left L - model 3');
+                    topRight(x);
+                    //bottom left L - model 3
                 }else{
-                    console.log('mid left T - model 2');
+                    topRight(x);
+                    bottomRight(x);
+                    //mid left T - model 2
                 };
             }else if(id == initWordId[initWordId.length - 1]){
                 if (ep == 'sp'){
-                    console.log('top right L - model 7');
+                    bottomLeft(x);
+                    //top right L - model 7
                 }else if(ep == 'fp'){
-                    console.log('bottom right L - model 9');
+                    topLeft(x);
+                    //bottom right L - model 9
                 }else{
-                    console.log('mid right T - model 8');
+                    bottomLeft(x);
+                    topLeft(x);
+                    //mid right T - model 8
                 };
             }else{
                 if (ep == 'sp'){
-                    console.log('top mid T - model 4');
+                    bottomLeft(x);
+                    bottomRight(x);
+                    //top mid T - model 4
                 }else if(ep == 'fp'){
-                    console.log('bottom mid T - model 6');
+                    topLeft(x);
+                    topRight(x);
+                   //bottom mid T - model 6
                 }else{
-                    console.log('center - model 5');
-                };
+                    bottomLeft(x);
+                    bottomRight(x);
+                    topLeft(x);
+                    topRight(x);
+                   //center - model 5'
                     };
                 };
-             };
+            };
+        };
     allIds.sort();
     };
 
     
-    // function id1(x){
-    //     let id1 = (x[0] - 1) + "." + (x[1] - 1);
-    //     let id1_s = id1.toString();
-    //     if (!id1_s.includes(0) && id1 < rowSize){
-    //         let deadCell = document.getElementById(id1);
-    //         deadCell.classList.remove('crossBox');
-    //         deadCell.classList += ' deadCell';
-    //     }else if (!id1_s.includes(0) && id1 > rowSize){
-    //         if(!invalids.includes(id1)){
-    //             invalids.push[id1];
-    //         };
-    //         console.log(invalids);
-    //     }else{
-    //         console.log(id1 + ' is invalid as contains 0');
-    //         };
-    //     }
+    function topLeft(x){
+        let col = x[0] - 1;
+        let row = x[1] - 1;
+        let id1 = col + "." + row;
+        let id1_s = id1.toString();
+        if (!id1_s.includes(0) && id1 < rowSize){
+            let deadCell = document.getElementById(id1);
+            deadCell.classList.remove('crossBox');
+            deadCell.classList += ' deadCell';
+        }else if (!id1_s.includes(0) && id1 > rowSize){
+            if(!invalids.includes(id1)){
+                invalids.push[id1];
+            };
+            console.log(invalids);
+        }else{
+            console.log(id1 + ' is invalid as contains 0');
+            };
+        }
 
-    // function id2(x){
-    //     let id2 = (x[0] - 1) + "." + (parseInt(x[1]) + 1);
-    //     let id2_s = id2.toString();
-    //     if (!id2_s.includes(0) && id2 < rowSize){
-    //         let deadCell = document.getElementById(id2);
-    //         deadCell.classList.remove('crossBox');
-    //         deadCell.classList += ' deadCell';
-    //     }else if (!id2_s.includes(0) && id2 > rowSize){
-    //         if(!invalids.includes(id2)){
-    //             invalids.push[id2];
-    //         };
-    //         console.log(invalids);
-    //     }else{
-    //         console.log(id2 + ' is invalid as contains 0');
-    //         };
-    //     }
+    function topRight(x){
+        let row = x[0] - 1;
+        let col = parseInt(x[1]) + 1;
+        let id2 =  row + "." + col;
+        let id2_s = id2.toString();
+        if (!id2_s.includes(0) && id2 < rowSize){
+            let deadCell = document.getElementById(id2);
+            deadCell.classList.remove('crossBox');
+            deadCell.classList += ' deadCell';
+        }else if (!id2_s.includes(0) && id2 > rowSize){
+            if(!invalids.includes(id2)){
+                invalids.push[id2];
+            };
+            console.log(invalids);
+        }else{
+            console.log(id2 + ' is invalid as contains 0');
+            };
+        }
 
-    // function id3(x){
-    //     let row = (parseInt(x[0]) + 1);
-    //     let col = x[1] - 1;
-    //     let id3 =  row + "." + col;
-    //     let id3_s = id3.toString();
-    //     if (!id3_s.includes(0) && rowSize > col){
-    //         let deadCell = document.getElementById(id3);
-    //         deadCell.classList.remove('crossBox');
-    //         deadCell.classList += ' deadCell';
-    //     }else if (!id3_s.includes(0)){
-    //         if(!invalids.includes(id3)){
-    //             invalids.push(id3);
-    //         };
-    //     };
-    // }
+    function bottomLeft(x){
+        let row = parseInt(x[0]) + 1;
+        let col = x[1] - 1;
+        let id3 =  row + "." + col;
+        let id3_s = id3.toString();
+        if (!id3_s.includes(0) && rowSize > col){
+            let deadCell = document.getElementById(id3);
+            deadCell.classList.remove('crossBox');
+            deadCell.classList += ' deadCell';
+        }else if (!id3_s.includes(0)){
+            if(!invalids.includes(id3)){
+                invalids.push(id3);
+            };
+        };
+    }
 
-    // function id4(x){
-    //     let row = (parseInt(x[0]) + 1);
-    //     let col = (parseInt(x[1]) + 1);
-    //     let id4 =  row + "." + col;
-    //     let id4_s = id4.toString();
-    //     console.log(id4_s);
-    //     if (!(id4_s.includes(0)) && rowSize > col){
-    //         let deadCell = document.getElementById(id4);
-    //         deadCell.classList.remove('crossBox');
-    //         deadCell.classList += ' deadCell';
-    //     }else if (!id4_s.includes(0)){
-    //         if(!invalids.includes(id4)){
-    //             invalids.push(id4);
-    //         };
-    //     }else{
-    //         console.log('is invalid as contains 0');
-    //         };
-    //     }
+    function bottomRight(x){
+        let row = parseInt(x[0]) + 1;
+        let col = parseInt(x[1]) + 1;
+        let id4 =  row + "." + col;
+        let id4_s = id4.toString();
+        if (!(id4_s.includes(0)) && rowSize > col){
+            let deadCell = document.getElementById(id4);
+            deadCell.classList.remove('crossBox');
+            deadCell.classList += ' deadCell';
+        }else if (!id4_s.includes(0)){
+            if(!invalids.includes(id4)){
+                invalids.push(id4);
+            };
+        }else{
+            console.log('is invalid as contains 0');
+            };
+        }
 
-    // if(crossPoints.length > 0){
-    //     for (let i = 0; i < crossPoints.length; i++){
-    //         let x = crossPoints[i].split(".");
-    //         if(orientation == 'down'){
-    //             if(crossPoints[i].includes('b')){
-    //                 console.log('model 1 - clue across + going up');
-    //                 id1(x);
-    //                 id2(x);
-    //             }else if(crossPoints[i].includes('t')){
-    //                 console.log(crossPoints);
-    //                 console.log('model 2 - clue across + going down');
-    //                 id3(x);
-    //                 id4(x);
-    //             }else{
-    //                 console.log('model 5a');
-    //                 id1(x);
-    //                 id2(x);
-    //                 id3(x);
-    //                 id4(x);
-    //             };
-    //         };
-    //         if(orientation == 'across'){
-    //             if(crossPoints[i].includes('b')){
-    //                 console.log('model 3');
-    //                 id1(x);
-    //                 id3(x);
-    //             }else if(crossPoints[i].includes('t')){
-    //                 console.log('model 4');
-    //                 id2(x);
-    //                 id4(x);
-    //             }else{
-    //                 console.log('model 5b');
-    //                 id1(x);
-    //                 id2(x);
-    //                 id3(x);
-    //                 id4(x);
-    //                     };
-    //                 };
-    //             };
-    //         };
 
     //ii. adds number to firstLetter
     initLetterId.insertAdjacentHTML('beforeBegin', 
