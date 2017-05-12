@@ -236,6 +236,17 @@ input[disabled]{
     background: #ffff99 !important;
 }
 
+.cross-point{
+    background: #e4e4e4;
+     -webkit-appearance: none;
+    outline:0;
+    max-width:45px;
+    max-height:45px;
+    text-align:center;
+    border:0;
+    cursor: default !important;
+}
+
 
 /*menu styles*/
 .boxes{

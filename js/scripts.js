@@ -127,7 +127,7 @@ getCrossword.addEventListener('keyup', getBox, false);
 function getBox(event) {
     if (event.target !== event.currentTarget) {
         let clickedItem = event.target;
-        if (!clickedItem.className.includes('selected')){
+        if (!clickedItem.className.includes('selected') ){
             clickedItem.className += ' selected';
         };
         if(clickedItem.value == '' && clickedItem.className.includes('selected')){
@@ -157,7 +157,8 @@ getCrossword.addEventListener('click', getSavedBox, false);
 function getSavedBox(el) {
     let clickedItem = el.target;
     let id = el.target.id;
-    if (clickedItem.className.includes('savedWord') && !(clickedItem.className.includes('selected')) && savedBoxList.length == 0 ){
+    let isCrossPoint = clickedItem.className.includes('cross-point');
+    if (clickedItem.className.includes('savedWord') && !(clickedItem.className.includes('selected')) && !isCrossPoint){
         clickedItem.className += ' selected';
         initWordId.push(id);
         savedBoxList.push(id);
@@ -292,6 +293,8 @@ confirmClueBtn.addEventListener('click', function(){
             getCell.classList += ` savedWord ${orientation}`;
         }else{
             getCell.classList += ' cross-point';
+            getCell.style.backgroundColor = 'lightgrey';
+            getCell.style.cursor = 'none !important';
         };
         getCell.classList.remove('selected');
         getCell.classList.remove('crossBox');
@@ -361,7 +364,6 @@ confirmClueBtn.addEventListener('click', function(){
         if(!allIds.includes(id)){
         allIds.push(id);
     }else{
-        console.log(id);
         let ep = document.getElementById(id).getAttribute('data-ep');
         let x = id.split(".");
         if (orientation == 'across'){
@@ -457,73 +459,37 @@ confirmClueBtn.addEventListener('click', function(){
     function topLeft(x){
         let col = x[0] - 1;
         let row = x[1] - 1;
-        let id1 = col + "." + row;
-        let id1_s = id1.toString();
-        if (!id1_s.includes(0) && id1 < rowSize){
-            let deadCell = document.getElementById(id1);
-            deadCell.classList.remove('crossBox');
-            deadCell.classList += ' deadCell';
-        }else if (!id1_s.includes(0) && id1 > rowSize){
-            if(!invalids.includes(id1)){
-                invalids.push[id1];
-            };
-            console.log(invalids);
-        }else{
-            console.log(id1 + ' is invalid as contains 0');
-            };
+        let id = col + "." + row;
+        let deadCell = document.getElementById(id);
+        deadCell.classList.remove('crossBox');
+        deadCell.classList += ' deadCell';
         }
 
     function topRight(x){
         let row = x[0] - 1;
         let col = parseInt(x[1]) + 1;
-        let id2 =  row + "." + col;
-        let id2_s = id2.toString();
-        if (!id2_s.includes(0) && id2 < rowSize){
-            let deadCell = document.getElementById(id2);
-            deadCell.classList.remove('crossBox');
-            deadCell.classList += ' deadCell';
-        }else if (!id2_s.includes(0) && id2 > rowSize){
-            if(!invalids.includes(id2)){
-                invalids.push[id2];
-            };
-            console.log(invalids);
-        }else{
-            console.log(id2 + ' is invalid as contains 0');
-            };
+        let id =  row + "." + col;
+        let deadCell = document.getElementById(id);
+        deadCell.classList.remove('crossBox');
+        deadCell.classList += ' deadCell';
         }
 
     function bottomLeft(x){
         let row = parseInt(x[0]) + 1;
         let col = x[1] - 1;
-        let id3 =  row + "." + col;
-        let id3_s = id3.toString();
-        if (!id3_s.includes(0) && rowSize > col){
-            let deadCell = document.getElementById(id3);
-            deadCell.classList.remove('crossBox');
-            deadCell.classList += ' deadCell';
-        }else if (!id3_s.includes(0)){
-            if(!invalids.includes(id3)){
-                invalids.push(id3);
-            };
-        };
+        let id =  row + "." + col;
+        let deadCell = document.getElementById(id);
+        deadCell.classList.remove('crossBox');
+        deadCell.classList += ' deadCell';
     }
 
     function bottomRight(x){
         let row = parseInt(x[0]) + 1;
         let col = parseInt(x[1]) + 1;
-        let id4 =  row + "." + col;
-        let id4_s = id4.toString();
-        if (!(id4_s.includes(0)) && rowSize > col){
-            let deadCell = document.getElementById(id4);
-            deadCell.classList.remove('crossBox');
-            deadCell.classList += ' deadCell';
-        }else if (!id4_s.includes(0)){
-            if(!invalids.includes(id4)){
-                invalids.push(id4);
-            };
-        }else{
-            console.log('is invalid as contains 0');
-            };
+        let id =  row + "." + col;
+        let deadCell = document.getElementById(id);
+        deadCell.classList.remove('crossBox');
+        deadCell.classList += ' deadCell';
         }
 
 
