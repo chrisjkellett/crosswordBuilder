@@ -3,7 +3,6 @@ const reduceRows = document.querySelector('#rowMinus');
 const cluebox = document.querySelector('.cluebox');
 const answers = [];
 const allIds = [];
-const crossPoints = [];
 const invalids = [];
 const maxSize = 9;
 const minSize = 4;
@@ -289,7 +288,11 @@ confirmClueBtn.addEventListener('click', function(){
     let initLetterId = document.getElementById(initWordId[0]);
     for (let i=0; i<initWordId.length; i++){
         let getCell = document.getElementById(initWordId[i]);
-        getCell.classList += ` savedWord ${orientation}`;
+        if(!getCell.className.includes('savedWord')){
+            getCell.classList += ` savedWord ${orientation}`;
+        }else{
+            getCell.classList += ' cross-point';
+        };
         getCell.classList.remove('selected');
         getCell.classList.remove('crossBox');
         if(i == 0){
