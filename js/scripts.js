@@ -529,6 +529,7 @@ confirmClueBtn.addEventListener('click', function(){
             tlrd.push(l);
             tlrd.push(r);
         };
+        console.log(tlrd);
         for (let id of tlrd){
             let el = document.getElementById(id); 
             el.classList += ' no-reinit';
