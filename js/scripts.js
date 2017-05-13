@@ -4,6 +4,7 @@ const cluebox = document.querySelector('.cluebox');
 const answers = [];
 const allIds = [];
 const invalids = [];
+const reverse_reinit = [];
 const maxSize = 9;
 const minSize = 4;
 let rowSize = 6;
@@ -46,7 +47,6 @@ function addToColumns(rowSize){
 function checkInvalids(){
     for (id of invalids){
         let deadCell = document.getElementById(id);
-        console.log(deadCell);
         deadCell.classList.remove('crossBox');
         deadCell.classList += ' deadCell';
         deadCell.disabled = true;
@@ -68,6 +68,7 @@ addRows.addEventListener('click', function(){
         for (let i=0; i<initWordId.length; i++){
             validateCrossword(initWordId[i]);
         }
+        reactivateUnselectables(reverse_reinit);
     };
 });
 
@@ -84,6 +85,7 @@ minusRows.addEventListener('click', function(){
         allCells = document.querySelectorAll('.crossBox');
         rowSize -= 1;
         gridinit -=1;
+        deactivateUnselectables(reverse_reinit);
     };
 });
 
@@ -242,6 +244,24 @@ function resetGrid(){
     savedBoxList = [];
 }
 
+//reactivate unselectable cells due to increase grid size #F246
+function reactivateUnselectables(ids){
+    for (id of ids){
+        let el = document.getElementById(id);
+        el.classList.remove('no-reinit');
+        el.style.backgroundColor = 'white';
+        console.log(el);
+    };
+}
+
+//deactivate unselectable cells due to increase grid size #F256
+function deactivateUnselectables(ids){
+    for (id of ids){
+        let el = document.getElementById(id);
+            el.classList += ' no-reinit';
+            el.style.backgroundColor = '#e4e4e4';
+    };
+}
 
 
 //3. add/initialise clue
@@ -375,7 +395,6 @@ confirmClueBtn.addEventListener('click', function(){
                     //top left L shaped clue - model 1
                 }else if(ep == 'fp'){
                     topRight(x);
-                    //bottom left L - model 3
                 }else{
                     topRight(x);
                     bottomRight(x);
@@ -384,6 +403,8 @@ confirmClueBtn.addEventListener('click', function(){
             }else if(id == initWordId[initWordId.length - 1]){
                 if (ep == 'sp'){
                     bottomLeft(x);
+                    let model = 3;
+                    reinit(x, model);
                     //top right L - model 7
                 }else if(ep == 'fp'){
                     topLeft(x);
@@ -397,7 +418,8 @@ confirmClueBtn.addEventListener('click', function(){
                 if (ep == 'sp'){
                     bottomLeft(x);
                     bottomRight(x);
-                    reinit_Model4(x);
+                    let model = 4;
+                    reinit(x, model);
                     //top mid T - model 4
                 }else if(ep == 'fp'){
                     topLeft(x);
@@ -419,17 +441,21 @@ confirmClueBtn.addEventListener('click', function(){
                     //top left L shaped clue - model 1
                 }else if(ep == 'fp'){
                     bottomLeft(x);
+                    let model = 3;
+                    reinit(x, model);
                     //top-right L - model 7
                 }else{
                     bottomLeft(x);
                     bottomRight(x);
-                    reinit_Model4(x);
+                    let model = 4;
+                    reinit(x, model);
                     //top mid T - model 4
                 };
             }else if(id == initWordId[initWordId.length - 1]){
                 if (ep == 'sp'){
                     topRight(x);
-                    //bottom left L - model 3
+                    let model = 3;
+                    reinit(x, model);
                 }else if(ep == 'fp'){
                     topLeft(x);
                     //bottom right L - model 9
@@ -499,7 +525,7 @@ confirmClueBtn.addEventListener('click', function(){
     }
     
     function reinit_Model5(x){
-        console.log('running reinit model');
+        console.log('running center reinit model');
         let col = x[0];
         let row = x[1];
         let t = (col - 1) + "." + row;
@@ -514,8 +540,8 @@ confirmClueBtn.addEventListener('click', function(){
     }
 
 
-    function reinit_Model4(x){
-        console.log('running reinit model 2.4');
+    function reinit(x, model){
+        console.log('running reinit model with flex');
         let col = x[0];
         let row = x[1];
         let t = (col - 1) + "." + row;
@@ -524,18 +550,40 @@ confirmClueBtn.addEventListener('click', function(){
         let d = (parseInt(col) + 1) + "." + row;
         let lUp = (parseInt(col) - 1) + "." + (row - 1);
         let rUp = (parseInt(col) - 1) + "." + (parseInt(row) + 1);
-        let tlrd = [d];
-        if (lUp < 1){
+        let rDown = (parseInt(row) + 1);
+        let tlrd = [];
+        if(model == '4'){
             tlrd.push(l);
             tlrd.push(r);
-        };
-        console.log(tlrd);
+            tlrd.push(d);
+
+        }else if(model == '3'){
+            if (rDown > rowSize && lUp < 1){
+                console.log('model 3.1');
+                console.log(rDown, rowSize);
+                tlrd.push(l);
+                tlrd.push(d);
+                reverse_reinit.push(d);
+            }else if(rDown > rowSize && lUp > 1){
+                console.log('model 3.2');
+                tlrd.push(d);
+                reverse_reinit.push(d);
+                console.log(reverse_reinit);
+            }else if (lUp < 1){
+                console.log('model 3.3');
+                tlrd.push(l);
+            }else{
+                console.log('model 3.4');
+                };
+            };
+
         for (let id of tlrd){
             let el = document.getElementById(id); 
             el.classList += ' no-reinit';
             el.style.backgroundColor = '#e4e4e4';
         };
     }
+
     //ii. adds number to firstLetter
     initLetterId.insertAdjacentHTML('beforeBegin', 
             `<div class="number-wrapper">${counter}</div>`);
