@@ -404,6 +404,9 @@ confirmClueBtn.addEventListener('click', function(){
                     //top left L shaped clue - model 1
                 }else if(ep == 'fp'){
                     topRight(x);
+                    const model = 7;
+                    reinit(x, model);
+                    //bottom left L shaped clue - model 7 (3)
                 }else{
                     topRight(x);
                     bottomRight(x);
@@ -437,7 +440,9 @@ confirmClueBtn.addEventListener('click', function(){
                 }else if(ep == 'fp'){
                     topLeft(x);
                     topRight(x);
-                   //bottom mid T - model 6
+                    const model = 8;
+                    reinit(x, model);
+                   //bottom mid T - model 8 (6)
                 }else{
                     bottomLeft(x);
                     bottomRight(x);
@@ -463,21 +468,24 @@ confirmClueBtn.addEventListener('click', function(){
                 }else{
                     bottomLeft(x);
                     bottomRight(x);
-                    let model = 2;
+                    const model = 2;
                     reinit(x, model);
                     //top mid T - model 2
                 };
             }else if(id == initWordId[initWordId.length - 1]){
                 if (ep == 'sp'){
                     topRight(x);
-                    let model = 3;
+                    const model = 7;
                     reinit(x, model);
+                    //bottom left L - model 7
                 }else if(ep == 'fp'){
                     topLeft(x);
                     //bottom right L - model 9
                 }else{
                     topRight(x);
                     topLeft(x);
+                    const model = 8;
+                    reinit(x, model);
                     //bottom mid T - model 8
                 };
             }else{
@@ -563,28 +571,28 @@ confirmClueBtn.addEventListener('click', function(){
     //#F542 validation on existing clues for reinitialisation 
     function reinit(x, model){
         console.log('running reinit model with flex');
-        let col = x[0];
-        let row = x[1];
-        let t = (col - 1) + "." + row;
-        let l = col + "." + (row - 1);
-        let r = col + "." + (parseInt(row) + 1);
-        let d = (parseInt(col) + 1) + "." + row;
-        let lUp = (parseInt(col) - 1) + "." + (row - 1);
-        let rUp = (parseInt(col) - 1) + "." + (parseInt(row) + 1);
-        let rDown = (parseInt(row) + 1);
-        let lDown = row - 1;
+        let row = x[0];
+        let col = x[1];
+        let t = (row - 1) + "." + col;
+        let l = row + "." + (col - 1);
+        let r = row + "." + (parseInt(col) + 1);
+        let d = (parseInt(row) + 1) + "." + col;
+        let colSub = col - 1;
+        let colAdd = parseInt(col) + 1;
+        let rowSub = row - 1;
+        let rowAdd = parseInt(row) + 1;
         let tlrd = [];
 
 
         if(model == '1'){
-            if(rUp < 1 && lDown < 1){
+            if(colSub < 1 && rowSub < 1){
                 console.log('model 1.1');
                 tlrd.push(d);
                 tlrd.push(r);
-            }else if(lDown < 1){
+            }else if(colSub < 1){
                 console.log('model 1.2');
                 tlrd.push(d);
-            }else if(rUp < 1){
+            }else if(rowAdd < 1){
                 console.log('model 1.3');
                 tlrd.push(r)
             }else{
@@ -593,11 +601,11 @@ confirmClueBtn.addEventListener('click', function(){
 
 
         }else if(model == '2'){
-            if(lUp < 1){
-            console.log('running model 2.1');
-            tlrd.push(l);
-            tlrd.push(r);
-            tlrd.push(d);
+            if(rowSub < 1){
+                console.log('running model 2.1');
+                tlrd.push(l);
+                tlrd.push(r);
+                tlrd.push(d);
             }else{
                 console.log('running model 2.2'); 
                 tlrd.push(d);
@@ -605,14 +613,14 @@ confirmClueBtn.addEventListener('click', function(){
 
         }else if(model == '3'){
             reverse_reinit.push(d);
-            if (rDown > rowSize && lUp < 1){
+            if (colAdd > rowSize && rowSub < 1){
                 console.log('model 3.1');
                 tlrd.push(l);
                 tlrd.push(d);
-            }else if(rDown > rowSize && lUp > 1){
+            }else if(colAdd > rowSize){
                 console.log('model 3.2');
                 tlrd.push(d);
-            }else if (lUp < 1){
+            }else if (rowSub < 1){
                 console.log('model 3.3');
                 tlrd.push(l);
             }else{
@@ -620,7 +628,7 @@ confirmClueBtn.addEventListener('click', function(){
         };
             
         }else if(model == '4'){
-            if(lDown < 1){
+            if(colPlus < 1){
                 console.log('running model 4.1');
                 tlrd.push(t);
                 tlrd.push(r);
@@ -638,19 +646,45 @@ confirmClueBtn.addEventListener('click', function(){
                 tlrd.push(d);
         
         }else if(model == '6'){
-            if(rDown > rowSize){
+            reverse_reinit.push(t);
+            reverse_reinit.push(d);
+            if(colPlus > rowSize){
                 console.log('running model 6.1');
                 tlrd.push(t);
                 tlrd.push(l);
                 tlrd.push(d);
-                reverse_reinit.push(t);
-                reverse_reinit.push(d);
             }else{
                 console.log('running model 6.2'); 
                 tlrd.push(l);
-                reverse_reinit.push(t);
-                reverse_reinit.push(d);
-        };
+            };
+
+        }else if(model == '7'){
+            if(colSub < 1 && rowAdd > rowSize){
+                console.log('model 7.1');
+                tlrd.push(t);
+                tlrd.push(r);
+            }else if(colSub < 1){
+                console.log('model 7.2');
+                tlrd.push(t);
+            }else if(rowAdd > rowSize){
+                console.log('model 7.3');
+                tlrd.push(r)
+            }else{
+                console.log('model 7.4');
+            };
+
+        }else if(model == '8'){
+            reverse_reinit.push(r);
+            reverse_reinit.push(l);
+            if(rowAdd > rowSize){
+                console.log('running model 8.1');
+                tlrd.push(t);
+                tlrd.push(l);
+                tlrd.push(r);
+            }else{
+                console.log('running model 8.2'); 
+                tlrd.push(t);
+            };
         };
 
 
