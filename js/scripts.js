@@ -40,7 +40,7 @@ function addToColumns(rowSize){
         let getRow = document.querySelector('#r-' + j);
             getRow.insertAdjacentHTML('beforeend', 
             `<div class="cell-wrapper">
-            <input type="text" maxlength="1" id="${j}.${rowSize}" class="crossBox crossFont" /></div>`);
+            <input type="text" maxlength="1" id="${j}.${rowSize}" class="crossBox crossFont row-${j} col-${rowSize}" /></div>`);
         };
 }
 
