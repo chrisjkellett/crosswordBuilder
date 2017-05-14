@@ -77,7 +77,6 @@ const minusRows = document.querySelector('#rowMinus');
 minusRows.addEventListener('click', function(){
     let lastRow = allIds[allIds.length - 1][2];
     let lastCol = allIds[allIds.length - 1][0];
-    console.log(lastRow, lastCol);
     if (rowSize > minSize && lastCol < rowSize && lastRow < rowSize){
         let row = document.querySelector('#r-' + (rowSize - 1));
         row.nextElementSibling.remove();
@@ -263,9 +262,14 @@ function reactivateUnselectables(ids){
 //deactivate unselectable cells due to increase grid size #F256
 function deactivateUnselectables(ids){
     for (id of ids){
+        const x = id.split(".");
+        const lastRow = parseInt(x[0]);
+        const lastCol = parseInt(x[1]); 
+        if(lastRow == rowSize || lastCol == rowSize){
         let el = document.getElementById(id);
             el.classList += ' no-reinit';
             el.style.backgroundColor = '#e4e4e4';
+        };
     };
 }
 
@@ -315,7 +319,7 @@ addWordBtn.addEventListener('click', function(){
 let confirmClueBtn = document.querySelector('#confirmClue');
 confirmClueBtn.addEventListener('click', function(){
     //i. adds and removes classes  
-    let initLetterId = document.getElementById(initWordId[0]);
+    let initLetterEl = document.getElementById(initWordId[0]);
     for (let i=0; i<initWordId.length; i++){
         let getCell = document.getElementById(initWordId[i]);
         if(!getCell.className.includes('savedWord')){
@@ -422,6 +426,8 @@ confirmClueBtn.addEventListener('click', function(){
                     //top right L - model 3 (7)
                 }else if(ep == 'fp'){
                     topLeft(x);
+                    const model = 9;
+                    reinit(x, model);
                     //bottom right L - model 9
                 }else{
                     bottomLeft(x);
@@ -480,6 +486,8 @@ confirmClueBtn.addEventListener('click', function(){
                     //bottom left L - model 7
                 }else if(ep == 'fp'){
                     topLeft(x);
+                    const model = 9;
+                    reinit(x, model);
                     //bottom right L - model 9
                 }else{
                     topRight(x);
@@ -628,7 +636,7 @@ confirmClueBtn.addEventListener('click', function(){
         };
             
         }else if(model == '4'){
-            if(colPlus < 1){
+            if(colAdd < 1){
                 console.log('running model 4.1');
                 tlrd.push(t);
                 tlrd.push(r);
@@ -648,7 +656,7 @@ confirmClueBtn.addEventListener('click', function(){
         }else if(model == '6'){
             reverse_reinit.push(t);
             reverse_reinit.push(d);
-            if(colPlus > rowSize){
+            if(colAdd > rowSize){
                 console.log('running model 6.1');
                 tlrd.push(t);
                 tlrd.push(l);
@@ -685,8 +693,28 @@ confirmClueBtn.addEventListener('click', function(){
                 console.log('running model 8.2'); 
                 tlrd.push(t);
             };
-        };
 
+        }else if(model == '9'){
+            if (colAdd > rowSize && rowAdd > rowSize){
+                console.log('model 9.1');
+                tlrd.push(l);
+                tlrd.push(t);
+                reverse_reinit.push(l);
+                reverse_reinit.push(t);
+            }else if(colAdd > rowSize){
+                console.log('model 9.2');
+                tlrd.push(t);
+                reverse_reinit.push(t);
+            }else if (rowAdd > rowSize){
+                console.log('model 9.3');
+                tlrd.push(l);
+                reverse_reinit.push(l);
+            }else{
+                console.log('model 9.4');
+                reverse_reinit.push(l);
+                reverse_reinit.push(t);
+            };
+        };
 
         for (let id of tlrd){
             let el = document.getElementById(id); 
@@ -696,8 +724,10 @@ confirmClueBtn.addEventListener('click', function(){
     }
 
     //ii. adds number to firstLetter
-    initLetterId.insertAdjacentHTML('beforeBegin', 
+    if(!initLetterEl.previousElementSibling){
+    initLetterEl.insertAdjacentHTML('beforeBegin', 
             `<div class="number-wrapper">${counter}</div>`);
+    };
 
     //iii. adds clues to clueList
     let getClueList = document.getElementById(`${orientation}`);
