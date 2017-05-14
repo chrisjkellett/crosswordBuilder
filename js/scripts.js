@@ -77,6 +77,7 @@ const minusRows = document.querySelector('#rowMinus');
 minusRows.addEventListener('click', function(){
     let lastRow = allIds[allIds.length - 1][2];
     let lastCol = allIds[allIds.length - 1][0];
+    console.log(lastRow, lastCol);
     if (rowSize > minSize && lastCol < rowSize && lastRow < rowSize){
         let row = document.querySelector('#r-' + (rowSize - 1));
         row.nextElementSibling.remove();
@@ -348,7 +349,7 @@ confirmClueBtn.addEventListener('click', function(){
     //ia - 1. endPoint validation
     let len = initWordId.length;
     let lastCell = document.getElementById(initWordId[len - 1]);
-    if(orientation == 'across' && len != rowSize){
+    if(orientation == 'across'){
         let row = initWordId[0][0];
         let lastCol = (parseInt(initWordId[len - 1][2])) + 1;
         let endPointCellId = row + '.' + lastCol;
@@ -356,6 +357,7 @@ confirmClueBtn.addEventListener('click', function(){
             let deadCell = document.getElementById(endPointCellId);
             deadCell.classList.remove('crossBox');
             deadCell.classList += ' deadCell';
+            console.log('running endPoint validation');
             invalids.push(endPointCellId);
         }else if (!endPointCellId.includes(0)){
             invalids.push(endPointCellId);
@@ -371,10 +373,10 @@ confirmClueBtn.addEventListener('click', function(){
     };
 
     //ia - 2. vertical validation for deadCells //#001 fix
-     if(orientation == 'down' && len != rowSize){
+     if(orientation == 'down'){
         let col = initWordId[0][2];
         let endPointCellId = (parseInt(initWordId[len - 1][0]) + 1) + '.' + col;
-        if (endPointCellId < (rowSize + 1)){
+        if (endPointCellId <= rowSize){
             let deadCell = document.getElementById(endPointCellId);
             deadCell.classList.remove('crossBox');
             deadCell.classList += ' deadCell';
@@ -560,25 +562,10 @@ confirmClueBtn.addEventListener('click', function(){
         deadCell.classList.remove('crossBox');
         deadCell.classList += ' deadCell';
     }
-    
-    function reinit_Model5(x){
-        console.log('running center reinit model');
-        let col = x[0];
-        let row = x[1];
-        let t = (col - 1) + "." + row;
-        let l = col + "." + (row - 1);
-        let r = col + "." + (parseInt(row) + 1);
-        let d = (parseInt(col) + 1) + "." + row;
-        let tlrd = [t, l, r, d];
-        for (let id of tlrd){
-            let el = document.getElementById(id); 
-            el.classList += ' no-reinit';
-        };
-    }
+
 
     //#F542 validation on existing clues for reinitialisation 
     function reinit(x, model){
-        console.log('running reinit model with flex');
         let row = x[0];
         let col = x[1];
         let t = (row - 1) + "." + col;
@@ -594,60 +581,56 @@ confirmClueBtn.addEventListener('click', function(){
 
         if(model == '1'){
             if(colSub < 1 && rowSub < 1){
-                console.log('model 1.1');
+                //model 1.1
                 tlrd.push(d);
                 tlrd.push(r);
             }else if(colSub < 1){
-                console.log('model 1.2');
+                //model 1.2
                 tlrd.push(d);
             }else if(rowAdd < 1){
-                console.log('model 1.3');
+                //model 1.3
                 tlrd.push(r)
-            }else{
-                console.log('model 1.4');
             };
 
 
         }else if(model == '2'){
             if(rowSub < 1){
-                console.log('running model 2.1');
+                //model 2.1
                 tlrd.push(l);
                 tlrd.push(r);
                 tlrd.push(d);
             }else{
-                console.log('running model 2.2'); 
+                //model 2.2 
                 tlrd.push(d);
         };
 
         }else if(model == '3'){
             reverse_reinit.push(d);
             if (colAdd > rowSize && rowSub < 1){
-                console.log('model 3.1');
+                //model 3.1
                 tlrd.push(l);
                 tlrd.push(d);
             }else if(colAdd > rowSize){
-                console.log('model 3.2');
+                //model 3.2
                 tlrd.push(d);
             }else if (rowSub < 1){
-                console.log('model 3.3');
+                //model 3.3
                 tlrd.push(l);
-            }else{
-                console.log('model 3.4');
         };
             
         }else if(model == '4'){
             if(colAdd < 1){
-                console.log('running model 4.1');
+                //model 4.1
                 tlrd.push(t);
                 tlrd.push(r);
                 tlrd.push(d);
             }else{
-                console.log('running model 4.2'); 
+                //model 4.2 
                 tlrd.push(r);
         };
 
         }else if(model == '5'){
-                console.log('running model 5');
+                //model 5
                 tlrd.push(t);
                 tlrd.push(l);
                 tlrd.push(r);
@@ -657,60 +640,58 @@ confirmClueBtn.addEventListener('click', function(){
             reverse_reinit.push(t);
             reverse_reinit.push(d);
             if(colAdd > rowSize){
-                console.log('running model 6.1');
+                //model 6.1
                 tlrd.push(t);
                 tlrd.push(l);
                 tlrd.push(d);
             }else{
-                console.log('running model 6.2'); 
+                //model 6.2
                 tlrd.push(l);
             };
 
         }else if(model == '7'){
             if(colSub < 1 && rowAdd > rowSize){
-                console.log('model 7.1');
+                //model 7.1
                 tlrd.push(t);
                 tlrd.push(r);
             }else if(colSub < 1){
-                console.log('model 7.2');
+                //model 7.2
                 tlrd.push(t);
             }else if(rowAdd > rowSize){
-                console.log('model 7.3');
+                //model 7.3
                 tlrd.push(r)
-            }else{
-                console.log('model 7.4');
             };
 
         }else if(model == '8'){
             reverse_reinit.push(r);
             reverse_reinit.push(l);
             if(rowAdd > rowSize){
-                console.log('running model 8.1');
+                //model 8.1
                 tlrd.push(t);
                 tlrd.push(l);
                 tlrd.push(r);
             }else{
-                console.log('running model 8.2'); 
+                //model 8.2
                 tlrd.push(t);
             };
 
         }else if(model == '9'){
             if (colAdd > rowSize && rowAdd > rowSize){
-                console.log('model 9.1');
+                //model 9.1
                 tlrd.push(l);
                 tlrd.push(t);
                 reverse_reinit.push(l);
                 reverse_reinit.push(t);
             }else if(colAdd > rowSize){
-                console.log('model 9.2');
+                //model 9.2
                 tlrd.push(t);
                 reverse_reinit.push(t);
             }else if (rowAdd > rowSize){
-                console.log('model 9.3');
+                //model 9.3
                 tlrd.push(l);
                 reverse_reinit.push(l);
             }else{
-                console.log('model 9.4');
+                //model 9.4
                 reverse_reinit.push(l);
                 reverse_reinit.push(t);
             };
