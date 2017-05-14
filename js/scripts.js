@@ -72,10 +72,13 @@ addRows.addEventListener('click', function(){
     };
 });
 
-//decrease grid size
+//#F75 decrease grid size
 const minusRows = document.querySelector('#rowMinus');
 minusRows.addEventListener('click', function(){
-    if (rowSize > minSize){
+    let lastRow = allIds[allIds.length - 1][2];
+    let lastCol = allIds[allIds.length - 1][0];
+    console.log(lastRow, lastCol);
+    if (rowSize > minSize && lastCol < rowSize && lastRow < rowSize){
         let row = document.querySelector('#r-' + (rowSize - 1));
         row.nextElementSibling.remove();
         for (let j=1; j<rowSize; j++){
@@ -86,6 +89,10 @@ minusRows.addEventListener('click', function(){
         rowSize -= 1;
         gridinit -=1;
         deactivateUnselectables(reverse_reinit);
+    }else if(rowSize > minSize){
+        console.log('reducing size would delete clues');
+    }else{
+        console.log('min size is currently set at 4');
     };
 });
 
@@ -250,7 +257,6 @@ function reactivateUnselectables(ids){
         let el = document.getElementById(id);
         el.classList.remove('no-reinit');
         el.style.backgroundColor = 'white';
-        console.log(el);
     };
 }
 
@@ -346,9 +352,10 @@ confirmClueBtn.addEventListener('click', function(){
             let deadCell = document.getElementById(endPointCellId);
             deadCell.classList.remove('crossBox');
             deadCell.classList += ' deadCell';
-            }else if (!endPointCellId.includes(0)){
-                invalids.push(endPointCellId);
-            };
+            invalids.push(endPointCellId);
+        }else if (!endPointCellId.includes(0)){
+            invalids.push(endPointCellId);
+        };
 
         let firstCol = initWordId[0][2];
         let precedingCellId = row + "." + (firstCol - 1);
@@ -405,7 +412,7 @@ confirmClueBtn.addEventListener('click', function(){
                     bottomLeft(x);
                     let model = 3;
                     reinit(x, model);
-                    //top right L - model 7
+                    //top right L - model 3 (7)
                 }else if(ep == 'fp'){
                     topLeft(x);
                     //bottom right L - model 9
@@ -418,9 +425,9 @@ confirmClueBtn.addEventListener('click', function(){
                 if (ep == 'sp'){
                     bottomLeft(x);
                     bottomRight(x);
-                    let model = 4;
+                    let model = 2;
                     reinit(x, model);
-                    //top mid T - model 4
+                    //top mid T - model 2 (4)
                 }else if(ep == 'fp'){
                     topLeft(x);
                     topRight(x);
@@ -447,9 +454,9 @@ confirmClueBtn.addEventListener('click', function(){
                 }else{
                     bottomLeft(x);
                     bottomRight(x);
-                    let model = 4;
+                    let model = 2;
                     reinit(x, model);
-                    //top mid T - model 4
+                    //top mid T - model 2
                 };
             }else if(id == initWordId[initWordId.length - 1]){
                 if (ep == 'sp'){
@@ -539,7 +546,7 @@ confirmClueBtn.addEventListener('click', function(){
         };
     }
 
-
+    //#F542 validation on existing clues for reinitialisation 
     function reinit(x, model){
         console.log('running reinit model with flex');
         let col = x[0];
@@ -552,10 +559,16 @@ confirmClueBtn.addEventListener('click', function(){
         let rUp = (parseInt(col) - 1) + "." + (parseInt(row) + 1);
         let rDown = (parseInt(row) + 1);
         let tlrd = [];
-        if(model == '4'){
+        if(model == '2'){
+            if(lUp < 1){
+            console.log('running model 2.1');
             tlrd.push(l);
             tlrd.push(r);
             tlrd.push(d);
+        }else{
+            console.log('running model 2.2');
+            tlrd.push(d);
+            };
 
         }else if(model == '3'){
             if (rDown > rowSize && lUp < 1){
@@ -568,7 +581,6 @@ confirmClueBtn.addEventListener('click', function(){
                 console.log('model 3.2');
                 tlrd.push(d);
                 reverse_reinit.push(d);
-                console.log(reverse_reinit);
             }else if (lUp < 1){
                 console.log('model 3.3');
                 tlrd.push(l);
