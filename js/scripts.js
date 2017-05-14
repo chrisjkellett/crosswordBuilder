@@ -399,13 +399,17 @@ confirmClueBtn.addEventListener('click', function(){
             if(id == initWordId[0]){
                 if (ep == 'sp'){
                     bottomRight(x);
+                    const model = 1;
+                    reinit(x, model);
                     //top left L shaped clue - model 1
                 }else if(ep == 'fp'){
                     topRight(x);
                 }else{
                     topRight(x);
                     bottomRight(x);
-                    //mid left T - model 2
+                    const model = 4;
+                    reinit(x, model);
+                    //mid left T - model 2 (4)
                 };
             }else if(id == initWordId[initWordId.length - 1]){
                 if (ep == 'sp'){
@@ -437,7 +441,8 @@ confirmClueBtn.addEventListener('click', function(){
                     bottomRight(x);
                     topLeft(x);
                     topRight(x);
-                    reinit_Model5(x);
+                    const model = 5;
+                    reinit(x, model);
                    //center - model 5'
                     };
                 };
@@ -445,6 +450,8 @@ confirmClueBtn.addEventListener('click', function(){
             if(id == initWordId[0]){
                 if (ep == 'sp'){
                     bottomRight(x);
+                    const model = 1;
+                    reinit(x, model);
                     //top left L shaped clue - model 1
                 }else if(ep == 'fp'){
                     bottomLeft(x);
@@ -475,7 +482,9 @@ confirmClueBtn.addEventListener('click', function(){
                 if (ep == 'sp'){
                     topRight(x);
                     bottomRight(x);
-                    //left mid T - model 2
+                    const model = 4;
+                    reinit(x, model);
+                    //mid left T - model 4 (2)
                 }else if(ep == 'fp'){
                     topLeft(x);
                     bottomLeft(x);
@@ -485,7 +494,8 @@ confirmClueBtn.addEventListener('click', function(){
                     bottomRight(x);
                     topLeft(x);
                     topRight(x);
-                    reinit_Model5(x);
+                    const model = 5;
+                    reinit(x, model);
                    //center - model 5'
                     };
                 };
@@ -558,17 +568,36 @@ confirmClueBtn.addEventListener('click', function(){
         let lUp = (parseInt(col) - 1) + "." + (row - 1);
         let rUp = (parseInt(col) - 1) + "." + (parseInt(row) + 1);
         let rDown = (parseInt(row) + 1);
+        let lDown = row - 1;
         let tlrd = [];
-        if(model == '2'){
+
+
+        if(model == '1'){
+            if(rUp < 1 && lDown < 1){
+                console.log('model 1.1');
+                tlrd.push(d);
+                tlrd.push(r);
+            }else if(lDown < 1){
+                console.log('model 1.2');
+                tlrd.push(d);
+            }else if(rUp < 1){
+                console.log('model 1.3');
+                tlrd.push(r)
+            }else{
+                console.log('model 1.4');
+            };
+
+
+        }else if(model == '2'){
             if(lUp < 1){
             console.log('running model 2.1');
             tlrd.push(l);
             tlrd.push(r);
             tlrd.push(d);
-        }else{
-            console.log('running model 2.2');
-            tlrd.push(d);
-            };
+            }else{
+                console.log('running model 2.2'); 
+                tlrd.push(d);
+        };
 
         }else if(model == '3'){
             if (rDown > rowSize && lUp < 1){
@@ -586,8 +615,26 @@ confirmClueBtn.addEventListener('click', function(){
                 tlrd.push(l);
             }else{
                 console.log('model 3.4');
-                };
-            };
+        };
+            
+        }else if(model == '4'){
+            if(lDown < 1){
+            console.log('running model 4.1');
+            tlrd.push(t);
+            tlrd.push(r);
+            tlrd.push(d);
+            }else{
+                console.log('running model 4.2'); 
+                tlrd.push(r);
+        };
+
+    }else if(model == '5'){
+            console.log('running model 5');
+            tlrd.push(t);
+            tlrd.push(l);
+            tlrd.push(r);
+            tlrd.push(d);
+    };
 
         for (let id of tlrd){
             let el = document.getElementById(id); 
