@@ -116,13 +116,19 @@ if(initWordId.length <= 1){
                 for (el of els){
                     if (el.className.includes('crossBox')){
                         el.disabled = true;
+                    }else if(!el.className.includes('selected') && !(el.className.includes('deadCell'))){
+                        el.classList += ' no-reinit';
+                        el.style.backgroundColor = '#e4e4e4';
                     };
-                };
+                };  
             }else{
                 let els = document.querySelectorAll('.col-' + col);
                 for (el of els){
                     if (el.className.includes('crossBox')){
                         el.disabled = true;
+                      }else if(!el.className.includes('selected') && !(el.className.includes('deadCell'))){
+                        el.classList += ' no-reinit';
+                        el.style.backgroundColor = '#e4e4e4';
                     };
                 };
             };
