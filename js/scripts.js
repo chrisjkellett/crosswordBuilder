@@ -423,7 +423,9 @@ confirmClueBtn.addEventListener('click', function(){
                 }else{
                     bottomLeft(x);
                     topLeft(x);
-                    //mid right T - model 8
+                    const model = 6;
+                    reinit(x, model);
+                    //mid right T - model 6 (8)
                 };
             }else{
                 if (ep == 'sp'){
@@ -488,7 +490,9 @@ confirmClueBtn.addEventListener('click', function(){
                 }else if(ep == 'fp'){
                     topLeft(x);
                     bottomLeft(x);
-                   //right mid T - model 8
+                    const model = 6;
+                    reinit(x, model);
+                   //right mid T - model 6 (8)
                 }else{
                     bottomLeft(x);
                     bottomRight(x);
@@ -600,16 +604,14 @@ confirmClueBtn.addEventListener('click', function(){
         };
 
         }else if(model == '3'){
+            reverse_reinit.push(d);
             if (rDown > rowSize && lUp < 1){
                 console.log('model 3.1');
-                console.log(rDown, rowSize);
                 tlrd.push(l);
                 tlrd.push(d);
-                reverse_reinit.push(d);
             }else if(rDown > rowSize && lUp > 1){
                 console.log('model 3.2');
                 tlrd.push(d);
-                reverse_reinit.push(d);
             }else if (lUp < 1){
                 console.log('model 3.3');
                 tlrd.push(l);
@@ -619,22 +621,38 @@ confirmClueBtn.addEventListener('click', function(){
             
         }else if(model == '4'){
             if(lDown < 1){
-            console.log('running model 4.1');
-            tlrd.push(t);
-            tlrd.push(r);
-            tlrd.push(d);
+                console.log('running model 4.1');
+                tlrd.push(t);
+                tlrd.push(r);
+                tlrd.push(d);
             }else{
                 console.log('running model 4.2'); 
                 tlrd.push(r);
         };
 
-    }else if(model == '5'){
-            console.log('running model 5');
-            tlrd.push(t);
-            tlrd.push(l);
-            tlrd.push(r);
-            tlrd.push(d);
-    };
+        }else if(model == '5'){
+                console.log('running model 5');
+                tlrd.push(t);
+                tlrd.push(l);
+                tlrd.push(r);
+                tlrd.push(d);
+        
+        }else if(model == '6'){
+            if(rDown > rowSize){
+                console.log('running model 6.1');
+                tlrd.push(t);
+                tlrd.push(l);
+                tlrd.push(d);
+                reverse_reinit.push(t);
+                reverse_reinit.push(d);
+            }else{
+                console.log('running model 6.2'); 
+                tlrd.push(l);
+                reverse_reinit.push(t);
+                reverse_reinit.push(d);
+        };
+        };
+
 
         for (let id of tlrd){
             let el = document.getElementById(id); 
