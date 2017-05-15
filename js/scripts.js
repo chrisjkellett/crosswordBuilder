@@ -141,6 +141,17 @@ if(initWordId.length <= 1){
     };
 }
 
+//prevent caps and non-alphanumeric characters
+getCrossword.addEventListener('keypress', function(e){
+        //logs unicode equiv of character
+        let charCode = event.charCode;
+        if (charCode < 97 || charCode > 122) {
+            e.preventDefault();
+            console.log("illegal char found");
+            };
+        }, false);
+
+
 //adds listener to children of getCrossword
 let initWordId = [];
 getCrossword.addEventListener('keyup', getBox, false);
