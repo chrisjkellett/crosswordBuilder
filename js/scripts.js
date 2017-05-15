@@ -1,6 +1,7 @@
 const getCrossword = document.querySelector('#crossword');
 const reduceRows = document.querySelector('#rowMinus');
 const cluebox = document.querySelector('.cluebox');
+const addWordFromForm = document.querySelector('#addWordFromForm')
 const answers = [];
 const allIds = [];
 const invalids = [];
@@ -145,9 +146,11 @@ if(initWordId.length <= 1){
 getCrossword.addEventListener('keypress', function(e){
         //logs unicode equiv of character
         let charCode = event.charCode;
-        if (charCode < 97 || charCode > 122) {
-            e.preventDefault();
-            console.log("illegal char found");
+        if(charCode != 13){
+            if (charCode < 97 || charCode > 122) {
+                e.preventDefault();
+                console.log("illegal char found: ", charCode);
+                };
             };
         }, false);
 
@@ -299,7 +302,9 @@ function deactivateUnselectables(ids){
 
 //3. add/initialise clue
 const addWordBtn = document.querySelector('#addWord');
-addWordBtn.addEventListener('click', function(){
+addWordFromForm.addEventListener('submit', (e) => {
+    //prevents form submission
+    e.preventDefault();
     //i get all cells with clue
     let getLetters = document.querySelectorAll('.selected');
 
