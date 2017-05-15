@@ -5,6 +5,7 @@ const answers = [];
 const allIds = [];
 const invalids = [];
 const reverse_reinit = [];
+let unselectables = [];
 const maxSize = 9;
 const minSize = 4;
 let rowSize = 6;
@@ -77,7 +78,6 @@ const minusRows = document.querySelector('#rowMinus');
 minusRows.addEventListener('click', function(){
     let lastRow = allIds[allIds.length - 1][2];
     let lastCol = allIds[allIds.length - 1][0];
-    console.log(lastRow, lastCol);
     if (rowSize > minSize && lastCol < rowSize && lastRow < rowSize){
         let row = document.querySelector('#r-' + (rowSize - 1));
         row.nextElementSibling.remove();
@@ -96,13 +96,16 @@ minusRows.addEventListener('click', function(){
     };
 });
 
-
+//#F100 validates crossword at points that are clues is initialised
 function validateLoop(initWordId){
+//clue has no letters in it - a. new clue | b. first letter deleted
 if(initWordId.length <= 1){
         let getCells = document.querySelectorAll('.crossBox');
         for (cell of getCells){
             cell.disabled = false;
         };
+        reactivateUnselectables(unselectables);
+        unselectables = [];
         if (initWordId.length == 1){
         validateCrossword(initWordId[0]);
         };
@@ -119,6 +122,7 @@ if(initWordId.length <= 1){
                     }else if(!el.className.includes('selected') && !(el.className.includes('deadCell'))){
                         el.classList += ' no-reinit';
                         el.style.backgroundColor = '#e4e4e4';
+                        unselectables.push(el.id);
                     };
                 };  
             }else{
@@ -129,6 +133,7 @@ if(initWordId.length <= 1){
                       }else if(!el.className.includes('selected') && !(el.className.includes('deadCell'))){
                         el.classList += ' no-reinit';
                         el.style.backgroundColor = '#e4e4e4';
+                        unselectables.push(el.id);
                     };
                 };
             };
@@ -363,7 +368,6 @@ confirmClueBtn.addEventListener('click', function(){
             let deadCell = document.getElementById(endPointCellId);
             deadCell.classList.remove('crossBox');
             deadCell.classList += ' deadCell';
-            console.log('running endPoint validation');
             invalids.push(endPointCellId);
         }else if (!endPointCellId.includes(0)){
             invalids.push(endPointCellId);
