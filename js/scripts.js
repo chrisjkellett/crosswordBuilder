@@ -69,7 +69,7 @@ addRows.addEventListener('click', function(){
         validateLoop(initWordId);
         for (let i=0; i<initWordId.length; i++){
             validateCrossword(initWordId[i]);
-        }
+        };
         reactivateUnselectables(reverse_reinit);
     };
 });
@@ -341,10 +341,30 @@ addWordFromForm.addEventListener('submit', (e) => {
     answers.push(clue);
 });
 
+//3b. cancel clue
+const cancelClueBtn = document.querySelector('#cancelClue');
+cancelClueBtn.addEventListener('click', function(){  
+    cluebox.style.display = 'none';
+    insertClue = '';
+    insertLocation ='';
+     for (let cell of allCells){
+            cell.disabled = false;
+        };
+    addWordBtn.disabled = false;
+    if (!document.getElementById(initWordId[0]).previousElementSibling){
+        counter -= 1;
+    };
 
+    const clueInput = document.getElementById('clueEntry').value;
+    clueInput.value = '';
+    validateLoop(initWordId);
+    for (let i=0; i<initWordId.length; i++){
+        validateCrossword(initWordId[i]);
+    };
+});
 
 //4. confirm clue and add to clueList
-let confirmClueBtn = document.querySelector('#confirmClue');
+const confirmClueBtn = document.querySelector('#confirmClue');
 confirmClueBtn.addEventListener('click', function(){
     //i. adds and removes classes  
     let initLetterEl = document.getElementById(initWordId[0]);
@@ -746,23 +766,30 @@ confirmClueBtn.addEventListener('click', function(){
         let clueListBlock = document.querySelector('#clueList');
         clueListBlock.style.display = 'block';
     };
+    wrap = document.createElement('div');
+    wrap.className = 'clue-wrapper';
     el = document.createElement('p');
     el.className = 'font-clue';
     el.textContent = `${counter}. ${getInputVal}`;
-    getClueList.appendChild(el);
+    wrap.insertAdjacentElement('afterbegin', el);
+    deleteBtn = document.createElement('button');
+    deleteBtn.className = 'delete-button';
+    deleteBtn.innerHTML = '<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>';
+    wrap.insertAdjacentElement('beforeend', deleteBtn);
+    getClueList.appendChild(wrap);
+
+    deleteBtn.addEventListener('click', (e) =>{
+        const el = e.target.parentNode.parentNode;
+        const clue = el.textContent;
+        console.log(el, clue);
+        //getClueList.removeChild(el);
+    });
 
     //iv. resets grid for next clue
     resetGrid();
 });
 
 
-//5b. cancel clue
-let cancelClueBtn = document.querySelector('#cancelClue');
-cancelClueBtn.addEventListener('click', function(){  
-    cluebox.style.display = 'none';
-    insertClue = '';
-    insertLocation ='';
-});
 
 
 

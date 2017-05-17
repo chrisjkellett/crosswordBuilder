@@ -149,6 +149,21 @@ header{
     display:none;
 }
 
+.clue-wrapper{
+    display:flex;
+    justify-content: space-between;
+}
+
+.delete-button{
+    background:0;
+    border: 0;
+    outline:0;
+}
+
+.font-clue{
+    margin:0;
+}
+
 .savedWord{
     -webkit-appearance: none;
     outline:0;
