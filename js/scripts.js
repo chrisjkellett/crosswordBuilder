@@ -99,14 +99,13 @@ minusRows.addEventListener('click', function(){
 
 //#F100 validates crossword at points that are clues is initialised
 function validateLoop(initWordId){
-//clue has no letters in it - a. new clue | b. first letter deleted
 if(initWordId.length <= 1){
         let getCells = document.querySelectorAll('.crossBox');
         for (cell of getCells){
             cell.disabled = false;
         };
-        reactivateUnselectables(unselectables);
-        unselectables = [];
+        //reactivateUnselectables(unselectables);
+        //unselectables = [];
         if (initWordId.length == 1){
         validateCrossword(initWordId[0]);
         };
@@ -121,9 +120,9 @@ if(initWordId.length <= 1){
                     if (el.className.includes('crossBox')){
                         el.disabled = true;
                     }else if(!el.className.includes('selected') && !(el.className.includes('deadCell'))){
-                        el.classList += ' no-reinit';
-                        el.style.backgroundColor = '#e4e4e4';
-                        unselectables.push(el.id);
+                        //el.classList += ' no-reinit';
+                        //el.style.backgroundColor = '#e4e4e4';
+                        //unselectables.push(el.id);
                     };
                 };  
             }else{
