@@ -131,9 +131,9 @@ if(initWordId.length <= 1){
                     if (el.className.includes('crossBox')){
                         el.disabled = true;
                       }else if(!el.className.includes('selected') && !(el.className.includes('deadCell'))){
-                        el.classList += ' no-reinit';
-                        el.style.backgroundColor = '#e4e4e4';
-                        unselectables.push(el.id);
+                        // el.classList += ' no-reinit';
+                        // el.style.backgroundColor = '#e4e4e4';
+                        // unselectables.push(el.id);
                     };
                 };
             };
@@ -183,27 +183,30 @@ function getBox(event) {
     initWordId.sort();
     word_length(initWordId);
     check_gaps(initWordId);
-    validateLoop(initWordId);
+    //validateLoop(initWordId);
 }
 
 let savedBoxList = [];
 getCrossword.addEventListener('click', getSavedBox, false);
-function getSavedBox(el) {
-    let clickedItem = el.target;
-    let id = el.target.id;
-    let isCrossPoint = clickedItem.className.includes('cross-point');
-    let isNoReinit = clickedItem.className.includes('no-reinit');
-    if (clickedItem.className.includes('savedWord') && !(clickedItem.className.includes('selected')) && !(isCrossPoint || isNoReinit)){
-        clickedItem.className += ' selected';
+function getSavedBox(cell) {
+    let el = cell.target;
+    let id = el.id;
+    let isSaved = el.className.includes('savedWord');
+    let isCrossPoint = el.className.includes('cross-point');
+    let isNoReinit = el.className.includes('no-reinit');
+    let isSelected = el.className.includes('selected');
+    if (isSaved && !isSelected && !(isCrossPoint || isNoReinit)){
+        el.className += ' selected';
+        console.log('clicked item');
         initWordId.push(id);
         initWordId.sort();
         savedBoxList.push(id);
-    }else if(clickedItem.className.includes('savedWord') && clickedItem.className.includes('selected')){
-        clickedItem.classList.remove('selected');
+    }else if(isSaved && isSelected){
+        el.classList.remove('selected');
         initWordId.pop(id);
         savedBoxList.pop(id);
         };
-    el.stopPropagation();
+    cell.stopPropagation();
     validateLoop(initWordId);
     }
 
