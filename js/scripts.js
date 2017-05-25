@@ -305,21 +305,16 @@ const addWordBtn = document.querySelector('#addWord');
 addWordFromForm.addEventListener('submit', (e) => {
     //prevents form submission
     e.preventDefault();
-    //i get all cells with clue
+
     let getLetters = document.querySelectorAll('.selected');
-
-    //ii. init clue variable
-    let clue = '';
-
-    //iii.disable everything
     for (let cell of allCells){
             cell.disabled = true;
         };
     addWordBtn.disabled = true;
 
-    //iv.change style for clue cells
+    let answer = '';
     for (let letter of getLetters){
-        clue += letter.value.toLowerCase();
+        answer += letter.value.toLowerCase();
         letter.style.background = 'white';  
     };
 
@@ -330,7 +325,7 @@ addWordFromForm.addEventListener('submit', (e) => {
 
     //vi. insert clue into clueBox
     let insertClue = document.querySelector('#insertClue');
-    insertClue.textContent = clue;
+    insertClue.textContent = answer;
     let insertLocation = document.querySelector('#insertLocation');
     insertLocation.textContent = counter + " " + orientation;
 
@@ -338,7 +333,7 @@ addWordFromForm.addEventListener('submit', (e) => {
     cluebox.style.display = 'block';
 
     //viii.push clue to answer list
-    answers.push(clue);
+    answers.push(answer);
 });
 
 //3b. cancel clue
@@ -371,9 +366,9 @@ confirmClueBtn.addEventListener('click', function(){
     for (let i=0; i<initWordId.length; i++){
         let getCell = document.getElementById(initWordId[i]);
         if(!getCell.className.includes('savedWord')){
-            getCell.classList += ` savedWord ${orientation}`;
+            getCell.classList += ` savedWord ${counter}-${orientation}`;
         }else{
-            getCell.classList += ' cross-point';
+            getCell.classList += ` cross-point ${counter}-${orientation}`;
             getCell.style.backgroundColor = '#e4e4e4';
         };
         getCell.classList.remove('selected');
@@ -569,9 +564,8 @@ confirmClueBtn.addEventListener('click', function(){
                 };
             };
         };
-    allIds.sort();
     };
-
+    allIds.sort();
     
     function topLeft(x){
         let col = x[0] - 1;
@@ -767,6 +761,7 @@ confirmClueBtn.addEventListener('click', function(){
         clueListBlock.style.display = 'block';
     };
     wrap = document.createElement('div');
+    wrap.id = `${counter}-${orientation}`;
     wrap.className = 'clue-wrapper';
     el = document.createElement('p');
     el.className = 'font-clue';
@@ -780,9 +775,28 @@ confirmClueBtn.addEventListener('click', function(){
 
     deleteBtn.addEventListener('click', (e) =>{
         const el = e.target.parentNode.parentNode;
+        const clueId = el.id;
         const clue = el.textContent;
-        console.log(el, clue);
+        console.log(clueId);
         //getClueList.removeChild(el);
+        for (id of allIds){
+            let el = document.getElementById(id);
+            let letterOfClue = el.className.includes(clueId);
+            let crossPoint = el.className.includes('cross-point');
+            if(letterOfClue && !crossPoint){
+                console.log(el);
+                el.value = '';
+                el.classList.remove(clueId);
+                el.classList.remove('savedWord');
+                el.className += ' crossBox';
+                allIds.pop(el.id);
+            };
+            if(letterOfClue && crossPoint){
+                let el = document.getElementById(id);
+                el.classList.remove(clueId);
+                el.classList.remove('cross-point');
+            };
+        };
     });
 
     //iv. resets grid for next clue
