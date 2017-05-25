@@ -53,12 +53,14 @@
                     <div class="row">
                         <div id="crosswordWrapper" class="col-md-6">
                             <p class="raleway font-small sub-heading">Add your crossword</p>
-                            <div id="crossword"></div>
-                            <div id="toolbar">
-                            <button class="btn btn-default flex-btn" id="addWord" disabled>Add word</button>
+                            <form id="addWordFromForm">
+                                <div id="crossword"></div>
+                                <div id="toolbar">
+                                    <button class="btn btn-default flex-btn" id="addWord" disabled>Add word</button>
+                            </form>
                                 <button class="rounded" id="rowMinus"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button>
                                 <button class="rounded" id="rowPlus"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
-                            <span id="errorMessage">You must add a text of between 10 and 200 words.</span>
+                                <span id="errorMessage">You must add a text of between 10 and 200 words.</span>
                             </div>
                             <div class="cluebox">
                                 <p class="raleway font-small">Add clue for <strong><span id="insertClue"></span></strong> at <strong><span id="insertLocation"></span></strong>:</p>
