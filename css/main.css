@@ -111,7 +111,7 @@ header{
     font-weight:300;
 }
 
-.row, .crossRow{
+._row, .crossRow{
     display:flex;
 }
 

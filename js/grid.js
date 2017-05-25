@@ -6,10 +6,9 @@ const maxSize = 12;
 const minSize = 4;
 let rowSize = 6;
 let gridinit = 1;
-let orientation;
-let counter = 0;
 
-//-----------Multiuse functions ----------------------------------
+
+//-----------Multiuse functions --------------------------------------------------------------------------
 function makeCells(){
     for (let i=gridinit; i<rowSize + 1; i++){
         let getRow = document.querySelector('#r-' + i);
@@ -22,10 +21,10 @@ function makeCells(){
 }
 
 
-//-----------Generate grid ----------------------------------
+//-----------Generate grid --------------------------------------------------------------------------
 function generateGrid(){
     for (let i=1; i<rowSize + 1; i++){
-            getCrossword.innerHTML += `<div id="r-${i}" class="crossRow"></div>`;
+            getCrossword.innerHTML += `<div id="r-${i}" class="_row"></div>`;
         }
         makeCells();
     }
@@ -33,12 +32,12 @@ function generateGrid(){
 generateGrid();
 
 
-//-----------Change grid size ----------------------------------
+//-----------Change grid size --------------------------------------------------------------------------
 function increaseGridSize(){
 if (rowSize < maxSize){
         rowSize += 1;
         let addNewRow = getCrossword.insertAdjacentHTML('beforeend', 
-        `<div id="r-${rowSize}" class="crossRow"></div>`);
+        `<div id="r-${rowSize}" class="_row"></div>`);
         for (let i=1; i<rowSize; i++){
         let getRow = document.querySelector('#r-' + i);
             getRow.insertAdjacentHTML('beforeend', 
@@ -68,12 +67,12 @@ function decreaseGridSize(){
         if ((rowSize > minSize) && (lastCol < rowSize) && (lastRow < rowSize)){
             decreaseSize();
         }else if(rowSize > minSize){
-            console.log('reducing size would delete clues');
+            console.log('PROMPT: reducing size would delete clues');
         }else if (rowSize <= minSize){
-            console.log('min size is currently set at 4');
+            console.log('PROMPT: min size is currently set at 4');
         }
     }else if(rowSize <= minSize){
-        console.log('min size is currently set at 4');
+        console.log('PROMPT: min size is currently set at 4');
     }else{
         decreaseSize();
     }
@@ -82,12 +81,7 @@ function decreaseGridSize(){
 
 
 
-//-----------Listeners ----------------------------------
-increaseBtn.addEventListener('click', () => {
-    increaseGridSize();
-});
-
-decreaseBtn.addEventListener('click', () => {
-    decreaseGridSize();
-});
+//-----------Listeners --------------------------------------------------------------------------
+increaseBtn.addEventListener('click', increaseGridSize, false);
+decreaseBtn.addEventListener('click', decreaseGridSize, false);
 

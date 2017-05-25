@@ -15,36 +15,36 @@ let orientation;
 let counter = 0;
 
 
-//generates grid
-function generateGrid(rowSize){
-    for (let i=1; i<rowSize + 1; i++){
-            getCrossword.innerHTML += `<div id="r-${i}" class="crossRow"></div>`;
-        };
-        makeCells(rowSize);
-    };
-generateGrid(rowSize);
-let allCells = document.querySelectorAll('.crossBox');
+// //generates grid
+// function generateGrid(rowSize){
+//     for (let i=1; i<rowSize + 1; i++){
+//             getCrossword.innerHTML += `<div id="r-${i}" class="crossRow"></div>`;
+//         };
+//         makeCells(rowSize);
+//     };
+// generateGrid(rowSize);
+// let allCells = document.querySelectorAll('.crossBox');
 
 
-function makeCells(rowSize){
-    for (let i=gridinit; i<rowSize + 1; i++){
-        let getRow = document.querySelector('#r-' + i);
-        gridinit = rowSize + 1;
-        for (let j=1; j<rowSize + 1; j++){
-            getRow.innerHTML += `<div class="cell-wrapper">
-            <input type="text" maxlength="1" id="${i}.${j}" class="crossBox row-${i} col-${j}" /></div>`;
-            };
-        };
-}
+// function makeCells(rowSize){
+//     for (let i=gridinit; i<rowSize + 1; i++){
+//         let getRow = document.querySelector('#r-' + i);
+//         gridinit = rowSize + 1;
+//         for (let j=1; j<rowSize + 1; j++){
+//             getRow.innerHTML += `<div class="cell-wrapper">
+//             <input type="text" maxlength="1" id="${i}.${j}" class="crossBox row-${i} col-${j}" /></div>`;
+//             };
+//         };
+// }
 
-function addToColumns(rowSize){
-    for (let j=1; j<rowSize; j++){
-        let getRow = document.querySelector('#r-' + j);
-            getRow.insertAdjacentHTML('beforeend', 
-            `<div class="cell-wrapper">
-            <input type="text" maxlength="1" id="${j}.${rowSize}" class="crossBox row-${j} col-${rowSize}" /></div>`);
-        };
-}
+// function addToColumns(rowSize){
+//     for (let j=1; j<rowSize; j++){
+//         let getRow = document.querySelector('#r-' + j);
+//             getRow.insertAdjacentHTML('beforeend', 
+//             `<div class="cell-wrapper">
+//             <input type="text" maxlength="1" id="${j}.${rowSize}" class="crossBox row-${j} col-${rowSize}" /></div>`);
+//         };
+// }
 
 function checkInvalids(){
     for (id of invalids){
@@ -56,46 +56,50 @@ function checkInvalids(){
     };
 }
 
-//increase grid rowSize
-const addRows = document.querySelector('#rowPlus');
-addRows.addEventListener('click', function(){
-    if (rowSize < maxSize){
-        rowSize += 1;
-        let addNewRow = getCrossword.insertAdjacentHTML('beforeend', `<div id="r-${rowSize}" class="crossRow"></div>`);
-        makeCells(rowSize);
-        addToColumns(rowSize);
-        allCells = document.querySelectorAll('.crossBox');
-        checkInvalids();
-        validateLoop(initWordId);
-        for (let i=0; i<initWordId.length; i++){
-            validateCrossword(initWordId[i]);
-        };
-        reactivateUnselectables(reverse_reinit);
-    };
-});
+// //increase grid rowSize
+// const addRows = document.querySelector('#rowPlus');
+// addRows.addEventListener('click', function(){
+//     if (rowSize < maxSize){
+//         rowSize += 1;
+//         let addNewRow = getCrossword.insertAdjacentHTML('beforeend', `<div id="r-${rowSize}" class="crossRow"></div>`);
+//         makeCells(rowSize);
+//         addToColumns(rowSize);
+//         allCells = document.querySelectorAll('.crossBox');
+//         checkInvalids();
+//         validateLoop(initWordId);
+//         for (let i=0; i<initWordId.length; i++){
+//             validateCrossword(initWordId[i]);
+//         };
+//         reactivateUnselectables(reverse_reinit);
+//     };
+// });
 
-//#F75 decrease grid size
-const minusRows = document.querySelector('#rowMinus');
-minusRows.addEventListener('click', function(){
-    let lastRow = allIds[allIds.length - 1][2];
-    let lastCol = allIds[allIds.length - 1][0];
-    if (rowSize > minSize && lastCol < rowSize && lastRow < rowSize){
-        let row = document.querySelector('#r-' + (rowSize - 1));
-        row.nextElementSibling.remove();
-        for (let j=1; j<rowSize; j++){
-            let row = document.querySelector('#r-' + j);
-            row.lastElementChild.remove();
-        };
-        allCells = document.querySelectorAll('.crossBox');
-        rowSize -= 1;
-        gridinit -=1;
-        deactivateUnselectables(reverse_reinit);
-    }else if(rowSize > minSize){
-        console.log('reducing size would delete clues');
-    }else{
-        console.log('min size is currently set at 4');
-    };
-});
+// //#F75 decrease grid size
+// const minusRows = document.querySelector('#rowMinus');
+// minusRows.addEventListener('click', function(){
+//     if(!allIds.length === 0){
+        
+//     }
+
+//     let lastRow = allIds[allIds.length - 1][2];
+//     let lastCol = allIds[allIds.length - 1][0];
+//     if (rowSize > minSize && lastCol < rowSize && lastRow < rowSize){
+//         let row = document.querySelector('#r-' + (rowSize - 1));
+//         row.nextElementSibling.remove();
+//         for (let j=1; j<rowSize; j++){
+//             let row = document.querySelector('#r-' + j);
+//             row.lastElementChild.remove();
+//         };
+//         allCells = document.querySelectorAll('.crossBox');
+//         rowSize -= 1;
+//         gridinit -=1;
+//         deactivateUnselectables(reverse_reinit);
+//     }else if(rowSize > minSize){
+//         console.log('reducing size would delete clues');
+//     }else{
+//         console.log('min size is currently set at 4');
+//     };
+// });
 
 //#F100 validates crossword at points that are clues is initialised
 function validateLoop(initWordId){
@@ -142,17 +146,17 @@ if(initWordId.length <= 1){
     };
 }
 
-//prevent caps and non-alphanumeric characters
-getCrossword.addEventListener('keypress', function(e){
-        //logs unicode equiv of character
-        let charCode = event.charCode;
-        if(charCode != 13){
-            if (charCode < 97 || charCode > 122) {
-                e.preventDefault();
-                console.log("illegal char found: ", charCode);
-                };
-            };
-        }, false);
+// //prevent caps and non-alphanumeric characters
+// getCrossword.addEventListener('keypress', function(e){
+//         //logs unicode equiv of character
+//         let charCode = event.charCode;
+//         if(charCode != 13){
+//             if (charCode < 97 || charCode > 122) {
+//                 e.preventDefault();
+//                 console.log("illegal char found: ", charCode);
+//                 };
+//             };
+//         }, false);
 
 
 //adds listener to children of getCrossword
