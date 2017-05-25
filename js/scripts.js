@@ -32,7 +32,7 @@ function makeCells(rowSize){
         gridinit = rowSize + 1;
         for (let j=1; j<rowSize + 1; j++){
             getRow.innerHTML += `<div class="cell-wrapper">
-            <input type="text" maxlength="1" id="${i}.${j}" class="crossBox crossFont row-${i} col-${j}" /></div>`;
+            <input type="text" maxlength="1" id="${i}.${j}" class="crossBox row-${i} col-${j}" /></div>`;
             };
         };
 }
@@ -42,7 +42,7 @@ function addToColumns(rowSize){
         let getRow = document.querySelector('#r-' + j);
             getRow.insertAdjacentHTML('beforeend', 
             `<div class="cell-wrapper">
-            <input type="text" maxlength="1" id="${j}.${rowSize}" class="crossBox crossFont row-${j} col-${rowSize}" /></div>`);
+            <input type="text" maxlength="1" id="${j}.${rowSize}" class="crossBox row-${j} col-${rowSize}" /></div>`);
         };
 }
 
@@ -302,7 +302,7 @@ function deactivateUnselectables(ids){
 
 //3. add/initialise clue
 const addWordBtn = document.querySelector('#addWord');
-addWordFromForm.addEventListener('submit', (e) => {
+addWordBtn.addEventListener('click', (e) => {
     //prevents form submission
     e.preventDefault();
 
