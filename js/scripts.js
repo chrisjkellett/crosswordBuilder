@@ -1,10 +1,12 @@
 const getCrossword = document.querySelector('#crossword');
 const reduceRows = document.querySelector('#rowMinus');
 const cluebox = document.querySelector('.cluebox');
+const addWordFromForm = document.querySelector('#addWordFromForm')
 const answers = [];
 const allIds = [];
-const crossPoints = [];
 const invalids = [];
+const reverse_reinit = [];
+let unselectables = [];
 const maxSize = 9;
 const minSize = 4;
 let rowSize = 6;
@@ -40,7 +42,7 @@ function addToColumns(rowSize){
         let getRow = document.querySelector('#r-' + j);
             getRow.insertAdjacentHTML('beforeend', 
             `<div class="cell-wrapper">
-            <input type="text" maxlength="1" id="${j}.${rowSize}" class="crossBox crossFont" /></div>`);
+            <input type="text" maxlength="1" id="${j}.${rowSize}" class="crossBox crossFont row-${j} col-${rowSize}" /></div>`);
         };
 }
 
@@ -67,14 +69,17 @@ addRows.addEventListener('click', function(){
         validateLoop(initWordId);
         for (let i=0; i<initWordId.length; i++){
             validateCrossword(initWordId[i]);
-        }
+        };
+        reactivateUnselectables(reverse_reinit);
     };
 });
 
-//decrease grid size
+//#F75 decrease grid size
 const minusRows = document.querySelector('#rowMinus');
 minusRows.addEventListener('click', function(){
-    if (rowSize > minSize){
+    let lastRow = allIds[allIds.length - 1][2];
+    let lastCol = allIds[allIds.length - 1][0];
+    if (rowSize > minSize && lastCol < rowSize && lastRow < rowSize){
         let row = document.querySelector('#r-' + (rowSize - 1));
         row.nextElementSibling.remove();
         for (let j=1; j<rowSize; j++){
@@ -84,16 +89,24 @@ minusRows.addEventListener('click', function(){
         allCells = document.querySelectorAll('.crossBox');
         rowSize -= 1;
         gridinit -=1;
+        deactivateUnselectables(reverse_reinit);
+    }else if(rowSize > minSize){
+        console.log('reducing size would delete clues');
+    }else{
+        console.log('min size is currently set at 4');
     };
 });
 
-
+//#F100 validates crossword at points that are clues is initialised
 function validateLoop(initWordId){
+//clue has no letters in it - a. new clue | b. first letter deleted
 if(initWordId.length <= 1){
         let getCells = document.querySelectorAll('.crossBox');
         for (cell of getCells){
             cell.disabled = false;
         };
+        reactivateUnselectables(unselectables);
+        unselectables = [];
         if (initWordId.length == 1){
         validateCrossword(initWordId[0]);
         };
@@ -107,13 +120,21 @@ if(initWordId.length <= 1){
                 for (el of els){
                     if (el.className.includes('crossBox')){
                         el.disabled = true;
+                    }else if(!el.className.includes('selected') && !(el.className.includes('deadCell'))){
+                        el.classList += ' no-reinit';
+                        el.style.backgroundColor = '#e4e4e4';
+                        unselectables.push(el.id);
                     };
-                };
+                };  
             }else{
                 let els = document.querySelectorAll('.col-' + col);
                 for (el of els){
                     if (el.className.includes('crossBox')){
                         el.disabled = true;
+                      }else if(!el.className.includes('selected') && !(el.className.includes('deadCell'))){
+                        el.classList += ' no-reinit';
+                        el.style.backgroundColor = '#e4e4e4';
+                        unselectables.push(el.id);
                     };
                 };
             };
@@ -121,13 +142,26 @@ if(initWordId.length <= 1){
     };
 }
 
+//prevent caps and non-alphanumeric characters
+getCrossword.addEventListener('keypress', function(e){
+        //logs unicode equiv of character
+        let charCode = event.charCode;
+        if(charCode != 13){
+            if (charCode < 97 || charCode > 122) {
+                e.preventDefault();
+                console.log("illegal char found: ", charCode);
+                };
+            };
+        }, false);
+
+
 //adds listener to children of getCrossword
 let initWordId = [];
 getCrossword.addEventListener('keyup', getBox, false);
 function getBox(event) {
     if (event.target !== event.currentTarget) {
         let clickedItem = event.target;
-        if (!clickedItem.className.includes('selected')){
+        if (!clickedItem.className.includes('selected') ){
             clickedItem.className += ' selected';
         };
         if(clickedItem.value == '' && clickedItem.className.includes('selected')){
@@ -136,6 +170,7 @@ function getBox(event) {
         let id = event.target.id;
         if (!initWordId.includes(id) && event.target.className.includes('selected')){
         initWordId.push(id);
+        initWordId.sort();
         validateCrossword(id);
         };
    };
@@ -157,9 +192,12 @@ getCrossword.addEventListener('click', getSavedBox, false);
 function getSavedBox(el) {
     let clickedItem = el.target;
     let id = el.target.id;
-    if (clickedItem.className.includes('savedWord') && !(clickedItem.className.includes('selected')) && savedBoxList.length == 0 ){
+    let isCrossPoint = clickedItem.className.includes('cross-point');
+    let isNoReinit = clickedItem.className.includes('no-reinit');
+    if (clickedItem.className.includes('savedWord') && !(clickedItem.className.includes('selected')) && !(isCrossPoint || isNoReinit)){
         clickedItem.className += ' selected';
         initWordId.push(id);
+        initWordId.sort();
         savedBoxList.push(id);
     }else if(clickedItem.className.includes('savedWord') && clickedItem.className.includes('selected')){
         clickedItem.classList.remove('selected');
@@ -238,26 +276,45 @@ function resetGrid(){
     savedBoxList = [];
 }
 
+//reactivate unselectable cells due to increase grid size #F246
+function reactivateUnselectables(ids){
+    for (id of ids){
+        let el = document.getElementById(id);
+        el.classList.remove('no-reinit');
+        el.style.backgroundColor = 'white';
+    };
+}
+
+//deactivate unselectable cells due to increase grid size #F256
+function deactivateUnselectables(ids){
+    for (id of ids){
+        const x = id.split(".");
+        const lastRow = parseInt(x[0]);
+        const lastCol = parseInt(x[1]); 
+        if(lastRow == rowSize || lastCol == rowSize){
+        let el = document.getElementById(id);
+            el.classList += ' no-reinit';
+            el.style.backgroundColor = '#e4e4e4';
+        };
+    };
+}
 
 
 //3. add/initialise clue
 const addWordBtn = document.querySelector('#addWord');
-addWordBtn.addEventListener('click', function(){
-    //i get all cells with clue
+addWordFromForm.addEventListener('submit', (e) => {
+    //prevents form submission
+    e.preventDefault();
+
     let getLetters = document.querySelectorAll('.selected');
-
-    //ii. init clue variable
-    let clue = '';
-
-    //iii.disable everything
     for (let cell of allCells){
             cell.disabled = true;
         };
     addWordBtn.disabled = true;
 
-    //iv.change style for clue cells
+    let answer = '';
     for (let letter of getLetters){
-        clue += letter.value.toLowerCase();
+        answer += letter.value.toLowerCase();
         letter.style.background = 'white';  
     };
 
@@ -268,7 +325,7 @@ addWordBtn.addEventListener('click', function(){
 
     //vi. insert clue into clueBox
     let insertClue = document.querySelector('#insertClue');
-    insertClue.textContent = clue;
+    insertClue.textContent = answer;
     let insertLocation = document.querySelector('#insertLocation');
     insertLocation.textContent = counter + " " + orientation;
 
@@ -276,32 +333,65 @@ addWordBtn.addEventListener('click', function(){
     cluebox.style.display = 'block';
 
     //viii.push clue to answer list
-    answers.push(clue);
+    answers.push(answer);
 });
 
+//3b. cancel clue
+const cancelClueBtn = document.querySelector('#cancelClue');
+cancelClueBtn.addEventListener('click', function(){  
+    cluebox.style.display = 'none';
+    insertClue = '';
+    insertLocation ='';
+     for (let cell of allCells){
+            cell.disabled = false;
+        };
+    addWordBtn.disabled = false;
+    if (!document.getElementById(initWordId[0]).previousElementSibling){
+        counter -= 1;
+    };
 
+    const clueInput = document.getElementById('clueEntry').value;
+    clueInput.value = '';
+    validateLoop(initWordId);
+    for (let i=0; i<initWordId.length; i++){
+        validateCrossword(initWordId[i]);
+    };
+});
 
 //4. confirm clue and add to clueList
-let confirmClueBtn = document.querySelector('#confirmClue');
+const confirmClueBtn = document.querySelector('#confirmClue');
 confirmClueBtn.addEventListener('click', function(){
     //i. adds and removes classes  
-    let initLetterId = document.getElementById(initWordId[0]);
+    let initLetterEl = document.getElementById(initWordId[0]);
     for (let i=0; i<initWordId.length; i++){
         let getCell = document.getElementById(initWordId[i]);
-        getCell.classList += ` savedWord ${orientation}`;
+        if(!getCell.className.includes('savedWord')){
+            getCell.classList += ` savedWord ${counter}-${orientation}`;
+        }else{
+            getCell.classList += ` cross-point ${counter}-${orientation}`;
+            getCell.style.backgroundColor = '#e4e4e4';
+        };
         getCell.classList.remove('selected');
         getCell.classList.remove('crossBox');
         if(i == 0){
-            getCell.classList += ' sp';
+            if(!getCell.hasAttribute('data-ep')){
+                getCell.setAttribute('data-ep', 'sp');
+            };
         }else if (i == initWordId.length - 1){
-            getCell.classList += ' ep';
+            if(!getCell.hasAttribute('data-ep')){
+            getCell.setAttribute('data-ep', 'fp');
+            };
+        }else{
+            if(!getCell.hasAttribute('data-ep')){
+            getCell.setAttribute('data-ep', 'mp');
+            };
         };
     };
 
     //ia - 1. endPoint validation
     let len = initWordId.length;
     let lastCell = document.getElementById(initWordId[len - 1]);
-    if(orientation == 'across' && len != rowSize){
+    if(orientation == 'across'){
         let row = initWordId[0][0];
         let lastCol = (parseInt(initWordId[len - 1][2])) + 1;
         let endPointCellId = row + '.' + lastCol;
@@ -309,9 +399,10 @@ confirmClueBtn.addEventListener('click', function(){
             let deadCell = document.getElementById(endPointCellId);
             deadCell.classList.remove('crossBox');
             deadCell.classList += ' deadCell';
-            }else if (!endPointCellId.includes(0)){
-                invalids.push(endPointCellId);
-            };
+            invalids.push(endPointCellId);
+        }else if (!endPointCellId.includes(0)){
+            invalids.push(endPointCellId);
+        };
 
         let firstCol = initWordId[0][2];
         let precedingCellId = row + "." + (firstCol - 1);
@@ -323,10 +414,10 @@ confirmClueBtn.addEventListener('click', function(){
     };
 
     //ia - 2. vertical validation for deadCells //#001 fix
-     if(orientation == 'down' && len != rowSize){
+     if(orientation == 'down'){
         let col = initWordId[0][2];
         let endPointCellId = (parseInt(initWordId[len - 1][0]) + 1) + '.' + col;
-        if (endPointCellId < (rowSize + 1)){
+        if (endPointCellId <= rowSize){
             let deadCell = document.getElementById(endPointCellId);
             deadCell.classList.remove('crossBox');
             deadCell.classList += ' deadCell';
@@ -348,131 +439,316 @@ confirmClueBtn.addEventListener('click', function(){
     for (id of initWordId){
         if(!allIds.includes(id)){
         allIds.push(id);
-        }else{
-            let crossPointCell = document.getElementById(id).className;
-            console.log(crossPointCell);
+    }else{
+        let ep = document.getElementById(id).getAttribute('data-ep');
+        let x = id.split(".");
+        if (orientation == 'across'){
             if(id == initWordId[0]){
-                crossPoints.push(id + '.sp');
+                if (ep == 'sp'){
+                    bottomRight(x);
+                    const model = 1;
+                    reinit(x, model);
+                    //top left L shaped clue - model 1
+                }else if(ep == 'fp'){
+                    topRight(x);
+                    const model = 7;
+                    reinit(x, model);
+                    //bottom left L shaped clue - model 7 (3)
+                }else{
+                    topRight(x);
+                    bottomRight(x);
+                    const model = 4;
+                    reinit(x, model);
+                    //mid left T - model 2 (4)
+                };
             }else if(id == initWordId[initWordId.length - 1]){
-                crossPoints.push(id + '.ep');
+                if (ep == 'sp'){
+                    bottomLeft(x);
+                    let model = 3;
+                    reinit(x, model);
+                    //top right L - model 3 (7)
+                }else if(ep == 'fp'){
+                    topLeft(x);
+                    const model = 9;
+                    reinit(x, model);
+                    //bottom right L - model 9
+                }else{
+                    bottomLeft(x);
+                    topLeft(x);
+                    const model = 6;
+                    reinit(x, model);
+                    //mid right T - model 6 (8)
+                };
             }else{
-                crossPoints.push(id);;
-                };
-            };
-    allIds.sort();
-    };
-
-    
-    // function id1(x){
-    //     let id1 = (x[0] - 1) + "." + (x[1] - 1);
-    //     let id1_s = id1.toString();
-    //     if (!id1_s.includes(0) && id1 < rowSize){
-    //         let deadCell = document.getElementById(id1);
-    //         deadCell.classList.remove('crossBox');
-    //         deadCell.classList += ' deadCell';
-    //     }else if (!id1_s.includes(0) && id1 > rowSize){
-    //         if(!invalids.includes(id1)){
-    //             invalids.push(id1);
-    //         };
-    //       };
-    //     }
-
-    // function id2(x){
-    //     let id2 = (x[0] - 1) + "." + (parseInt(x[1]) + 1);
-    //     let id2_s = id2.toString();
-    //     if (!id2_s.includes(0) && id2 < rowSize){
-    //         let deadCell = document.getElementById(id2);
-    //         deadCell.classList.remove('crossBox');
-    //         deadCell.classList += ' deadCell';
-    //     }else if (!id2_s.includes(0) && id2 > rowSize){
-    //         if(!invalids.includes(id2)){
-    //             invalids.push[id2];
-    //         };
-    //         console.log(invalids);
-    //     }else{
-    //         console.log(id2 + ' is invalid as contains 0');
-    //         };
-    //     }
-
-    // function id3(x){
-    //     let row = (parseInt(x[0]) + 1);
-    //     let col = x[1] - 1;
-    //     let id3 =  row + "." + col;
-    //     let id3_s = id3.toString();
-    //     if (!id3_s.includes(0) && rowSize > col){
-    //         let deadCell = document.getElementById(id3);
-    //         deadCell.classList.remove('crossBox');
-    //         deadCell.classList += ' deadCell';
-    //     }else if (!id3_s.includes(0)){
-    //         if(!invalids.includes(id3)){
-    //             invalids.push(id3);
-    //         };
-    //     };
-    // }
-
-    // function id4(x){
-    //     let row = (parseInt(x[0]) + 1);
-    //     let col = (parseInt(x[1]) + 1);
-    //     let id4 =  row + "." + col;
-    //     let id4_s = id4.toString();
-    //     console.log(id4_s);
-    //     if (!(id4_s.includes(0)) && rowSize > col){
-    //         let deadCell = document.getElementById(id4);
-    //         deadCell.classList.remove('crossBox');
-    //         deadCell.classList += ' deadCell';
-    //     }else if (!id4_s.includes(0)){
-    //         if(!invalids.includes(id4)){
-    //             invalids.push(id4);
-    //         };
-    //     }else{
-    //         console.log('is invalid as contains 0');
-    //         };
-    //     }
-
-    if(crossPoints.length > 0){
-        for (let i = 0; i < crossPoints.length; i++){
-            let x = crossPoints[i].split(".");
-            if(orientation == 'down'){
-                if(crossPoints[i].includes('ep')){
-                    console.log('model 1 - clue across + going up');
-                    id1(x);
-                    id2(x);
-                }else if(crossPoints[i].includes('sp')){
-                    console.log(crossPoints);
-                    console.log('model 2 - clue across + going down');
-                    id3(x);
-                    id4(x);
+                if (ep == 'sp'){
+                    bottomLeft(x);
+                    bottomRight(x);
+                    let model = 2;
+                    reinit(x, model);
+                    //top mid T - model 2 (4)
+                }else if(ep == 'fp'){
+                    topLeft(x);
+                    topRight(x);
+                    const model = 8;
+                    reinit(x, model);
+                   //bottom mid T - model 8 (6)
                 }else{
-                    console.log('model 5a');
-                    id1(x);
-                    id2(x);
-                    id3(x);
-                    id4(x);
+                    bottomLeft(x);
+                    bottomRight(x);
+                    topLeft(x);
+                    topRight(x);
+                    const model = 5;
+                    reinit(x, model);
+                   //center - model 5'
+                    };
                 };
-            };
-            if(orientation == 'across'){
-                if(crossPoints[i].includes('ep')){
-                    console.log('model 3');
-                    id1(x);
-                    id3(x);
-                }else if(crossPoints[i].includes('sp')){
-                    console.log('model 4');
-                    id2(x);
-                    id4(x);
+        }else if (orientation == 'down'){
+            if(id == initWordId[0]){
+                if (ep == 'sp'){
+                    bottomRight(x);
+                    const model = 1;
+                    reinit(x, model);
+                    //top left L shaped clue - model 1
+                }else if(ep == 'fp'){
+                    bottomLeft(x);
+                    let model = 3;
+                    reinit(x, model);
+                    //top-right L - model 7
                 }else{
-                    console.log('model 5b');
-                    id1(x);
-                    id2(x);
-                    id3(x);
-                    id4(x);
-                        };
+                    bottomLeft(x);
+                    bottomRight(x);
+                    const model = 2;
+                    reinit(x, model);
+                    //top mid T - model 2
+                };
+            }else if(id == initWordId[initWordId.length - 1]){
+                if (ep == 'sp'){
+                    topRight(x);
+                    const model = 7;
+                    reinit(x, model);
+                    //bottom left L - model 7
+                }else if(ep == 'fp'){
+                    topLeft(x);
+                    const model = 9;
+                    reinit(x, model);
+                    //bottom right L - model 9
+                }else{
+                    topRight(x);
+                    topLeft(x);
+                    const model = 8;
+                    reinit(x, model);
+                    //bottom mid T - model 8
+                };
+            }else{
+                if (ep == 'sp'){
+                    topRight(x);
+                    bottomRight(x);
+                    const model = 4;
+                    reinit(x, model);
+                    //mid left T - model 4 (2)
+                }else if(ep == 'fp'){
+                    topLeft(x);
+                    bottomLeft(x);
+                    const model = 6;
+                    reinit(x, model);
+                   //right mid T - model 6 (8)
+                }else{
+                    bottomLeft(x);
+                    bottomRight(x);
+                    topLeft(x);
+                    topRight(x);
+                    const model = 5;
+                    reinit(x, model);
+                   //center - model 5'
                     };
                 };
             };
+        };
+    };
+    allIds.sort();
+    
+    function topLeft(x){
+        let col = x[0] - 1;
+        let row = x[1] - 1;
+        let id = col + "." + row;
+        let deadCell = document.getElementById(id);
+        deadCell.classList.remove('crossBox');
+        deadCell.classList += ' deadCell';
+        }
+
+    function topRight(x){
+        let row = x[0] - 1;
+        let col = parseInt(x[1]) + 1;
+        let id =  row + "." + col;
+        let deadCell = document.getElementById(id);
+        deadCell.classList.remove('crossBox');
+        deadCell.classList += ' deadCell';
+        }
+
+    function bottomLeft(x){
+        let row = parseInt(x[0]) + 1;
+        let col = x[1] - 1;
+        let id =  row + "." + col;
+        let deadCell = document.getElementById(id);
+        deadCell.classList.remove('crossBox');
+        deadCell.classList += ' deadCell';
+    }
+
+    function bottomRight(x){
+        let row = parseInt(x[0]) + 1;
+        let col = parseInt(x[1]) + 1;
+        let id =  row + "." + col;
+        let deadCell = document.getElementById(id);
+        deadCell.classList.remove('crossBox');
+        deadCell.classList += ' deadCell';
+    }
+
+
+    //#F542 validation on existing clues for reinitialisation 
+    function reinit(x, model){
+        let row = x[0];
+        let col = x[1];
+        let t = (row - 1) + "." + col;
+        let l = row + "." + (col - 1);
+        let r = row + "." + (parseInt(col) + 1);
+        let d = (parseInt(row) + 1) + "." + col;
+        let colSub = col - 1;
+        let colAdd = parseInt(col) + 1;
+        let rowSub = row - 1;
+        let rowAdd = parseInt(row) + 1;
+        let tlrd = [];
+
+
+        if(model == '1'){
+            if(colSub < 1 && rowSub < 1){
+                //model 1.1
+                tlrd.push(d);
+                tlrd.push(r);
+            }else if(colSub < 1){
+                //model 1.2
+                tlrd.push(d);
+            }else if(rowAdd < 1){
+                //model 1.3
+                tlrd.push(r)
+            };
+
+
+        }else if(model == '2'){
+            if(rowSub < 1){
+                //model 2.1
+                tlrd.push(l);
+                tlrd.push(r);
+                tlrd.push(d);
+            }else{
+                //model 2.2 
+                tlrd.push(d);
+        };
+
+        }else if(model == '3'){
+            reverse_reinit.push(d);
+            if (colAdd > rowSize && rowSub < 1){
+                //model 3.1
+                tlrd.push(l);
+                tlrd.push(d);
+            }else if(colAdd > rowSize){
+                //model 3.2
+                tlrd.push(d);
+            }else if (rowSub < 1){
+                //model 3.3
+                tlrd.push(l);
+        };
+            
+        }else if(model == '4'){
+            if(colAdd < 1){
+                //model 4.1
+                tlrd.push(t);
+                tlrd.push(r);
+                tlrd.push(d);
+            }else{
+                //model 4.2 
+                tlrd.push(r);
+        };
+
+        }else if(model == '5'){
+                //model 5
+                tlrd.push(t);
+                tlrd.push(l);
+                tlrd.push(r);
+                tlrd.push(d);
+        
+        }else if(model == '6'){
+            reverse_reinit.push(t);
+            reverse_reinit.push(d);
+            if(colAdd > rowSize){
+                //model 6.1
+                tlrd.push(t);
+                tlrd.push(l);
+                tlrd.push(d);
+            }else{
+                //model 6.2
+                tlrd.push(l);
+            };
+
+        }else if(model == '7'){
+            if(colSub < 1 && rowAdd > rowSize){
+                //model 7.1
+                tlrd.push(t);
+                tlrd.push(r);
+            }else if(colSub < 1){
+                //model 7.2
+                tlrd.push(t);
+            }else if(rowAdd > rowSize){
+                //model 7.3
+                tlrd.push(r)
+            };
+
+        }else if(model == '8'){
+            reverse_reinit.push(r);
+            reverse_reinit.push(l);
+            if(rowAdd > rowSize){
+                //model 8.1
+                tlrd.push(t);
+                tlrd.push(l);
+                tlrd.push(r);
+            }else{
+                //model 8.2
+                tlrd.push(t);
+            };
+
+        }else if(model == '9'){
+            if (colAdd > rowSize && rowAdd > rowSize){
+                //model 9.1
+                tlrd.push(l);
+                tlrd.push(t);
+                reverse_reinit.push(l);
+                reverse_reinit.push(t);
+            }else if(colAdd > rowSize){
+                //model 9.2
+                tlrd.push(t);
+                reverse_reinit.push(t);
+            }else if (rowAdd > rowSize){
+                //model 9.3
+                tlrd.push(l);
+                reverse_reinit.push(l);
+            }else{
+                //model 9.4
+                reverse_reinit.push(l);
+                reverse_reinit.push(t);
+            };
+        };
+
+        for (let id of tlrd){
+            let el = document.getElementById(id); 
+            el.classList += ' no-reinit';
+            el.style.backgroundColor = '#e4e4e4';
+        };
+    }
 
     //ii. adds number to firstLetter
-    initLetterId.insertAdjacentHTML('beforeBegin', 
+    if(!initLetterEl.previousElementSibling){
+    initLetterEl.insertAdjacentHTML('beforeBegin', 
             `<div class="number-wrapper">${counter}</div>`);
+    };
 
     //iii. adds clues to clueList
     let getClueList = document.getElementById(`${orientation}`);
@@ -484,23 +760,50 @@ confirmClueBtn.addEventListener('click', function(){
         let clueListBlock = document.querySelector('#clueList');
         clueListBlock.style.display = 'block';
     };
+    wrap = document.createElement('div');
+    wrap.id = `${counter}-${orientation}`;
+    wrap.className = 'clue-wrapper';
     el = document.createElement('p');
     el.className = 'font-clue';
     el.textContent = `${counter}. ${getInputVal}`;
-    getClueList.appendChild(el);
+    wrap.insertAdjacentElement('afterbegin', el);
+    deleteBtn = document.createElement('button');
+    deleteBtn.className = 'delete-button';
+    deleteBtn.innerHTML = '<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>';
+    wrap.insertAdjacentElement('beforeend', deleteBtn);
+    getClueList.appendChild(wrap);
+
+    deleteBtn.addEventListener('click', (e) =>{
+        const el = e.target.parentNode.parentNode;
+        const clueId = el.id;
+        const clue = el.textContent;
+        console.log(clueId);
+        //getClueList.removeChild(el);
+        for (id of allIds){
+            let el = document.getElementById(id);
+            let letterOfClue = el.className.includes(clueId);
+            let crossPoint = el.className.includes('cross-point');
+            if(letterOfClue && !crossPoint){
+                console.log(el);
+                el.value = '';
+                el.classList.remove(clueId);
+                el.classList.remove('savedWord');
+                el.className += ' crossBox';
+                allIds.pop(el.id);
+            };
+            if(letterOfClue && crossPoint){
+                let el = document.getElementById(id);
+                el.classList.remove(clueId);
+                el.classList.remove('cross-point');
+            };
+        };
+    });
 
     //iv. resets grid for next clue
     resetGrid();
 });
 
 
-//5b. cancel clue
-let cancelClueBtn = document.querySelector('#cancelClue');
-cancelClueBtn.addEventListener('click', function(){  
-    cluebox.style.display = 'none';
-    insertClue = '';
-    insertLocation ='';
-});
 
 
 
