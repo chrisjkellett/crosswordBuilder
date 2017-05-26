@@ -25,13 +25,47 @@ function validateCrossword(id){
 }
 
 //3. check word is at least 2 characters
-function word_length(){
+function wordLength(){
     if (initWord.length < 2){
         addWordBtn.disabled = true;
     }else{
         addWordBtn.disabled = false;
     }
 }
+
+//4. make sure there are no gaps in words and return false if there is
+function checkGaps(){
+    let cols = [];
+    let rows = [];
+    let fail, row, column;
+    for (id of initWord){
+        let sp = id.split(".");
+        cols.push(parseInt(sp[0]));
+        rows.push(parseInt(sp[1]));
+    }
+
+    for (let i=cols.length - 1; i > 0; i--){
+        let j = i - 1;
+        if (cols[i] - cols[j] > 1){
+            fail = true;
+        }else if (rows[i] - rows[j] > 1){
+            fail = true;
+        }else if (cols[i] - cols[j] == 0){
+            row = true;
+        }else if (rows[i] - rows[j] == 0){
+            column = true;
+        }
+    }
+
+    if(fail){
+        addWordBtn.disabled = true;
+    }else if(row){
+        orientation = 'across';
+    }else if(column){
+        orientation = 'down';
+    }
+}
+
 
 //-----------Listeners ----------------------------------
 getCrossword.addEventListener('keypress', preventIllegalChars, false);

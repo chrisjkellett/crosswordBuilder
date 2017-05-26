@@ -1,10 +1,12 @@
 let initWord = [];
 const addWordBtn = document.querySelector('#addWord');
 const cancelClueBtn = document.querySelector('#cancelClue');
+const confirmClueBtn = document.querySelector('#confirmClue');
 
-//-----------Multipurpose functions ----------------------------------
+//-----------Multipurpose functions ----------------------------------------------------------------------------
 //Fi. disables or enables cells not used for clue
 //used in F2a (initialise clue) and F2b (cancel clue)
+
 function disOrEnableAll(bool){
     let answer = '';
     addWordBtn.disabled = bool;
@@ -23,6 +25,7 @@ function disOrEnableAll(bool){
 
 //Fii. displays/hides prompt box and updates its html content
 //used in F2a (initialise clue) and F2b (cancel clue)
+
 function promptClue(block, sum, answer){
     const $clue = document.getElementById('insertClue');
     const $location = document.getElementById('insertLocation');
@@ -34,18 +37,20 @@ function promptClue(block, sum, answer){
     $clue.textContent = answer;
     $location.textContent = counter + " " + orientation;
     cluebox.style.display = block;
-    }
+}
 
 
 
 
-//-----------Functions ----------------------------------
+//-----------Functions -------------------------------------------------------------------------------------------
+
 //F1. select cells
 function selectCell(e) {
     function sortAndValidate(id){
         initWord.sort();
         validateCrossword(id);
-        word_length()
+        wordLength();
+        checkGaps();
     }
 
     if (e.target !== e.currentTarget) {
@@ -67,6 +72,7 @@ function selectCell(e) {
             }
         }
    }  
+   
 
 //F2a. initialise clue
 function initialiseClue() {
@@ -96,7 +102,55 @@ function cancelClue(){
 }
 
 
+//3. confirm clue and add to clueList
+function confirmClue(){
+    function updateClass(cell, newClass){
+            cell.classList.add(newClass);
+            // cell.classList += ` ${counter}-${orientation}`;
+            if(newClass == 'cross-point'){
+                cell.style.backgroundColor = '#e4e4e4';
+            }
+        }
+
+    function removeClasses(cell, $class){
+        for (let i = 0; i < $class.length; i++){
+            cell.classList.remove($class[i]);
+        }
+    }
+
+    let initLetterEl = document.getElementById(initWord[0]);
+
+    for (let i=0; i<initWord.length; i++){
+        let cell = document.getElementById(initWord[i]);
+        let isSaved  = cell.className.includes('savedWord');
+        if(!isSaved){
+            updateClass(cell, 'savedWord');
+        }else{
+            updateClass(cell, 'cross-point');
+        }
+
+        removeClasses(cell, ['selected', 'cell']);
+        
+        //refactor ends here
+        if(i == 0){
+            if(!cell.hasAttribute('data-ep')){
+                cell.setAttribute('data-ep', 'sp');
+            };
+        }else if (i == initWord.length - 1){
+            if(!cell.hasAttribute('data-ep')){
+            cell.setAttribute('data-ep', 'fp');
+            };
+        }else{
+            if(!cell.hasAttribute('data-ep')){
+            cell.setAttribute('data-ep', 'mp');
+            };
+        };
+    };
+}
+
+
 //-----------Listeners ----------------------------------
 getCrossword.addEventListener('keyup', selectCell, false);
 addWordBtn.addEventListener('click', initialiseClue, false);
 cancelClueBtn.addEventListener('click', cancelClue, false);
+confirmClueBtn.addEventListener('click', confirmClue, false);
