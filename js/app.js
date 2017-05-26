@@ -28,6 +28,20 @@ function updateAllCells(){
 }
 
 
+function removeClasses(cell, $class){
+        for (let i = 0; i < $class.length; i++){
+            cell.classList.remove($class[i]);
+        }
+    }
+
+function updateClass(cell, newClass){
+        cell.classList.add(newClass);
+        // cell.classList += ` ${counter}-${orientation}`;
+        if(newClass == 'cross-point'){
+            cell.style.backgroundColor = '#e4e4e4';
+        }
+    }
+
 //-----------Generate grid --------------------------------------------------------------------------
 function generateGrid(){
     for (let i=1; i<rowSize + 1; i++){
@@ -86,6 +100,13 @@ function decreaseGridSize(){
     }
 }
 
+function resetGrid(){
+    let getCells = document.querySelectorAll('.cell');
+        for (cell of getCells){
+            cell.disabled = false;
+        }
+    initWordId = [];
+}
 
 
 

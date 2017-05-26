@@ -1,3 +1,5 @@
+let invalids = [];
+
 //1. prevent caps and non-alphanumeric characters
 function preventIllegalChars(e){
     const x = e.charCode;
@@ -64,6 +66,56 @@ function checkGaps(){
     }else if(column){
         orientation = 'down';
     }
+}
+
+
+//5. endPoint validation
+function endPoint(){
+    const len = initWord.length;
+    const lastCell = document.getElementById(initWord[len - 1]);
+    if(orientation == 'across'){
+        const sp = lastCell.id.split(".");
+        const row = sp[0];
+        const lastCol = parseInt(sp[1]) + 1;
+        const firstCol = parseInt(sp[1]) - 1;
+        const preId = row + "." + (firstCol - 1);
+        const id = row + '.' + lastCol;
+
+        if (lastCol <= rowSize){
+            const cell = document.getElementById(id);
+            removeClasses(cell, ['cell']);
+            updateClass(cell, 'dead-cell');
+            invalids.push(id);  
+        }else if (!id.includes(0)){
+            invalids.push(id);
+        }
+
+    // const firstCol = initWord[0][2];
+    const precedingCellId = row + "." + (firstCol - 1);
+    if (!precedingCellId.includes(0)){
+        let precedingCell = document.getElementById(precedingCellId);
+        precedingCell.classList.remove('cell');
+        precedingCell.classList += ' dead-cell';
+        };
+    }else if(orientation == 'down'){
+        let col = initWord[0][2];
+        let endPointCellId = (parseInt(initWord[len - 1][0]) + 1) + '.' + col;
+        if (endPointCellId <= rowSize){
+            let deadCell = document.getElementById(endPointCellId);
+            deadCell.classList.remove('cell');
+            deadCell.classList += ' dead-cell';
+            }else if (!endPointCellId.includes(0)){
+                invalids.push(endPointCellId);
+            };
+
+        let firstCol = initWord[0][2];
+        let precedingCellId = (parseInt(initWord[0][0]) - 1) + '.' + col;
+        if (!precedingCellId.includes(0)){
+            let precedingCell = document.getElementById(precedingCellId);
+            precedingCell.classList.remove('cell');
+            precedingCell.classList += ' dead-cell';
+        }
+     }
 }
 
 

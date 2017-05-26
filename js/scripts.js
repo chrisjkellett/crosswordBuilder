@@ -362,34 +362,34 @@ function deactivateUnselectables(ids){
 // });
 
 //4. confirm clue and add to clueList
-const confirmClueBtn = document.querySelector('#confirmClue');
-confirmClueBtn.addEventListener('click', function(){
-    //i. adds and removes classes  
-    let initLetterEl = document.getElementById(initWordId[0]);
-    for (let i=0; i<initWordId.length; i++){
-        let getCell = document.getElementById(initWordId[i]);
-        if(!getCell.className.includes('savedWord')){
-            getCell.classList += ` savedWord ${counter}-${orientation}`;
-        }else{
-            getCell.classList += ` cross-point ${counter}-${orientation}`;
-            getCell.style.backgroundColor = '#e4e4e4';
-        };
-        getCell.classList.remove('selected');
-        getCell.classList.remove('crossBox');
-        if(i == 0){
-            if(!getCell.hasAttribute('data-ep')){
-                getCell.setAttribute('data-ep', 'sp');
-            };
-        }else if (i == initWordId.length - 1){
-            if(!getCell.hasAttribute('data-ep')){
-            getCell.setAttribute('data-ep', 'fp');
-            };
-        }else{
-            if(!getCell.hasAttribute('data-ep')){
-            getCell.setAttribute('data-ep', 'mp');
-            };
-        };
-    };
+// const confirmClueBtn = document.querySelector('#confirmClue');
+// confirmClueBtn.addEventListener('click', function(){
+//     //i. adds and removes classes  
+//     let initLetterEl = document.getElementById(initWordId[0]);
+//     for (let i=0; i<initWordId.length; i++){
+//         let getCell = document.getElementById(initWordId[i]);
+//         if(!getCell.className.includes('savedWord')){
+//             getCell.classList += ` savedWord ${counter}-${orientation}`;
+//         }else{
+//             getCell.classList += ` cross-point ${counter}-${orientation}`;
+//             getCell.style.backgroundColor = '#e4e4e4';
+//         };
+//         getCell.classList.remove('selected');
+//         getCell.classList.remove('crossBox');
+//         if(i == 0){
+//             if(!getCell.hasAttribute('data-ep')){
+//                 getCell.setAttribute('data-ep', 'sp');
+//             };
+//         }else if (i == initWordId.length - 1){
+//             if(!getCell.hasAttribute('data-ep')){
+//             getCell.setAttribute('data-ep', 'fp');
+//             };
+//         }else{
+//             if(!getCell.hasAttribute('data-ep')){
+//             getCell.setAttribute('data-ep', 'mp');
+//             };
+//         };
+//     };
 
     //ia - 1. endPoint validation
     let len = initWordId.length;
