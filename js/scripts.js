@@ -159,37 +159,37 @@ if(initWordId.length <= 1){
 //         }, false);
 
 
-//adds listener to children of getCrossword
-let initWordId = [];
-getCrossword.addEventListener('keyup', getBox, false);
-function getBox(event) {
-    if (event.target !== event.currentTarget) {
-        let clickedItem = event.target;
-        if (!clickedItem.className.includes('selected') ){
-            clickedItem.className += ' selected';
-        };
-        if(clickedItem.value == '' && clickedItem.className.includes('selected')){
-            clickedItem.classList.remove('selected'); 
-        };
-        let id = event.target.id;
-        if (!initWordId.includes(id) && event.target.className.includes('selected')){
-        initWordId.push(id);
-        initWordId.sort();
-        validateCrossword(id);
-        };
-   };
-    event.stopPropagation();
-    for (let id of initWordId){
-        let el = document.getElementById(id);
-        if (!el.className.includes('selected')){
-            initWordId.pop(id);
-            };
-        };
-    initWordId.sort();
-    word_length(initWordId);
-    check_gaps(initWordId);
-    validateLoop(initWordId);
-}
+// //adds listener to children of getCrossword
+// let initWordId = [];
+// getCrossword.addEventListener('keyup', getBox, false);
+// function getBox(event) {
+//     if (event.target !== event.currentTarget) {
+//         let clickedItem = event.target;
+//         if (!clickedItem.className.includes('selected') ){
+//             clickedItem.className += ' selected';
+//         };
+//         if(clickedItem.value == '' && clickedItem.className.includes('selected')){
+//             clickedItem.classList.remove('selected'); 
+//         };
+//         let id = event.target.id;
+//         if (!initWordId.includes(id) && event.target.className.includes('selected')){
+//         initWordId.push(id);
+//         initWordId.sort();
+//         validateCrossword(id);
+//         };
+//    };
+//     event.stopPropagation();
+//     for (let id of initWordId){
+//         let el = document.getElementById(id);
+//         if (!el.className.includes('selected')){
+//             initWordId.pop(id);
+//             };
+//         };
+//     initWordId.sort();
+//     word_length(initWordId);
+//     check_gaps(initWordId);
+//     validateLoop(initWordId);
+// }
 
 let savedBoxList = [];
 getCrossword.addEventListener('click', getSavedBox, false);
@@ -213,28 +213,28 @@ function getSavedBox(el) {
     }
 
 
-function validateCrossword(id){
-    let selectedIdRef = id.split(".");
-    let col = selectedIdRef[0];
-    let row = selectedIdRef[1];
-    for(cell of allCells){
-        let loopIdRef = cell.id.split(".");
-        let loopCol = loopIdRef[0];
-        let loopRow = loopIdRef[1];
-        if (!(row == loopRow || col == loopCol) || cell.className.includes('dead')){
-            cell.disabled = true;
-        };
-    };
-}
+// function validateCrossword(id){
+//     let selectedIdRef = id.split(".");
+//     let col = selectedIdRef[0];
+//     let row = selectedIdRef[1];
+//     for(cell of allCells){
+//         let loopIdRef = cell.id.split(".");
+//         let loopCol = loopIdRef[0];
+//         let loopRow = loopIdRef[1];
+//         if (!(row == loopRow || col == loopCol) || cell.className.includes('dead')){
+//             cell.disabled = true;
+//         };
+//     };
+// }
 
 //F1. check word length and return false if too short
-function word_length(ids){
-    if (ids.length < 2){
-        addWordBtn.disabled = true;
-    }else{
-        addWordBtn.disabled = false;
-    };
-};
+// function word_length(ids){
+//     if (ids.length < 2){
+//         addWordBtn.disabled = true;
+//     }else{
+//         addWordBtn.disabled = false;
+//     };
+// };
 
 
 //F2. make sure there are no gaps in words and return false if there is
@@ -266,7 +266,6 @@ function check_gaps(ids){
     }else if(column){
         orientation = 'down';
     };
-
 }
 
 //F.reset grid
@@ -304,63 +303,63 @@ function deactivateUnselectables(ids){
 }
 
 
-//3. add/initialise clue
-const addWordBtn = document.querySelector('#addWord');
-addWordBtn.addEventListener('click', (e) => {
-    //prevents form submission
-    e.preventDefault();
+// //3. add/initialise clue
+// const addWordBtn = document.querySelector('#addWord');
+// addWordBtn.addEventListener('click', (e) => {
+//     //prevents form submission
+//     e.preventDefault();
 
-    let getLetters = document.querySelectorAll('.selected');
-    for (let cell of allCells){
-            cell.disabled = true;
-        };
-    addWordBtn.disabled = true;
+//     let getLetters = document.querySelectorAll('.selected');
+//     for (let cell of allCells){
+//             cell.disabled = true;
+//         };
+//     addWordBtn.disabled = true;
 
-    let answer = '';
-    for (let letter of getLetters){
-        answer += letter.value.toLowerCase();
-        letter.style.background = 'white';  
-    };
+//     let answer = '';
+//     for (let letter of getLetters){
+//         answer += letter.value.toLowerCase();
+//         letter.style.background = 'white';  
+//     };
 
-    //v. increase counter if required
-    if (!document.getElementById(initWordId[0]).previousElementSibling){
-        counter += 1;
-    };
+//     //v. increase counter if required
+//     if (!document.getElementById(initWordId[0]).previousElementSibling){
+//         counter += 1;
+//     };
 
-    //vi. insert clue into clueBox
-    let insertClue = document.querySelector('#insertClue');
-    insertClue.textContent = answer;
-    let insertLocation = document.querySelector('#insertLocation');
-    insertLocation.textContent = counter + " " + orientation;
+//     //vi. insert clue into clueBox
+//     let insertClue = document.querySelector('#insertClue');
+//     insertClue.textContent = answer;
+//     let insertLocation = document.querySelector('#insertLocation');
+//     insertLocation.textContent = counter + " " + orientation;
 
-    //vii. show clueBox
-    cluebox.style.display = 'block';
+//     //vii. show clueBox
+//     cluebox.style.display = 'block';
 
-    //viii.push clue to answer list
-    answers.push(answer);
-});
+//     //viii.push clue to answer list
+//     answers.push(answer);
+// });
 
-//3b. cancel clue
-const cancelClueBtn = document.querySelector('#cancelClue');
-cancelClueBtn.addEventListener('click', function(){  
-    cluebox.style.display = 'none';
-    insertClue = '';
-    insertLocation ='';
-     for (let cell of allCells){
-            cell.disabled = false;
-        };
-    addWordBtn.disabled = false;
-    if (!document.getElementById(initWordId[0]).previousElementSibling){
-        counter -= 1;
-    };
+// //3b. cancel clue
+// const cancelClueBtn = document.querySelector('#cancelClue');
+// cancelClueBtn.addEventListener('click', function(){  
+//     cluebox.style.display = 'none';
+//     insertClue = '';
+//     insertLocation ='';
+//      for (let cell of allCells){
+//             cell.disabled = false;
+//         };
+//     addWordBtn.disabled = false;
+//     if (!document.getElementById(initWordId[0]).previousElementSibling){
+//         counter -= 1;
+//     };
 
-    const clueInput = document.getElementById('clueEntry').value;
-    clueInput.value = '';
-    validateLoop(initWordId);
-    for (let i=0; i<initWordId.length; i++){
-        validateCrossword(initWordId[i]);
-    };
-});
+//     const clueInput = document.getElementById('clueEntry').value;
+//     clueInput.value = '';
+//     validateLoop(initWordId);
+//     for (let i=0; i<initWordId.length; i++){
+//         validateCrossword(initWordId[i]);
+//     };
+// });
 
 //4. confirm clue and add to clueList
 const confirmClueBtn = document.querySelector('#confirmClue');

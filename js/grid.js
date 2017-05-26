@@ -4,8 +4,11 @@ const decreaseBtn = document.querySelector('#rowMinus');
 const allIds = [];
 const maxSize = 12;
 const minSize = 4;
+let allCells;
 let rowSize = 6;
 let gridinit = 1;
+let orientation;
+let counter = 0;
 
 
 //-----------Multiuse functions --------------------------------------------------------------------------
@@ -20,6 +23,10 @@ function makeCells(){
         }
 }
 
+function updateAllCells(){
+    allCells = document.querySelectorAll('.cell');
+}
+
 
 //-----------Generate grid --------------------------------------------------------------------------
 function generateGrid(){
@@ -27,16 +34,15 @@ function generateGrid(){
             getCrossword.innerHTML += `<div id="r-${i}" class="_row"></div>`;
         }
         makeCells();
+        updateAllCells();
     }
-
-generateGrid();
 
 
 //-----------Change grid size --------------------------------------------------------------------------
 function increaseGridSize(){
 if (rowSize < maxSize){
         rowSize += 1;
-        let addNewRow = getCrossword.insertAdjacentHTML('beforeend', 
+        const addNewRow = getCrossword.insertAdjacentHTML('beforeend', 
         `<div id="r-${rowSize}" class="_row"></div>`);
         for (let i=1; i<rowSize; i++){
         let getRow = document.querySelector('#r-' + i);
@@ -45,6 +51,7 @@ if (rowSize < maxSize){
             <input type="text" maxlength="1" id="$i}.${rowSize}" class="cell row-${i} col-${rowSize}" /></div>`);
         };
         makeCells();
+        updateAllCells();
     }
 }
 
@@ -58,12 +65,13 @@ function decreaseGridSize(){
         }
         rowSize -= 1;
         gridinit -=1;
+        updateAllCells();
     }
 
     if(!allIds.length == 0){
-        let $sp = allIds[allIds.length - 1].split(".");
-        let lastRow = $sp[1];
-        let lastCol = $sp[0];
+        let sp = allIds[allIds.length - 1].split(".");
+        let lastRow = sp[1];
+        let lastCol = sp[0];
         if ((rowSize > minSize) && (lastCol < rowSize) && (lastRow < rowSize)){
             decreaseSize();
         }else if(rowSize > minSize){
@@ -85,3 +93,6 @@ function decreaseGridSize(){
 increaseBtn.addEventListener('click', increaseGridSize, false);
 decreaseBtn.addEventListener('click', decreaseGridSize, false);
 
+
+//-----------run APP --------------------------------------------------------------------------
+generateGrid();
