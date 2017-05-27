@@ -72,31 +72,31 @@ function checkGaps(){
 //5. endPoint validation
 function endPoint(){
     const len = initWord.length;
-    const lastCell = document.getElementById(initWord[len - 1]);
-    if(orientation == 'across'){
-        const sp = lastCell.id.split(".");
-        const row = sp[0];
-        const lastCol = parseInt(sp[1]) + 1;
-        const firstCol = parseInt(sp[1]) - 1;
-        const preId = row + "." + (firstCol - 1);
-        const id = row + '.' + lastCol;
+    const rightCol = parseInt(initWord[len - 1].split(".")[1]);
+    const sp = initWord[0].split(".");
+    const row = parseInt(sp[0]);
+    const leftCol = parseInt(sp[1]); 
 
-        if (lastCol <= rowSize){
-            const cell = document.getElementById(id);
+    if(orientation == 'across'){
+        const leftId = row + "." + (leftCol - 1);
+        const rightId = row + '.' + (rightCol + 1);
+
+        if (rightId <= rowSize){
+            const cell = document.getElementById(rightId);
             removeClasses(cell, ['cell']);
             updateClass(cell, 'dead-cell');
             invalids.push(id);  
-        }else if (!id.includes(0)){
+        }else if (!leftCol == 0){
             invalids.push(id);
         }
 
-    // const firstCol = initWord[0][2];
-    const precedingCellId = row + "." + (firstCol - 1);
-    if (!precedingCellId.includes(0)){
-        let precedingCell = document.getElementById(precedingCellId);
-        precedingCell.classList.remove('cell');
-        precedingCell.classList += ' dead-cell';
-        };
+    if (!(leftCol - 1) == 0){
+        const cell = document.getElementById(leftId);
+        removeClasses(cell, ['cell']);
+        updateClass(cell, 'dead-cell');
+    }
+    
+
     }else if(orientation == 'down'){
         let col = initWord[0][2];
         let endPointCellId = (parseInt(initWord[len - 1][0]) + 1) + '.' + col;

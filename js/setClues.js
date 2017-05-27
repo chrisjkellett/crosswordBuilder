@@ -154,7 +154,6 @@ function confirmClue(){
         }else{
             updateClass(cell, 'cross-point');
         }
-
         removeClasses(cell, ['selected', 'cell']);
         //refactor ends here
         if(i == 0){

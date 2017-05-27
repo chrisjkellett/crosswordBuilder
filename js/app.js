@@ -40,6 +40,10 @@ function updateClass(cell, newClass){
         if(newClass == 'cross-point'){
             cell.style.backgroundColor = '#e4e4e4';
         }
+
+        if(newClass == 'savedWord'){
+            cell.style.backgroundColor = 'white';
+        }
     }
 
 //-----------Generate grid --------------------------------------------------------------------------
@@ -105,7 +109,9 @@ function resetGrid(){
         for (cell of getCells){
             cell.disabled = false;
         }
-    initWordId = [];
+    initWord = [];
+    increaseBtn.disabled = '';
+    decreaseBtn.disabled = '';
 }
 
 
