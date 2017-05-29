@@ -44,6 +44,10 @@ function updateClass(cell, newClass){
         if(newClass == 'savedWord'){
             cell.style.backgroundColor = 'white';
         }
+
+        if(newClass == 'dead-cell'){
+            cell.disabled = true;
+        }
     }
 
 //-----------Generate grid --------------------------------------------------------------------------
@@ -66,16 +70,17 @@ if (rowSize < maxSize){
         let getRow = document.querySelector('#r-' + i);
             getRow.insertAdjacentHTML('beforeend', 
             `<div class="cell-wrapper">
-            <input type="text" maxlength="1" id="$i}.${rowSize}" class="cell row-${i} col-${rowSize}" /></div>`);
+            <input type="text" maxlength="1" id="${i}.${rowSize}" class="cell row-${i} col-${rowSize}" /></div>`);
         };
         makeCells();
         updateAllCells();
+        checkInvalids();
     }
 }
 
 function decreaseGridSize(){
     function decreaseSize(){
-        let row = document.querySelector('#r-' + (rowSize - 1));
+        const row = document.querySelector('#r-' + (rowSize - 1));
         row.nextElementSibling.remove();
         for (let i=1; i<rowSize; i++){
             let row = document.querySelector('#r-' + i);
@@ -92,7 +97,7 @@ function decreaseGridSize(){
         let lastCol = sp[0];
         if ((rowSize > minSize) && (lastCol < rowSize) && (lastRow < rowSize)){
             decreaseSize();
-        }else if(rowSize > minSize){
+        }else if(rowSize >= minSize){
             console.log('PROMPT: reducing size would delete clues');
         }else if (rowSize <= minSize){
             console.log('PROMPT: min size is currently set at 4');
@@ -105,10 +110,18 @@ function decreaseGridSize(){
 }
 
 function resetGrid(){
-    let getCells = document.querySelectorAll('.cell');
-        for (cell of getCells){
-            cell.disabled = false;
+    const getCells = document.querySelectorAll('.cell');
+    for (cell of getCells){
+        cell.disabled = false;
+    }
+
+    for (let id of initWord){
+        if(!allIds.includes(id)){
+            allIds.push(id);
         }
+    }
+
+    allIds.sort();
     initWord = [];
     increaseBtn.disabled = '';
     decreaseBtn.disabled = '';

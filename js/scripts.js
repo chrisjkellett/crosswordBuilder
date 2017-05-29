@@ -237,36 +237,36 @@ function getSavedBox(el) {
 // };
 
 
-//F2. make sure there are no gaps in words and return false if there is
-function check_gaps(ids){
-    let col_list = [];
-    let row_list = [];
-    let fail, row, column;
-    for (id of ids){
-        let splitId = id.split(".");
-        col_list.push(parseInt(splitId[0]));
-        row_list.push(parseInt(splitId[1]));
-    };
-    for (let i=col_list.length - 1; i > 0; i--){
-        let j = i - 1;
-        if (col_list[i] - col_list[j] > 1){
-            fail = true;
-        }else if (row_list[i] - row_list[j] > 1){
-            fail = true;
-        }else if (col_list[i] - col_list[j] == 0){
-            row = true;
-        }else if (row_list[i] - row_list[j] == 0){
-            column = true;
-        };
-    };
-    if(fail){
-        addWordBtn.disabled = true;
-    }else if(row){
-        orientation = 'across';
-    }else if(column){
-        orientation = 'down';
-    };
-}
+// //F2. make sure there are no gaps in words and return false if there is
+// function check_gaps(ids){
+//     let col_list = [];
+//     let row_list = [];
+//     let fail, row, column;
+//     for (id of ids){
+//         let splitId = id.split(".");
+//         col_list.push(parseInt(splitId[0]));
+//         row_list.push(parseInt(splitId[1]));
+//     };
+//     for (let i=col_list.length - 1; i > 0; i--){
+//         let j = i - 1;
+//         if (col_list[i] - col_list[j] > 1){
+//             fail = true;
+//         }else if (row_list[i] - row_list[j] > 1){
+//             fail = true;
+//         }else if (col_list[i] - col_list[j] == 0){
+//             row = true;
+//         }else if (row_list[i] - row_list[j] == 0){
+//             column = true;
+//         };
+//     };
+//     if(fail){
+//         addWordBtn.disabled = true;
+//     }else if(row){
+//         orientation = 'across';
+//     }else if(column){
+//         orientation = 'down';
+//     };
+// }
 
 //F.reset grid
 function resetGrid(){
@@ -391,51 +391,51 @@ function deactivateUnselectables(ids){
 //         };
 //     };
 
-    //ia - 1. endPoint validation
-    let len = initWordId.length;
-    let lastCell = document.getElementById(initWordId[len - 1]);
-    if(orientation == 'across'){
-        let row = initWordId[0][0];
-        let lastCol = (parseInt(initWordId[len - 1][2])) + 1;
-        let endPointCellId = row + '.' + lastCol;
-        if (lastCol <= rowSize){
-            let deadCell = document.getElementById(endPointCellId);
-            deadCell.classList.remove('crossBox');
-            deadCell.classList += ' deadCell';
-            invalids.push(endPointCellId);
-        }else if (!endPointCellId.includes(0)){
-            invalids.push(endPointCellId);
-        };
+    // //ia - 1. endPoint validation
+    // let len = initWordId.length;
+    // let lastCell = document.getElementById(initWordId[len - 1]);
+    // if(orientation == 'across'){
+    //     let row = initWordId[0][0];
+    //     let lastCol = (parseInt(initWordId[len - 1][2])) + 1;
+    //     let endPointCellId = row + '.' + lastCol;
+    //     if (lastCol <= rowSize){
+    //         let deadCell = document.getElementById(endPointCellId);
+    //         deadCell.classList.remove('crossBox');
+    //         deadCell.classList += ' deadCell';
+    //         invalids.push(endPointCellId);
+    //     }else if (!endPointCellId.includes(0)){
+    //         invalids.push(endPointCellId);
+    //     };
 
-        let firstCol = initWordId[0][2];
-        let precedingCellId = row + "." + (firstCol - 1);
-        if (!precedingCellId.includes(0)){
-            let precedingCell = document.getElementById(precedingCellId);
-            precedingCell.classList.remove('crossBox');
-            precedingCell.classList += ' deadCell';
-        };
-    };
+    //     let firstCol = initWordId[0][2];
+    //     let precedingCellId = row + "." + (firstCol - 1);
+    //     if (!precedingCellId.includes(0)){
+    //         let precedingCell = document.getElementById(precedingCellId);
+    //         precedingCell.classList.remove('crossBox');
+    //         precedingCell.classList += ' deadCell';
+    //     };
+    // };
 
-    //ia - 2. vertical validation for deadCells //#001 fix
-     if(orientation == 'down'){
-        let col = initWordId[0][2];
-        let endPointCellId = (parseInt(initWordId[len - 1][0]) + 1) + '.' + col;
-        if (endPointCellId <= rowSize){
-            let deadCell = document.getElementById(endPointCellId);
-            deadCell.classList.remove('crossBox');
-            deadCell.classList += ' deadCell';
-            }else if (!endPointCellId.includes(0)){
-                invalids.push(endPointCellId);
-            };
+    // //ia - 2. vertical validation for deadCells //#001 fix
+    //  if(orientation == 'down'){
+    //     let col = initWordId[0][2];
+    //     let endPointCellId = (parseInt(initWordId[len - 1][0]) + 1) + '.' + col;
+    //     if (endPointCellId <= rowSize){
+    //         let deadCell = document.getElementById(endPointCellId);
+    //         deadCell.classList.remove('crossBox');
+    //         deadCell.classList += ' deadCell';
+    //         }else if (!endPointCellId.includes(0)){
+    //             invalids.push(endPointCellId);
+    //         };
 
-        let firstCol = initWordId[0][2];
-        let precedingCellId = (parseInt(initWordId[0][0]) - 1) + '.' + col;
-        if (!precedingCellId.includes(0)){
-            let precedingCell = document.getElementById(precedingCellId);
-            precedingCell.classList.remove('crossBox');
-            precedingCell.classList += ' deadCell';
-        };
-     };
+    //     let firstCol = initWordId[0][2];
+    //     let precedingCellId = (parseInt(initWordId[0][0]) - 1) + '.' + col;
+    //     if (!precedingCellId.includes(0)){
+    //         let precedingCell = document.getElementById(precedingCellId);
+    //         precedingCell.classList.remove('crossBox');
+    //         precedingCell.classList += ' deadCell';
+    //     };
+    //  };
         
 
     //ia - 3. crossPoint validation for deadCells
@@ -747,64 +747,64 @@ function deactivateUnselectables(ids){
         };
     }
 
-    //ii. adds number to firstLetter
-    if(!initLetterEl.previousElementSibling){
-    initLetterEl.insertAdjacentHTML('beforeBegin', 
-            `<div class="number-wrapper">${counter}</div>`);
-    };
+//     //ii. adds number to firstLetter
+//     if(!initLetterEl.previousElementSibling){
+//     initLetterEl.insertAdjacentHTML('beforeBegin', 
+//             `<div class="number-wrapper">${counter}</div>`);
+//     };
 
-    //iii. adds clues to clueList
-    let getClueList = document.getElementById(`${orientation}`);
-    const getInput = document.getElementById('clueEntry');
-    let getInputVal = getInput.value;
-    cluebox.style.display = 'none';
-    getInput.value = '';    
-    if (counter == 1){
-        let clueListBlock = document.querySelector('#clueList');
-        clueListBlock.style.display = 'block';
-    };
-    wrap = document.createElement('div');
-    wrap.id = `${counter}-${orientation}`;
-    wrap.className = 'clue-wrapper';
-    el = document.createElement('p');
-    el.className = 'font-clue';
-    el.textContent = `${counter}. ${getInputVal}`;
-    wrap.insertAdjacentElement('afterbegin', el);
-    deleteBtn = document.createElement('button');
-    deleteBtn.className = 'delete-button';
-    deleteBtn.innerHTML = '<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>';
-    wrap.insertAdjacentElement('beforeend', deleteBtn);
-    getClueList.appendChild(wrap);
+//     //iii. adds clues to clueList
+//     let getClueList = document.getElementById(`${orientation}`);
+//     const getInput = document.getElementById('clueEntry');
+//     let getInputVal = getInput.value;
+//     cluebox.style.display = 'none';
+//     getInput.value = '';    
+//     if (counter == 1){
+//         let clueListBlock = document.querySelector('#clueList');
+//         clueListBlock.style.display = 'block';
+//     };
+//     wrap = document.createElement('div');
+//     wrap.id = `${counter}-${orientation}`;
+//     wrap.className = 'clue-wrapper';
+//     el = document.createElement('p');
+//     el.className = 'font-clue';
+//     el.textContent = `${counter}. ${getInputVal}`;
+//     wrap.insertAdjacentElement('afterbegin', el);
+//     deleteBtn = document.createElement('button');
+//     deleteBtn.className = 'delete-button';
+//     deleteBtn.innerHTML = '<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>';
+//     wrap.insertAdjacentElement('beforeend', deleteBtn);
+//     getClueList.appendChild(wrap);
 
-    deleteBtn.addEventListener('click', (e) =>{
-        const el = e.target.parentNode.parentNode;
-        const clueId = el.id;
-        const clue = el.textContent;
-        console.log(clueId);
-        //getClueList.removeChild(el);
-        for (id of allIds){
-            let el = document.getElementById(id);
-            let letterOfClue = el.className.includes(clueId);
-            let crossPoint = el.className.includes('cross-point');
-            if(letterOfClue && !crossPoint){
-                console.log(el);
-                el.value = '';
-                el.classList.remove(clueId);
-                el.classList.remove('savedWord');
-                el.className += ' crossBox';
-                allIds.pop(el.id);
-            };
-            if(letterOfClue && crossPoint){
-                let el = document.getElementById(id);
-                el.classList.remove(clueId);
-                el.classList.remove('cross-point');
-            };
-        };
-    });
+//     deleteBtn.addEventListener('click', (e) =>{
+//         const el = e.target.parentNode.parentNode;
+//         const clueId = el.id;
+//         const clue = el.textContent;
+//         console.log(clueId);
+//         //getClueList.removeChild(el);
+//         for (id of allIds){
+//             let el = document.getElementById(id);
+//             let letterOfClue = el.className.includes(clueId);
+//             let crossPoint = el.className.includes('cross-point');
+//             if(letterOfClue && !crossPoint){
+//                 console.log(el);
+//                 el.value = '';
+//                 el.classList.remove(clueId);
+//                 el.classList.remove('savedWord');
+//                 el.className += ' crossBox';
+//                 allIds.pop(el.id);
+//             };
+//             if(letterOfClue && crossPoint){
+//                 let el = document.getElementById(id);
+//                 el.classList.remove(clueId);
+//                 el.classList.remove('cross-point');
+//             };
+//         };
+//     });
 
-    //iv. resets grid for next clue
-    resetGrid();
-});
+//     //iv. resets grid for next clue
+//     resetGrid();
+// });
 
 
 

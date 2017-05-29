@@ -71,51 +71,66 @@ function checkGaps(){
 
 //5. endPoint validation
 function endPoint(){
-    const len = initWord.length;
-    const rightCol = parseInt(initWord[len - 1].split(".")[1]);
-    const sp = initWord[0].split(".");
-    const row = parseInt(sp[0]);
-    const leftCol = parseInt(sp[1]); 
+    const sp1 = initWord[0].split(".");
+    const sp2 = initWord[initWord.length - 1].split(".");
 
     if(orientation == 'across'){
-        const leftId = row + "." + (leftCol - 1);
-        const rightId = row + '.' + (rightCol + 1);
+        const row = parseInt(sp1[0]);
+        const l = parseInt(sp1[1]); 
+        const r = parseInt(sp2[1]);
+        const lId = row + "." + (l - 1);
+        const rId = row + '.' + (r + 1);
 
-        if (rightId <= rowSize){
-            const cell = document.getElementById(rightId);
+        if (r < rowSize){
+            const cell = document.getElementById(rId);
             removeClasses(cell, ['cell']);
             updateClass(cell, 'dead-cell');
-            invalids.push(id);  
-        }else if (!leftCol == 0){
-            invalids.push(id);
+            invalids.push(rId);  
+        }else if (l != 0){
+            invalids.push(rId);
         }
 
-    if (!(leftCol - 1) == 0){
-        const cell = document.getElementById(leftId);
-        removeClasses(cell, ['cell']);
-        updateClass(cell, 'dead-cell');
-    }
+        if ((l - 1) != 0){
+            const cell = document.getElementById(lId);
+            removeClasses(cell, ['cell']);
+            updateClass(cell, 'dead-cell');
+        }
     
 
     }else if(orientation == 'down'){
-        let col = initWord[0][2];
-        let endPointCellId = (parseInt(initWord[len - 1][0]) + 1) + '.' + col;
-        if (endPointCellId <= rowSize){
-            let deadCell = document.getElementById(endPointCellId);
-            deadCell.classList.remove('cell');
-            deadCell.classList += ' dead-cell';
-            }else if (!endPointCellId.includes(0)){
-                invalids.push(endPointCellId);
-            };
+        const col = parseInt(sp1[1]);
+        const u = parseInt(sp1[0]);
+        const d = parseInt(sp2[0]);
+        const dId = (d + 1) + '.' + col;
+        const uId = (u - 1) + '.' + col;
 
-        let firstCol = initWord[0][2];
-        let precedingCellId = (parseInt(initWord[0][0]) - 1) + '.' + col;
-        if (!precedingCellId.includes(0)){
-            let precedingCell = document.getElementById(precedingCellId);
-            precedingCell.classList.remove('cell');
-            precedingCell.classList += ' dead-cell';
+        if (d <= rowSize){
+            const cell = document.getElementById(dId);
+            removeClasses(cell, ['cell']);
+            updateClass(cell, 'dead-cell');
+            invalids.push(dId);
+        }else if (u != 0){
+            invalids.push(dId);
+        }
+
+
+        if ((u - 1) != 0){
+            const cell = document.getElementById(uId);
+            removeClasses(cell, ['cell']);
+            updateClass(cell, 'dead-cell');
+            invalids.push(uId);
         }
      }
+}
+
+//6. check invalids list on increase grid size
+
+function checkInvalids(){
+    for (let id of invalids){
+        let cell = document.getElementById(id);
+        removeClasses(cell, ['cell']);
+        updateClass(cell, 'dead-cell');
+    }
 }
 
 
