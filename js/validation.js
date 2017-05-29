@@ -42,34 +42,43 @@ function resetValidation(){
     // unselectables = [];
 }
 
-function savedValidation(){
+function validateClue(){
     if (savedBoxList.length == 1){
     let splitter = savedBoxList[0].split(".");
     let col = splitter[1];
     let row = splitter[0];
-    let el = document.getElementById(savedBoxList[0]);
-    if(el.className.includes('across')){
-        let els = document.querySelectorAll('.row-' + row);
-        for (el of els){
-            if (el.className.includes('crossBox')){
+    let $el = document.getElementById(savedBoxList[0]);
+    if($el.className.includes('across')){
+        const els = document.querySelectorAll('.row-' + row);
+        for (let el of els){
+            const c = el.className; 
+            const isSelected = c.includes('selected');
+            const isCell = c.includes('cell');
+            const noReinit = c.includes('no-reinit');
+            console.log(c);
+            if(isCell){
                 el.disabled = true;
-            }else if(!el.className.includes('selected') && !(el.className.includes('deadCell'))){
-                el.classList += ' no-reinit';
-                el.style.backgroundColor = '#e4e4e4';
-                // unselectables.push(el.id);
+            }else if(!isSelected){
+                el.classList.add('no-reinit');
+                el.style.background = 'lightgrey';
+            }else if(noReinit){
+                el.classList.remove('no-reinit');
+                el.style.background = '';
             }
         }
-    }else{
-        let els = document.querySelectorAll('.col-' + col);
-        for (el of els){
-            if (el.className.includes('crossBox')){
-                el.disabled = true;
-            }else if(!el.className.includes('selected') && !(el.className.includes('deadCell'))){
-                el.classList += ' no-reinit';
-                el.style.backgroundColor = '#e4e4e4';
-                // unselectables.push(el.id);
-                }
-            }
+    }else if($el.className.includes('down')){
+        // let els = document.querySelectorAll('.col-' + col);
+        // for (el of els){
+        //     if (el.className.includes('cell')){
+        //         el.disabled = true;
+        //     }else if(!el.className.includes('selected') && !(el.className.includes('dead-cell'))){
+        //         el.classList += ' no-reinit';
+        //         el.style.backgroundColor = '#e4e4e4';
+        //         // unselectables.push(el.id);
+        //         }
+        //     }
+        }else{
+            
         }
     }
 }

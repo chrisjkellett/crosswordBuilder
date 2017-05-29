@@ -37,7 +37,7 @@ function removeClasses(cell, $class){
 
 function updateClass(cell, newClass){
         cell.classList.add(newClass);
-        // cell.classList += ` ${counter}-${orientation}`;
+        cell.classList += ` ${counter}-${orientation}`;
         if(newClass == 'cross-point'){
             cell.style.backgroundColor = '#e4e4e4';
         }

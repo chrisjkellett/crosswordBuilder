@@ -87,14 +87,15 @@ function clickCell(e){
         el.classList.add('selected');
         initWord.push(id);
         initWord.sort();
-        // savedBoxList.push(id);
+        savedBoxList.push(id);
     }else if(isSaved && isSelected){
         el.classList.remove('selected');
         initWord.pop(id);
-        // savedBoxList.pop(id);
+        savedBoxList.pop(id);
         }
     e.stopPropagation();
     resetValidation();
+    validateClue();
     }   
    
 
