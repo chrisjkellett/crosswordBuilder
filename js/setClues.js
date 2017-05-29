@@ -51,6 +51,7 @@ function selectCell(e) {
         validateCrossword(id);
         wordLength();
         checkGaps();
+        validateLoop();
     }
 
     if (e.target !== e.currentTarget) {
@@ -93,7 +94,7 @@ function clickCell(e){
         // savedBoxList.pop(id);
         }
     e.stopPropagation();
-    // validateLoop(initWordId);
+    validateLoop();
     }   
    
 

@@ -21,6 +21,7 @@ function makeCells(){
             <input type="text" maxlength="1" id="${i}.${j}" class="cell row-${i} col-${j}" /></div>`;
             }
         }
+        updateAllCells();
 }
 
 function updateAllCells(){

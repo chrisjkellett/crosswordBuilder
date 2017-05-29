@@ -1,4 +1,5 @@
 let invalids = [];
+let savedBoxList = [];
 
 //1. prevent caps and non-alphanumeric characters
 function preventIllegalChars(e){
@@ -22,6 +23,50 @@ function validateCrossword(id){
         let $row = $sp[1];
         if (!(row == $row || col == $col) || cell.className.includes('dead')){
             cell.disabled = true;
+        }
+    }
+}
+
+//1c more validation
+function validateLoop(){
+//clue has no letters in it - a. new clue | b. first letter deleted
+if(initWord.length <= 1){
+        for (cell of allCells){
+            cell.disabled = false;
+        }
+        // reactivateUnselectables(unselectables);
+        // unselectables = [];
+        if (initWord.length == 1){
+        validateCrossword(initWord[0]);
+        };
+        if (savedBoxList.length == 1){
+            let splitter = savedBoxList[0].split(".");
+            let col = splitter[1];
+            let row = splitter[0];
+            let el = document.getElementById(savedBoxList[0]);
+            if(el.className.includes('across')){
+                let els = document.querySelectorAll('.row-' + row);
+                for (el of els){
+                    if (el.className.includes('crossBox')){
+                        el.disabled = true;
+                    }else if(!el.className.includes('selected') && !(el.className.includes('deadCell'))){
+                        el.classList += ' no-reinit';
+                        el.style.backgroundColor = '#e4e4e4';
+                        // unselectables.push(el.id);
+                    };
+                };  
+            }else{
+                let els = document.querySelectorAll('.col-' + col);
+                for (el of els){
+                    if (el.className.includes('crossBox')){
+                        el.disabled = true;
+                      }else if(!el.className.includes('selected') && !(el.className.includes('deadCell'))){
+                        el.classList += ' no-reinit';
+                        el.style.backgroundColor = '#e4e4e4';
+                        // unselectables.push(el.id);
+                    }
+                }
+            }
         }
     }
 }
