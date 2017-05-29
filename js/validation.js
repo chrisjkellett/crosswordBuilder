@@ -32,8 +32,10 @@ function resetValidation(){
     const len = initWord.length;
     if(len < 2){
         for (let cell of allCells){
+            if(!invalids.includes(cell.id)){
             cell.disabled = false;
             }
+        }
         if (len == 1){
             validateCrossword(initWord[0]);
         }
@@ -180,7 +182,7 @@ function endPoint(){
      }
 }
 
-//6. check invalids list on increase grid size
+//6. check invalids list on increase grid size or on clue reset
 
 function checkInvalids(){
     for (let id of invalids){
