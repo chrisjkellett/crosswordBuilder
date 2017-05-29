@@ -51,7 +51,7 @@ function selectCell(e) {
         validateCrossword(id);
         wordLength();
         checkGaps();
-        validateLoop();
+        resetValidation();
     }
 
     if (e.target !== e.currentTarget) {
@@ -94,7 +94,7 @@ function clickCell(e){
         // savedBoxList.pop(id);
         }
     e.stopPropagation();
-    validateLoop();
+    resetValidation();
     }   
    
 
@@ -119,7 +119,7 @@ function cancelClue(){
     disOrEnableAll(bool);
     promptClue(block, sum, answer);
     clueInput.value = '';
-    // validateLoop(initWordId);
+    // resetValidation(initWordId);
     // for (let i=0; i<initWordId.length; i++){
     //     validateCrossword(initWordId[i]);
     // };

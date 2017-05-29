@@ -27,44 +27,47 @@ function validateCrossword(id){
     }
 }
 
-//1c more validation
-function validateLoop(){
-//clue has no letters in it - a. new clue | b. first letter deleted
-if(initWord.length <= 1){
-        for (cell of allCells){
+//1c resets when clue length 1 or 0
+function resetValidation(){
+    const len = initWord.length;
+    if(len < 2){
+        for (let cell of allCells){
             cell.disabled = false;
+            }
+        if (len == 1){
+            validateCrossword(initWord[0]);
         }
-        // reactivateUnselectables(unselectables);
-        // unselectables = [];
-        if (initWord.length == 1){
-        validateCrossword(initWord[0]);
-        };
-        if (savedBoxList.length == 1){
-            let splitter = savedBoxList[0].split(".");
-            let col = splitter[1];
-            let row = splitter[0];
-            let el = document.getElementById(savedBoxList[0]);
-            if(el.className.includes('across')){
-                let els = document.querySelectorAll('.row-' + row);
-                for (el of els){
-                    if (el.className.includes('crossBox')){
-                        el.disabled = true;
-                    }else if(!el.className.includes('selected') && !(el.className.includes('deadCell'))){
-                        el.classList += ' no-reinit';
-                        el.style.backgroundColor = '#e4e4e4';
-                        // unselectables.push(el.id);
-                    };
-                };  
-            }else{
-                let els = document.querySelectorAll('.col-' + col);
-                for (el of els){
-                    if (el.className.includes('crossBox')){
-                        el.disabled = true;
-                      }else if(!el.className.includes('selected') && !(el.className.includes('deadCell'))){
-                        el.classList += ' no-reinit';
-                        el.style.backgroundColor = '#e4e4e4';
-                        // unselectables.push(el.id);
-                    }
+    }
+    // reactivateUnselectables(unselectables);
+    // unselectables = [];
+}
+
+function savedValidation(){
+    if (savedBoxList.length == 1){
+    let splitter = savedBoxList[0].split(".");
+    let col = splitter[1];
+    let row = splitter[0];
+    let el = document.getElementById(savedBoxList[0]);
+    if(el.className.includes('across')){
+        let els = document.querySelectorAll('.row-' + row);
+        for (el of els){
+            if (el.className.includes('crossBox')){
+                el.disabled = true;
+            }else if(!el.className.includes('selected') && !(el.className.includes('deadCell'))){
+                el.classList += ' no-reinit';
+                el.style.backgroundColor = '#e4e4e4';
+                // unselectables.push(el.id);
+            }
+        }
+    }else{
+        let els = document.querySelectorAll('.col-' + col);
+        for (el of els){
+            if (el.className.includes('crossBox')){
+                el.disabled = true;
+            }else if(!el.className.includes('selected') && !(el.className.includes('deadCell'))){
+                el.classList += ' no-reinit';
+                el.style.backgroundColor = '#e4e4e4';
+                // unselectables.push(el.id);
                 }
             }
         }
