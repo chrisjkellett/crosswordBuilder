@@ -46,15 +46,15 @@ let counter = 0;
 //         };
 // }
 
-function checkInvalids(){
-    for (id of invalids){
-        let deadCell = document.getElementById(id);
-        deadCell.classList.remove('crossBox');
-        deadCell.classList += ' deadCell';
-        deadCell.disabled = true;
-        // invalids.pop(id);
-    };
-}
+// function checkInvalids(){
+//     for (id of invalids){
+//         let deadCell = document.getElementById(id);
+//         deadCell.classList.remove('crossBox');
+//         deadCell.classList += ' deadCell';
+//         deadCell.disabled = true;
+//         // invalids.pop(id);
+//     };
+// }
 
 // //increase grid rowSize
 // const addRows = document.querySelector('#rowPlus');

@@ -72,6 +72,29 @@ function selectCell(e) {
             }
         }
    }  
+
+//F1b - select cells by click
+function clickCell(e){
+    const el = e.target;
+    const id = e.target.id;
+    const $class = el.className;
+    const isCrossPoint = $class.includes('cross-point');
+    const isNoReinit = $class.includes('no-reinit');
+    const isSaved = $class.includes('savedWord');
+    const isSelected = $class.includes('selected');
+    if (isSaved && !isSelected && !(isCrossPoint || isNoReinit)){
+        el.classList.add('selected');
+        initWord.push(id);
+        initWord.sort();
+        // savedBoxList.push(id);
+    }else if(isSaved && isSelected){
+        el.classList.remove('selected');
+        initWord.pop(id);
+        // savedBoxList.pop(id);
+        }
+    e.stopPropagation();
+    // validateLoop(initWordId);
+    }   
    
 
 //F2a. initialise clue
@@ -186,6 +209,7 @@ function confirmClue(){
 
 //-----------Listeners ----------------------------------
 getCrossword.addEventListener('keyup', selectCell, false);
+getCrossword.addEventListener('click', clickCell, false);
 addWordBtn.addEventListener('click', initialiseClue, false);
 cancelClueBtn.addEventListener('click', cancelClue, false);
 confirmClueBtn.addEventListener('click', confirmClue, false);
