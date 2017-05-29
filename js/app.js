@@ -111,8 +111,7 @@ function decreaseGridSize(){
 }
 
 function resetGrid(){
-    const getCells = document.querySelectorAll('.cell');
-    for (cell of getCells){
+    for (let cell of allCells){
         cell.disabled = false;
     }
 

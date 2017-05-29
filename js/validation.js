@@ -1,5 +1,6 @@
 let invalids = [];
 let savedBoxList = [];
+const noreinits = [];
 
 //1. prevent caps and non-alphanumeric characters
 function preventIllegalChars(e){
@@ -34,6 +35,7 @@ function resetValidation(){
         for (let cell of allCells){
             if(!invalids.includes(cell.id)){
             cell.disabled = false;
+            console.log(cell);
             }
         }
         if (len == 1){
@@ -45,45 +47,44 @@ function resetValidation(){
 }
 
 function validateClue(){
-    if (savedBoxList.length == 1){
-    let splitter = savedBoxList[0].split(".");
-    let col = splitter[1];
-    let row = splitter[0];
-    let $el = document.getElementById(savedBoxList[0]);
-    if($el.className.includes('across')){
-        const els = document.querySelectorAll('.row-' + row);
-        for (let el of els){
-            const c = el.className; 
-            const isSelected = c.includes('selected');
-            const isCell = c.includes('cell');
-            const noReinit = c.includes('no-reinit');
-            console.log(c);
-            if(isCell){
-                el.disabled = true;
-            }else if(!isSelected){
-                el.classList.add('no-reinit');
-                el.style.background = 'lightgrey';
-            }else if(noReinit){
-                el.classList.remove('no-reinit');
-                el.style.background = '';
+    function setNoReinit(ids){
+        for (let id of ids){
+            const sp = savedBoxList[0].split(".");
+            const col = sp[1];
+            const row = sp[0];
+            const $el = document.getElementById(savedBoxList[0]);
+            if($el.className.includes('across')){
+                const els = document.querySelectorAll('.row-' + row);
+                for (let el of els){
+                    const c = el.className; 
+                    const isSelected = c.includes('selected');
+                    const isCell = c.includes('cell');
+                    const noReinit = c.includes('no-reinit');
+                    if(isCell){
+                        el.disabled = true;
+                    }else if(!isSelected){
+                        el.classList.add('no-reinit');
+                        el.style.background = 'lightgrey';
+                        el.disabled = true;
+                        noreinits.push(el.id);
+                        }
+                    }
+                }
             }
         }
-    }else if($el.className.includes('down')){
-        // let els = document.querySelectorAll('.col-' + col);
-        // for (el of els){
-        //     if (el.className.includes('cell')){
-        //         el.disabled = true;
-        //     }else if(!el.className.includes('selected') && !(el.className.includes('dead-cell'))){
-        //         el.classList += ' no-reinit';
-        //         el.style.backgroundColor = '#e4e4e4';
-        //         // unselectables.push(el.id);
-        //         }
-        //     }
-        }else{
-            
+
+    //conditionals to run  
+    if (savedBoxList.length == 1){
+        setNoReinit(savedBoxList);
+    }else if(savedBoxList.length == 0){
+        for(let id of noreinits){
+            el = document.getElementById(id);
+            el.classList.remove('no-reinit');
+            el.style.background = 'white';
+            }
         }
     }
-}
+
 
 //3. check word is at least 2 characters
 function wordLength(){
@@ -153,6 +154,7 @@ function endPoint(){
             const cell = document.getElementById(lId);
             removeClasses(cell, ['cell']);
             updateClass(cell, 'dead-cell');
+            invalids.push(lId);
         }
     
 

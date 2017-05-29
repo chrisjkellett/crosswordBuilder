@@ -52,6 +52,7 @@ function selectCell(e) {
         wordLength();
         checkGaps();
         resetValidation();
+        validateClue();
     }
 
     if (e.target !== e.currentTarget) {
@@ -171,11 +172,13 @@ function confirmClue(){
     }
 
     for (let i=0; i<initWord.length; i++){
-        let cell = document.getElementById(initWord[i]);
+        const cell = document.getElementById(initWord[i]);
         const notEP = !cell.hasAttribute('data-ep');
-        let isSaved  = cell.className.includes('savedWord');
+        const isSaved  = cell.className.includes('savedWord');
         if(!isSaved){
             updateClass(cell, 'savedWord');
+            cell.disabled = true;
+            
         }else{
             updateClass(cell, 'cross-point');
         }
@@ -195,6 +198,7 @@ function confirmClue(){
             }
         }
     }
+    updateAllCells();
     endPoint();
 
     //ii. adds number to firstLetter
