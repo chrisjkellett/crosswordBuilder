@@ -33,6 +33,9 @@ function updateAllCells(){
 function removeClasses(cell, $class){
         for (let i = 0; i < $class.length; i++){
             cell.classList.remove($class[i]);
+            if ($class == 'no-reinit'){
+                cell.style.backgroundColor = 'white';
+            }
         }
     }
 
@@ -127,8 +130,16 @@ function resetGrid(){
         }
     }
 
+    for (let id of allIds){
+        const cell = document.getElementById(id);
+        if(cell.className.includes('no-reinit')){
+            removeClasses(cell, ['no-reinit']);
+        }
+    }
+
     allIds.sort();
     initWord = [];
+    savedBoxList = [];
     increaseBtn.disabled = '';
     decreaseBtn.disabled = '';
 }

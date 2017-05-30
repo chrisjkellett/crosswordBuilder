@@ -2,6 +2,26 @@ let invalids = [];
 let savedBoxList = [];
 const noreinits = [];
 
+//multiuse functions --------------------------------------------------------------------------
+function setHTML(dir, sDir){
+    const cells = document.querySelectorAll('.' + sDir + '-' + dir);
+    for (let cell of cells){
+        const c = cell.className; 
+        const isSelected = c.includes('selected');
+        const isCell = c.includes('cell');
+        const isCross = c.includes('cross-point');
+        if(isCell){
+            cell.disabled = true;
+        }else if(!isSelected && !isCross){
+            updateClass(cell, 'no-reinit');
+            if(!noreinits.includes(cell.id)){
+                noreinits.push(cell.id);
+                }
+            }
+        }
+    }
+
+
 //1. prevent caps and non-alphanumeric characters
 function preventIllegalChars(e){
     const x = e.charCode;
@@ -46,46 +66,13 @@ function resetValidation(){
 }
 
 function validateClue(){
-    function setNoReinit(ids){
-        function setHTML(dir, sDir){
-            const cells = document.querySelectorAll('.' + sDir + '-' + dir);
-            for (let cell of cells){
-                const c = cell.className; 
-                const isSelected = c.includes('selected');
-                const isCell = c.includes('cell');
-                if(isCell){
-                    cell.disabled = true;
-                }else if(!isSelected){
-                    updateClass(cell, 'no-reinit');
-                    noreinits.push(cell.id);
-                    }
-                }
-            }
-
-
-    for (let id of ids){
-        const sp = savedBoxList[0].split(".");
-        const col = sp[1];
-        const row = sp[0];
-        const $el = document.getElementById(savedBoxList[0]);
-        const isAcross = $el.className.includes('across');
-    if(isAcross){
-        setHTML(row, 'row');
-    }else{
-        setHTML(col, 'col');
-            }
-        }
-    }
-
-
-    //conditionals to run  
     if (savedBoxList.length == 1){
         setNoReinit(savedBoxList);
+        inWordValidation(savedBoxList);
     }else if(savedBoxList.length == 0){
         for(let id of noreinits){
-            el = document.getElementById(id);
-            el.classList.remove('no-reinit');
-            el.style.background = 'white';
+            cell = document.getElementById(id);
+            removeClasses(cell, ['no-reinit']);
             }
         }
     }
@@ -134,7 +121,7 @@ function checkGaps(){
 }
 
 
-//5. endPoint validation
+//5. endPoint validation (v5)
 function endPoint(){
     const sp1 = initWord[0].split(".");
     const sp2 = initWord[initWord.length - 1].split(".");
@@ -190,12 +177,66 @@ function endPoint(){
 }
 
 //6. check invalids list on increase grid size or on clue reset
-
 function checkInvalids(){
     for (let id of invalids){
         let cell = document.getElementById(id);
         removeClasses(cell, ['cell']);
         updateClass(cell, 'dead-cell');
+    }
+}
+
+//7. set no reinits on selection 
+function setNoReinit(ids){
+    for (let id of ids){
+        const sp = savedBoxList[0].split(".");
+        const col = sp[1];
+        const row = sp[0];
+        const $cell = document.getElementById(savedBoxList[0]);
+        const $class = $cell.className;
+        const isAcross = $class.includes('across');
+        const isCross = $class.includes('cross-point');
+    if(!isCross){
+        if(isAcross){
+            setHTML(row, 'row');
+        }else if (!isAcross){
+            setHTML(col, 'col');
+            }
+        }
+    }
+}    
+    
+
+
+//7. check inword for no reinits
+function inWordValidation($ids){
+    function checkIds(i, $dir, $id){
+        for (let id of allIds){
+            const sp = id.split(".");
+            const dir = sp[i];
+            if(dir == $dir || id == $id){
+                //console.log(id);
+            }else{
+                const cell = document.getElementById(id);
+                const $class = cell.className;
+                const noReinit = $class.includes('no-reinit');
+                const isCross = $class.includes('cross-point');
+                if(!(noReinit || isCross)){
+                    updateClass(cell, 'no-reinit');
+                }
+            }
+        }
+    }
+
+    for (let $id of $ids){
+        const cell = document.getElementById($id);
+        //console.log($ids);
+        const $sp = $id.split(".");
+        const isAcross = cell.className.includes('across');
+        if(isAcross){
+            checkIds(1, $sp[1], $id); //checks against cols
+        }else{
+            checkIds(0, $sp[0], $id); //checks against rows
+        }
     }
 }
 
