@@ -41,7 +41,7 @@ function removeClasses(cell, $class){
 
 function updateClass(cell, newClass){
         cell.classList.add(newClass);
-        if(newClass == 'cross-point' || newClass == 'no-reinit'){
+        if(newClass == 'cross-point' || newClass == 'no-reinit' || newClass == 'no-reinit-on-reset'){
             cell.style.backgroundColor = '#e4e4e4';
         }
 
@@ -52,6 +52,12 @@ function updateClass(cell, newClass){
 
         if(newClass == 'dead-cell' || newClass == 'no-reinit'){
             cell.disabled = true;
+        }
+
+        if(newClass == 'dead-cell'){
+            if(!invalids.includes(cell.id)){
+            invalids.push(cell.id);
+            }
         }
     }
 
@@ -119,7 +125,7 @@ function decreaseGridSize(){
 //
 function resetGrid(){
     for (let cell of allCells){
-        if(!invalids.includes(cell.id)){
+        if(!(invalids.includes(cell.id)) || (noReinitOnReset.includes(cell.id))){
             cell.disabled = false;
         }
     }

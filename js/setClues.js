@@ -180,9 +180,11 @@ function confirmClue(){
             cell.disabled = true;
             
         }else{
+            console.log(cell);
             updateClass(cell, 'cross-point');
         }
         removeClasses(cell, ['selected', 'cell']);
+        
         //refactor ends here
         if(i == 0){
             if(notEP){
@@ -200,6 +202,7 @@ function confirmClue(){
     }
     updateAllCells();
     endPoint();
+    crossPoint();
 
     //ii. adds number to firstLetter
     addNumber();
