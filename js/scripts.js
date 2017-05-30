@@ -191,26 +191,26 @@ if(initWordId.length <= 1){
 //     validateLoop(initWordId);
 // }
 
-let savedBoxList = [];
-getCrossword.addEventListener('click', getSavedBox, false);
-function getSavedBox(el) {
-    let clickedItem = el.target;
-    let id = el.target.id;
-    let isCrossPoint = clickedItem.className.includes('cross-point');
-    let isNoReinit = clickedItem.className.includes('no-reinit');
-    if (clickedItem.className.includes('savedWord') && !(clickedItem.className.includes('selected')) && !(isCrossPoint || isNoReinit)){
-        clickedItem.className += ' selected';
-        initWordId.push(id);
-        initWordId.sort();
-        savedBoxList.push(id);
-    }else if(clickedItem.className.includes('savedWord') && clickedItem.className.includes('selected')){
-        clickedItem.classList.remove('selected');
-        initWordId.pop(id);
-        savedBoxList.pop(id);
-        };
-    el.stopPropagation();
-    validateLoop(initWordId);
-    }
+// let savedBoxList = [];
+// getCrossword.addEventListener('click', getSavedBox, false);
+// function getSavedBox(el) {
+//     let clickedItem = el.target;
+//     let id = el.target.id;
+//     let isCrossPoint = clickedItem.className.includes('cross-point');
+//     let isNoReinit = clickedItem.className.includes('no-reinit');
+//     if (clickedItem.className.includes('savedWord') && !(clickedItem.className.includes('selected')) && !(isCrossPoint || isNoReinit)){
+//         clickedItem.className += ' selected';
+//         initWordId.push(id);
+//         initWordId.sort();
+//         savedBoxList.push(id);
+//     }else if(clickedItem.className.includes('savedWord') && clickedItem.className.includes('selected')){
+//         clickedItem.classList.remove('selected');
+//         initWordId.pop(id);
+//         savedBoxList.pop(id);
+//         };
+//     el.stopPropagation();
+//     validateLoop(initWordId);
+//     }
 
 
 // function validateCrossword(id){

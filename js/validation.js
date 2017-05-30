@@ -47,30 +47,36 @@ function resetValidation(){
 
 function validateClue(){
     function setNoReinit(ids){
-        for (let id of ids){
-            const sp = savedBoxList[0].split(".");
-            const col = sp[1];
-            const row = sp[0];
-            const $el = document.getElementById(savedBoxList[0]);
-            if($el.className.includes('across')){
-                const els = document.querySelectorAll('.row-' + row);
-                for (let el of els){
-                    const c = el.className; 
-                    const isSelected = c.includes('selected');
-                    const isCell = c.includes('cell');
-                    const noReinit = c.includes('no-reinit');
-                    if(isCell){
-                        el.disabled = true;
-                    }else if(!isSelected){
-                        el.classList.add('no-reinit');
-                        el.style.background = 'lightgrey';
-                        el.disabled = true;
-                        noreinits.push(el.id);
-                        }
+        function setHTML(dir, sDir){
+            const cells = document.querySelectorAll('.' + sDir + '-' + dir);
+            for (let cell of cells){
+                const c = cell.className; 
+                const isSelected = c.includes('selected');
+                const isCell = c.includes('cell');
+                if(isCell){
+                    cell.disabled = true;
+                }else if(!isSelected){
+                    updateClass(cell, 'no-reinit');
+                    noreinits.push(cell.id);
                     }
                 }
             }
+
+
+    for (let id of ids){
+        const sp = savedBoxList[0].split(".");
+        const col = sp[1];
+        const row = sp[0];
+        const $el = document.getElementById(savedBoxList[0]);
+        const isAcross = $el.className.includes('across');
+    if(isAcross){
+        setHTML(row, 'row');
+    }else{
+        setHTML(col, 'col');
+            }
         }
+    }
+
 
     //conditionals to run  
     if (savedBoxList.length == 1){

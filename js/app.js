@@ -37,16 +37,16 @@ function removeClasses(cell, $class){
 
 function updateClass(cell, newClass){
         cell.classList.add(newClass);
-        cell.classList += ` ${counter}-${orientation}`;
-        if(newClass == 'cross-point'){
+        if(newClass == 'cross-point' || newClass == 'no-reinit'){
             cell.style.backgroundColor = '#e4e4e4';
         }
 
         if(newClass == 'savedWord'){
             cell.style.backgroundColor = 'white';
+            cell.classList += ` ${counter}-${orientation}`;
         }
 
-        if(newClass == 'dead-cell'){
+        if(newClass == 'dead-cell' || newClass == 'no-reinit'){
             cell.disabled = true;
         }
     }
@@ -112,7 +112,9 @@ function decreaseGridSize(){
 
 function resetGrid(){
     for (let cell of allCells){
-        cell.disabled = false;
+        if(!invalids.includes(cell.id)){
+            cell.disabled = false;
+        }
     }
 
     for (let id of initWord){
