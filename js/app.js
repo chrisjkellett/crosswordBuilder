@@ -1,3 +1,4 @@
+//-----------variables --------------------------------------------------------------------------
 const getCrossword = document.querySelector('#crossword');
 const increaseBtn = document.querySelector('#rowPlus');
 const decreaseBtn = document.querySelector('#rowMinus');
@@ -79,6 +80,8 @@ if (rowSize < maxSize){
     }
 }
 
+
+//
 function decreaseGridSize(){
     function decreaseSize(){
         const row = document.querySelector('#r-' + (rowSize - 1));
@@ -110,6 +113,7 @@ function decreaseGridSize(){
     }
 }
 
+//
 function resetGrid(){
     for (let cell of allCells){
         if(!invalids.includes(cell.id)){
