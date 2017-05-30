@@ -35,7 +35,6 @@ function resetValidation(){
         for (let cell of allCells){
             if(!invalids.includes(cell.id)){
             cell.disabled = false;
-            console.log(cell);
             }
         }
         if (len == 1){
