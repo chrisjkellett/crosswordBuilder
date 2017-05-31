@@ -34,20 +34,23 @@ function removeClasses(cell, $class){
         for (let i = 0; i < $class.length; i++){
             cell.classList.remove($class[i]);
             if ($class == 'no-reinit'){
-                cell.style.backgroundColor = 'white';
+                cell.style.background = '#ffffff';
             }
         }
     }
 
 function updateClass(cell, newClass){
         cell.classList.add(newClass);
-        if(newClass == 'cross-point' || newClass == 'no-reinit' || newClass == 'no-reinit-on-reset'){
-            cell.style.backgroundColor = '#e4e4e4';
-        }
 
         if(newClass == 'savedWord'){
-            cell.style.backgroundColor = 'white';
+            cell.style.background = '#ffffff';
             cell.classList += ` ${counter}-${orientation}`;
+            cell.disabled = true;
+        }
+
+        if(newClass == 'cross-point' || newClass == 'no-reinit' || newClass == 'no-reinit-on-reset'){
+            cell.style.background = '';
+            cell.style.background = '#e4e4e4';
         }
 
         if(newClass == 'dead-cell' || newClass == 'no-reinit'){

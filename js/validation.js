@@ -568,7 +568,7 @@ function reinit(x, model){
         updateClass(cell, 'no-reinit-on-reset'); 
         //noReinitOnReset.push(id);
         // el.classList += ' no-reinit';
-        el.style.backgroundColor = '#e4e4e4';
+        cell.style.backgroundColor = '#E4E4E4';
     }
 }
 

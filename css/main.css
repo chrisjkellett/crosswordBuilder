@@ -65,7 +65,7 @@ header{
 }
 
 .navbar-toggle:hover, .navbar-toggle:focus{
-    background-color:white !important;
+    background-color:#ffffff !important;
 }
 
 .navbar-toggle{
@@ -229,7 +229,7 @@ select.form-control:focus{
 
 .rounded{
     border: 0;
-    background: white;
+    background: #ffffff;
     outline:0;
 }
 
@@ -250,7 +250,7 @@ input[disabled]{
     background: #ffff99 !important;
 }
 
-.cross-point, .no-reinit{
+.cross-point, .no-reinit, .no-reinit-on-reset{
     background: #e4e4e4;
      -webkit-appearance: none;
     outline:0;
@@ -259,6 +259,10 @@ input[disabled]{
     text-align:center;
     border:0;
     cursor: default !important;
+}
+
+.no-reinit-on-reset{
+    background: #e4e4e4 !important;
 }
 
 

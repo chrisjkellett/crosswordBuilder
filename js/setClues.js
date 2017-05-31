@@ -177,10 +177,8 @@ function confirmClue(){
         const isSaved  = cell.className.includes('savedWord');
         if(!isSaved){
             updateClass(cell, 'savedWord');
-            cell.disabled = true;
             
         }else{
-            console.log(cell);
             updateClass(cell, 'cross-point');
         }
         removeClasses(cell, ['selected', 'cell']);
