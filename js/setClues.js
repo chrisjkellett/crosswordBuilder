@@ -55,25 +55,24 @@ function selectCell(e) {
         validateClue();
     }
 
-    if (e.target !== e.currentTarget) {
-        const cell = e.target;
-        const id = e.target.id;
-        const isSelected = cell.className.includes('selected');
-        const notInList = !initWord.includes(id);
-        const $class = cell.classList;
-        const hasValue = cell.value === '';
 
-        if (!isSelected && !hasValue && notInList){
-            $class.add('selected');
-            initWord.push(id);
-            sortAndValidate(id); 
-        }else if (isSelected && hasValue){
-            $class.remove('selected');
-            initWord.pop(id);
-            sortAndValidate(id);
-            }
+    const cell = e.target;
+    const id = e.target.id;
+    const isSelected = cell.className.includes('selected');
+    const notInList = !initWord.includes(id);
+    const $class = cell.classList;
+    const hasValue = cell.value === '';
+
+    if (!isSelected && !hasValue && notInList){
+        $class.add('selected');
+        initWord.push(id);
+        sortAndValidate(id);
+    }else if (isSelected && hasValue){
+        $class.remove('selected');
+        initWord.pop(id);
+        sortAndValidate(id);
         }
-   }  
+   }
 
 //F1b - select cells by click
 function clickCell(e){
@@ -97,8 +96,8 @@ function clickCell(e){
     e.stopPropagation();
     resetValidation();
     validateClue();
-    }   
-   
+    }
+
 
 //F2a. initialise clue
 function initialiseClue() {
@@ -108,13 +107,13 @@ function initialiseClue() {
     const answer = disOrEnableAll(bool);
     promptClue(block, sum, answer);
 
-}      
+}
 
 
 //F2b. cancel clue
 function cancelClue(){
     const clueInput = document.getElementById('clueEntry').value;
-    const bool = false;  
+    const bool = false;
     const block = '';
     const answer = '';
     const sum = (counter -= 1);
@@ -134,7 +133,7 @@ function confirmClue(){
         const firstLetter = document.getElementById(initWord[0]);
         const hasNoClue = !firstLetter.previousElementSibling;
         if(hasNoClue){
-        firstLetter.insertAdjacentHTML('beforeBegin', 
+        firstLetter.insertAdjacentHTML('beforeBegin',
             `<div class="number-wrapper">${counter}</div>`);
         }
     }
@@ -144,7 +143,7 @@ function confirmClue(){
         const $clue = document.getElementById('clueEntry');
         const clue = $clue.value;
         cluebox.style.display = '';
-        $clue.value = '';    
+        $clue.value = '';
         if (counter == 1){
             const clueListBlock = document.querySelector('#clueList');
             clueListBlock.style.display = 'block';
@@ -177,12 +176,12 @@ function confirmClue(){
         const isSaved  = cell.className.includes('savedWord');
         if(!isSaved){
             updateClass(cell, 'savedWord');
-            
+
         }else{
             updateClass(cell, 'cross-point');
         }
         removeClasses(cell, ['selected', 'cell']);
-        
+
         //refactor ends here
         if(i == 0){
             if(notEP){
