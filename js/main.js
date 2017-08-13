@@ -10,6 +10,12 @@
     init: function(){
       this.generateGrid(this.settings.rows);
       this.increaseGridBtn(this.settings.rows, this.settings.max);
+      this.cacheDOM();
+    },
+
+    cacheDOM: function(){
+      this.$wrapper = $('div#crosswordWrapper');
+      console.log(this.$wrapper);
     },
     
     generateGrid: function(rows){
@@ -50,7 +56,7 @@
           console.log('Exceeds grid size');
         }//end if 
       });//end listener
-    }//end function
+    }
 
   }//end object
   crossword.init();
