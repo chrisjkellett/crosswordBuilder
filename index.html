@@ -1,86 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/main.css">
-</head>
+  </head>
 
-<body>
-<div class="container fully">
-<div class="wrapper">
-<div class="divider"></div>
-</div>
-
-<!--START HEADER -->
-<header>
-    <nav class="navbar navbar-default">
-        <div class="container-fluid">
-            <!-- Brand and toggle get grouped for better mobile display -->
+  <body>
+    <div class="container fully">
+      <div class="wrapper"><div class="divider"></div></div>
+      <header>
+        <nav class="navbar navbar-default">
+          <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
+                  <span class="sr-only">Toggle navigation</span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
                 </button>
             <a class="navbar-brand" id="title-link" href="">      
-                <span class="poiret">cross</span>
-                <span class="raleway font-heavy"><strong>Builder</strong></span>
-                <span class="raleway font-small">v1.2</span>
+              <span class="poiret">cross</span>
+              <span class="raleway font-heavy"><strong>Builder</strong></span>
+              <span class="raleway font-small">v1.2</span>
             </a>
-            </div>
-        </div>
-</header>
-<!--END header -->
-
-
-<!--START main-->
-<div id="content-wrap"> 
-    <div id="holdsCross" class="form-group">
+            </div><!--end navbar-header-->
+          </div><!--end container-fluid-->
+        </nav>
+      </header>
+      <div id="holdsCross" class="form-group">
         <div class="row">
-            <div id="crosswordWrapper" class="col-md-6">
+          <div id="crosswordWrapper" class="col-md-6">
             <p class="raleway font-small sub-heading">Add your crossword</p>
-
-            <!--START crossword-->
-                <div id="crossword"></div>
-            <!--END crossword-->
-
-                <div id="toolbar">
-                    <button class="btn btn-default flex-btn" id="addWord" disabled>Add word</button>
-                    <button class="rounded" id="rowMinus"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button>
-                    <button class="rounded" id="increaseBtn"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
-                </div>
-                <div id="cluebox">
-                <p class="raleway font-small">Add clue for <strong><span id="insertClue"></span></strong> at <strong><span id="insertLocation"></span></strong>:</p>
-                <div>
-                    <input type="text" id="clueEntry"/></div>       
-                    <button class="btn btn-default flex-btn" id="confirmClue">Confirm</button>
-                    <button class="btn btn-default flex-btn" id="cancelClue">Cancel</button>
-                </div>
+            <div id="crossword"></div>
+            <div id="toolbar">
+              <button class="btn btn-default flex-btn" id="addWord" disabled>Add word</button>
+              <button class="rounded" id="decreaseBtn"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button>
+              <button class="rounded" id="increaseBtn"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+            </div><!--end toolbar-->
+            <div id="cluebox">
+              <p class="raleway font-small">Add clue for <strong><span id="insertClue"></span></strong> at <strong><span id="insertLocation"></span></strong>:</p>
+              <div>
+                <input type="text" id="clueEntry"/>
+              </div>       
+              <button class="btn btn-default flex-btn" id="confirmClue">Confirm</button>
+              <button class="btn btn-default flex-btn" id="cancelClue">Cancel</button>
+            </div><!--end cluebox-->
             <button class="btn btn-default flex-btn" id="makeCrossword" disabled>Make crossword</button>
-            </div>
-
-            <!--START clues-->
             <div id="clueList" class="raleway font-small col-md-6">
-                <div class="row">
-                    <div id="across" class="col-sm-6">
-                        <p class="sub-heading">Across</p>
-                    </div>
-                    <div id="down" class="col-sm-6">
-                        <p class="sub-heading">Down</p>
-                    </div>
-                </div>
-            </div>
-            <!--END clues-->
-        </div>
-    </div>
-<!--END main-->
+              <div class="row">
+                <div id="across" class="col-sm-6">
+                  <p class="sub-heading">Across</p>
+                </div><!--end across-->
+                <div id="down" class="col-sm-6">
+                  <p class="sub-heading">Down</p>
+                </div><!--end down-->
+              </div><!--end row-->
+            </div><!--end clueList-->
+          </div><!--end crosswordWrapper-->
+        </div><!--end row-->
+      </div><!--end holdsCross-->
+    </div><!--end container-->
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-<script src="js/main.js"></script>
-</body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="js/test.js"></script>
+  </body>
 </html>
