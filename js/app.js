@@ -73,32 +73,32 @@ function updateClass(cell, newClass){
     }
 
 // //-----------Generate grid --------------------------------------------------------------------------
-// function generateGrid(){
-//     for (let i=1; i<rowSize + 1; i++){
-//             getCrossword.innerHTML += `<div id="r-${i}" class="_row"></div>`;
-//         }
-//         makeCells();
-//         updateAllCells();
-//     }
+function generateGrid(){
+    for (let i=1; i<rowSize + 1; i++){
+            getCrossword.innerHTML += `<div id="r-${i}" class="_row"></div>`;
+        }
+        makeCells();
+        updateAllCells();
+    }
 
 
 // //-----------Change grid size --------------------------------------------------------------------------
-// function increaseGridSize(){
-// if (rowSize < maxSize){
-//         rowSize += 1;
-//         const addNewRow = getCrossword.insertAdjacentHTML('beforeend', 
-//         `<div id="r-${rowSize}" class="_row"></div>`);
-//         for (let i=1; i<rowSize; i++){
-//         let getRow = document.querySelector('#r-' + i);
-//             getRow.insertAdjacentHTML('beforeend', 
-//             `<div class="cell-wrapper">
-//             <input type="text" maxlength="1" id="${i}.${rowSize}" class="cell row-${i} col-${rowSize}" /></div>`);
-//         };
-//         makeCells();
-//         updateAllCells();
-//         checkInvalids();
-//     }
-// }
+function increaseGridSize(){
+if (rowSize < maxSize){
+        rowSize += 1;
+        const addNewRow = getCrossword.insertAdjacentHTML('beforeend', 
+        `<div id="r-${rowSize}" class="_row"></div>`);
+        for (let i=1; i<rowSize; i++){
+        let getRow = document.querySelector('#r-' + i);
+            getRow.insertAdjacentHTML('beforeend', 
+            `<div class="cell-wrapper">
+            <input type="text" maxlength="1" id="${i}.${rowSize}" class="cell row-${i} col-${rowSize}" /></div>`);
+        };
+        makeCells();
+        updateAllCells();
+        checkInvalids();
+    }
+}
 
 
 //
@@ -386,7 +386,7 @@ function preventIllegalChars(e){
         }
 }
 
-//2. not in row or col
+// //2. not in row or col
 function validateCrossword(id){
     const sp = id.split(".");
     const col = sp[0];
@@ -924,7 +924,7 @@ function reinit(x, model){
 }
 
 getCrossword.addEventListener('keypress', preventIllegalChars, false);
-increaseBtn.addEventListener('click', increaseGridSize, false);
+// increaseBtn.addEventListener('click', increaseGridSize, false);
 decreaseBtn.addEventListener('click', decreaseGridSize, false);
 getCrossword.addEventListener('keyup', selectCell, false);
 getCrossword.addEventListener('click', clickCell, false);

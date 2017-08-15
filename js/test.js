@@ -8,6 +8,8 @@
       this.min = 4;
       this.currentWord = [];
       this.orientation = 'across';
+      this.validateCount = 0;
+      this.myKeyCommands = false;
     },
 
     init: function(){
@@ -21,17 +23,30 @@
       this.$wrapper = $('#crosswordWrapper');
       this.$crossword = this.$wrapper.find('#crossword');
       this.$increaseBtn = this.$wrapper.find('#increaseBtn');
+      this.$decreaseBtn = this.$wrapper.find('#decreaseBtn');
       this.$allCells = this.$wrapper.find('.cell');
       this.$alertBox = this.$wrapper.find('#alertBox');
+      this.$clueBox = this.$wrapper.find('#clueBox');
+      this.$insertClue = this.$wrapper.find('#insertClue');
+      this.$insertReference = this.$wrapper.find('#insertReference');
       this.$alertMessage = this.$wrapper.find('#alertMessage');
       this.$alertConfirm = this.$wrapper.find('#okAlert');
       this.$addWordBtn = this.$wrapper.find('#addWordBtn');
     },
 
     bindEvents: function(){
-      this.$crossword.keyup(this.runCrosswordEvents.bind(this));
+      this.$crossword.keyup(this.validateCells.bind(this));
+      this.$crossword.keyup(this.navigateGrid.bind(this));
+      this.$crossword.keypress(this.validateInput.bind(this));
       this.$increaseBtn.click(this.increaseSize.bind(this));
+      this.$decreaseBtn.click(this.decreaseSize.bind(this));
       this.$alertConfirm.click(this.alertBoxConfirm.bind(this));
+      this.$addWordBtn.click(this.renderClue.bind(this));
+    },
+
+    runCrosswordEvents: function(e){
+      this.validateCells(e);
+      this.navigateGrid(e);
     },
     
     generateGrid: function(){
@@ -84,6 +99,9 @@
           $row.append(newItem);
         }
         this.makeCells(this.rows, this.init);
+        for (let id of this.currentWord){
+          this.validateGrid(id);
+        }
       }
       
       else{
@@ -92,70 +110,80 @@
       }
     },
 
-    runCrosswordEvents: function(e){
-      this.selectCells(e);
-      this.navigateGrid(e);
-    },
-
-    selectCells: function(e){
-      const cell = e.target;
-      const id = cell.id;
-      const a = cell.className.includes('selected');
-      const b = cell.value === '';
-      const c = !this.currentWord.includes(id);
-
-      if (!a && !b && c){
-        cell.classList.add('selected');
-        this.currentWord.push(id);
-      }
-
-      else if (a && b){
-        cell.classList.remove('selected');
-        this.currentWord.pop(id);
-      }
-
-      this.validateGrid(id);
-      this.validateWordLength();
-      this.validateCompleteWord();
-      console.log(this.currentWord);
+    decreaseSize: function(){
+      const message = 'Not currently working';
+      this.alertBox(message);
     },
 
     navigateGrid: function(e){
       if (e.keyCode === 37){
+        this.myKeyCommands = true;
         const i = this.$allCells.index(e.target);
         const item = this.$allCells.get(i - 1);
         item.focus();
       }
 
       else if (e.keyCode === 38){
+        this.myKeyCommands = true;
         const i = this.$allCells.index(e.target);
         const item = this.$allCells.get(i - this.rows);
         item.focus();
       }
 
       else if (e.keyCode === 39){
+        this.myKeyCommands = true;
         const i = this.$allCells.index(e.target);
         const item = this.$allCells.get(i + 1);
         if (item ? item.focus() : console.log('cannot go further'));
       }
 
       else if (e.keyCode === 40){
+        this.myKeyCommands = true;
         const i = this.$allCells.index(e.target);
         const item = this.$allCells.get(i + this.rows);
         if (item ? item.focus() : console.log('cannot go further'));
       }
+      else
+        this.myKeyCommands = false;
 
+    },
+
+    validateCells: function(e){
+      const cell = e.target;
+      const id = cell.id;
+      const a = cell.className.includes('selected');
+      const b = e.target.value === '';
+      const c = this.currentWord.includes(id);
+
+      if (!a && !b && !c){
+        cell.classList.add('selected');
+        this.currentWord.push(id);
+        this.validateGrid(id);
+      }
+
+      else if (a && b){
+        cell.classList.remove('selected');
+        const i = this.currentWord.indexOf(id);
+        this.currentWord.splice(i, 1);
+        this.validateGrid(id);
+      }
+
+      this.validateWordLength();
+      this.validateWordStructure();
+      this.validateReset();
+      //console.log(this.currentWord);
     },
 
     validateGrid: function(id){
       const sp = id.split(".");
       const col = sp[0];
       const row = sp[1];
+      let list = [];
       for (let cell of this.$allCells){
         let $sp = cell.id.split(".");
         let $col = $sp[0];
         let $row = $sp[1];
-        if (!(row == $row || col == $col) || cell.className.includes('dead'))
+        if (!(row === $row || col === $col) || cell.className.includes('dead'))
           cell.disabled = true;
       }
     },
@@ -167,26 +195,27 @@
         this.$addWordBtn.removeAttr('disabled');
     },
 
-    validateCompleteWord: function(){
+    validateWordStructure: function(){
       this.currentWord.sort();
-      let cols = [];
+      let cols = []; 
       let rows = [];
       let testFails, isRow, isColumn;
+
       for (let id of this.currentWord){
         let sp = id.split(".");
         cols.push(parseInt(sp[0]));
         rows.push(parseInt(sp[1]));
       }
 
-      for (let i=cols.length - 1; i > 0; i--){
+      for (let i = cols.length - 1; i > 0; i--){
         let j = i - 1;
         if (cols[i] - cols[j] > 1)
           testFails = true;
         else if (rows[i] - rows[j] > 1)
           testFails = true;
-        else if (cols[i] - cols[j] == 0)
+        else if (cols[i] - cols[j] === 0)
           isRow = true;
-        else if (rows[i] - rows[j] == 0)
+        else if (rows[i] - rows[j] === 0)
           isColumn = true;
       }
 
@@ -198,6 +227,49 @@
       else if(isColumn){
         this.orientation = 'down';
       }
+    },
+
+    validateInput: function(e){
+      if (e.charCode < 64 || e.charCode > 122) {
+        const message = 'Non alphanumeric characters cannot form part of a word';
+        e.preventDefault();
+        this.alertBox(message);
+      }
+    },
+
+    validateReset: function(){
+      if(this.currentWord.length < 2){
+        for (let cell of this.$allCells){
+          cell.disabled = false;
+          //##this area needs work to avoid unnecessary 2 step resets
+        }
+      }
+       
+      if (this.currentWord.length === 1)
+        this.validateGrid(this.currentWord[0]);
+
+      if (this.currentWord.length === 0)
+        this.validateCount = 0;
+    },
+
+    renderClue: function(){
+      this.addClueAndReference();
+      this.showPromptBox();
+    },
+
+    captureClue: function(){
+      for (let id of this.currentWord){
+        let el = this.$wrapper.find('#1.1');
+        console.log(el);
+      }
+    },
+
+    addClueAndReference: function(){
+      this.$insertClue = this.captureClue();
+    },
+
+    showPromptBox: function(){
+      this.$clueBox.css('display', 'block');
     }
 
   }//end object
