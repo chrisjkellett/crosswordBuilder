@@ -333,19 +333,24 @@ input[disabled]{
   text-decoration: underline;
 }
 
-#cluebox{
-    border:1px solid #A9A9A9;
-    margin-top:3px;
-    width:100%;
-    margin-bottom:10px;
-    padding:10px;
-    text-align:center;
-    z-index:1;
-    display: none;
-    background: #F2F2F2;
+#cluebox, #alertBox{
+  border:1px solid #A9A9A9;
+  margin-top:3px;
+  width:100%;
+  margin-bottom:10px;
+  padding:10px;
+  text-align:center;
+  z-index:1;
+  display: none;
+  background: #F2F2F2;
 }
 
-
+#alertBox{
+  position: absolute;
+  width: 80%;
+  top: 40%;
+  left: 10%;
+}
 
 /*FONT STYLES*/
 .raleway{

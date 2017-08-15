@@ -36,7 +36,7 @@
             <p class="raleway font-small sub-heading">Add your crossword</p>
             <div id="crossword"></div>
             <div id="toolbar">
-              <button class="btn btn-default flex-btn" id="addWord" disabled>Add word</button>
+              <button class="btn btn-default flex-btn" id="addWordBtn" disabled>Add word</button>
               <button class="rounded" id="decreaseBtn"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button>
               <button class="rounded" id="increaseBtn"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
             </div><!--end toolbar-->
@@ -48,6 +48,10 @@
               <button class="btn btn-default flex-btn" id="confirmClue">Confirm</button>
               <button class="btn btn-default flex-btn" id="cancelClue">Cancel</button>
             </div><!--end cluebox-->
+            <div id="alertBox">
+              <p class="raleway font-small"><span id="alertMessage"></span></p>       
+              <button class="btn btn-default flex-btn" id="okAlert">Ok</button>
+            </div><!--end alertbox-->
             <button class="btn btn-default flex-btn" id="makeCrossword" disabled>Make crossword</button>
             <div id="clueList" class="raleway font-small col-md-6">
               <div class="row">
