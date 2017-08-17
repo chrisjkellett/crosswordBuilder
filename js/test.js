@@ -125,8 +125,40 @@
 
 
     decreaseSize: function(){
-      const message = 'Not currently working';
-      this.alertBox(message);
+      function decreaseSize(){
+        const row = module.$wrapper.find('#r-' + (module.rows));
+        row.remove();
+        for (let i = 1; i < module.rows; i++){
+          let row = module.$wrapper.find('#r-' + i);
+          row.children().last().remove();
+        } 
+        module.rows --;
+        module.init --;
+        module.cacheCells();
+      }
+
+      if(this.currentIds.length > 0){
+        console.log('running');
+        let sp = this.currentIds[this.currentIds.length - 1].split("-");
+        let lastRow = sp[1];
+        let lastCol = sp[0];
+        if ((this.rows > this.min) && (lastCol < this.rows) && (lastRow < this.rows))
+          decreaseSize();
+        else if(this.rows >= this.min){
+          const message = 'Reducing size would delete clues.';
+          this.alertBox(message);
+        }
+        else if (this.rows <= this.min){
+          const message = 'Cannot reduce further. Minimum size for this crossword is set to 4.';
+          this.alertBox(message);
+        }
+      }
+      else if(this.rows <= this.min){
+        const message = 'Cannot reduce further. Minimum size for this crossword is set to 4.';
+        this.alertBox(message);
+      }
+      else
+          decreaseSize();
     },
 
 
@@ -260,7 +292,7 @@
     renderClue: function(){
       this.captureClue();
       this.addClueAndReference();
-      this.showPromptBox();
+      this.togglePromptBox('block');
     },
 
 
@@ -275,39 +307,41 @@
     addClueAndReference: function(){
       this.$insertClue.text(this.sCurrentWord);
       this.$insertReference.text(this.clueCounter + ' ' + this.orientation);
-      this.clueCounter ++;
     },
 
 
-    showPromptBox: function(){
-      this.$clueBox.css('display', 'block');
+    togglePromptBox: function(x){
+      this.$clueBox.css('display', x);
     },
 
 
     confirmClue: function(){
-      const clueEntry = this.$clueEntry.val();
-      if (clueEntry)
-        this.saveClueAsJSON(clueEntry);
+      this.saveClueAsJSON();
+      this.togglePromptBox('none');
+      this.addNumber();
     },
 
+    initJSON: function(word, reference, ids, clueEntry){
+      this.word = word;
+      this.reference = reference;
+      this.ids = ids;
+      this.clueEntry = clueEntry;
+    },
 
-    saveClueAsJSON: function(clueEntry){
-      function Clue(word, reference, ids, clueEntry){
-        this.word = word;
-        this.reference = reference;
-        this.ids = ids;
-        this.clueEntry = clueEntry;
-      } 
-
-      const clue = new Clue(this.sCurrentWord, 
-                            (this.clueCounter - 1) + ' ' + this.orientation, 
-                            this.currentIds,
-                            clueEntry);
-
+    saveClueAsJSON: function(){
+      const clue = new this.initJSON(this.sCurrentWord, 
+                  (this.clueCounter) + ' ' + this.orientation, 
+                  this.currentIds,
+                  this.$clueEntry.val());
       this.json.push(clue);
       console.log(clue);
     },
 
+    addNumber: function(){
+      const $firstLetter = this.$wrapper.find('#' + this.currentIds[0]);
+      const newItem = (`<div class="number-wrapper">${this.clueCounter}</div>`);
+      console.log($firstLetter.parent().prepend(newItem));
+    },
 
     cancelClue: function(){
       this.$clueBox.css('display', 'none');
