@@ -6,9 +6,11 @@
       this.init = 1;
       this.max = 10;
       this.min = 4;
-      this.currentWord = [];
+      this.currentIds = [];
+      this.sCurrentWord = '';
+      this.clueCounter = 1;
       this.orientation = 'across';
-      this.myKeyCommands = false;
+      this.json = [];
     },
 
     
@@ -33,6 +35,9 @@
       this.$alertMessage = this.$wrapper.find('#alertMessage');
       this.$alertConfirm = this.$wrapper.find('#okAlert');
       this.$addWordBtn = this.$wrapper.find('#addWordBtn');
+      this.$confirmClueBtn = this.$wrapper.find('#confirmClue');
+      this.$clueEntry = this.$wrapper.find('#clueEntry');
+      this.$cancelClueBtn = this.$wrapper.find('#cancelClue');
     },
 
 
@@ -44,6 +49,8 @@
       this.$decreaseBtn.click(this.decreaseSize.bind(this));
       this.$alertConfirm.click(this.alertBoxConfirm.bind(this));
       this.$addWordBtn.click(this.renderClue.bind(this));
+      this.$cancelClueBtn.click(this.cancelClue.bind(this));
+      this.$confirmClueBtn.click(this.confirmClue.bind(this));
     },
 
 
@@ -68,7 +75,7 @@
         this.init = this.rows + 1;
         for (let j = 1; j < this.rows + 1; j++){
           let newItem = $(`<div class="cell-wrapper">\
-          <input type="text" maxlength="1" id="${i}.${j}" class="cell row-${i} col-${j}" /></div>`);
+          <input type="text" maxlength="1" id="${i}-${j}" class="cell row-${i} col-${j}" /></div>`);
           $row.append(newItem);
         }
       }
@@ -100,12 +107,12 @@
         for (let i = 1; i < this.rows; i++){
           let $row = this.$wrapper.find('#r-' + i);
           let newItem = $(`<div class="cell-wrapper">\
-          <input type="text" maxlength="1" id="${i}.${this.rows}"\
+          <input type="text" maxlength="1" id="${i}-${this.rows}"\
            class="cell row-${i} col-${this.rows}" /></div>`);
           $row.append(newItem);
         }
         this.makeCells(this.rows, this.init);
-        for (let id of this.currentWord){
+        for (let id of this.currentIds){
           this.validateGrid(id);
         }
       }
@@ -151,11 +158,11 @@
       const id = cell.id;
       const a = cell.className.includes('selected');
       const b = e.target.value === '';
-      const c = this.currentWord.includes(id);
+      const c = this.currentIds.includes(id);
 
       if (!a && !b && !c){
         cell.classList.add('selected');
-        this.currentWord.push(id);
+        this.currentIds.push(id);
         this.validateGrid(id);
         this.validateWordLength();
         this.validateWordStructure();
@@ -163,24 +170,24 @@
       }
       else if (a && b){
         cell.classList.remove('selected');
-        const i = this.currentWord.indexOf(id);
-        this.currentWord.splice(i, 1);
+        const i = this.currentIds.indexOf(id);
+        this.currentIds.splice(i, 1);
         this.validateGrid(id);
         this.validateWordLength();
         this.validateWordStructure();
         this.validateReset();
       }
-      //console.log(this.currentWord);
+      console.log(this.currentIds);
     },
 
 
     validateGrid: function(id){
-      const sp = id.split(".");
+      const sp = id.split("-");
       const col = sp[0];
       const row = sp[1];
       let list = [];
       for (let cell of this.$allCells){
-        let $sp = cell.id.split(".");
+        let $sp = cell.id.split("-");
         let $col = $sp[0];
         let $row = $sp[1];
         if (!(row === $row || col === $col) || cell.className.includes('dead'))
@@ -190,7 +197,7 @@
 
 
     validateWordLength: function(){
-      if (this.currentWord.length < 2)
+      if (this.currentIds.length < 2)
         this.$addWordBtn.attr('disabled', true);
       else
         this.$addWordBtn.removeAttr('disabled');
@@ -198,12 +205,12 @@
 
 
     validateWordStructure: function(){
-      this.currentWord.sort();
+      this.currentIds.sort();
       let cols = []; 
       let rows = [];
       let testFails, isRow, isColumn;
-      for (let id of this.currentWord){
-        let sp = id.split(".");
+      for (let id of this.currentIds){
+        let sp = id.split("-");
         cols.push(parseInt(sp[0]));
         rows.push(parseInt(sp[1]));
       }
@@ -239,38 +246,73 @@
 
 
     validateReset: function(){
-      if(this.currentWord.length < 2){
+      if(this.currentIds.length < 2){
         for (let cell of this.$allCells){
           cell.disabled = false;
           //##this area needs work to avoid unnecessary 2 step resets
         }
       }
-      if (this.currentWord.length === 1)
-        this.validateGrid(this.currentWord[0]);
+      if (this.currentIds.length === 1)
+        this.validateGrid(this.currentIds[0]);
     },
 
 
     renderClue: function(){
+      this.captureClue();
       this.addClueAndReference();
       this.showPromptBox();
     },
 
 
     captureClue: function(){
-      for (let id of this.currentWord){
-        let el = this.$wrapper.find('#1.1');
-        console.log(el);
+      for(let id of this.currentIds){
+        let letter = this.$wrapper.find('#' + id).val();
+        this.sCurrentWord += letter;
       }
     },
 
 
     addClueAndReference: function(){
-      this.$insertClue = this.captureClue();
+      this.$insertClue.text(this.sCurrentWord);
+      this.$insertReference.text(this.clueCounter + ' ' + this.orientation);
+      this.clueCounter ++;
     },
 
 
     showPromptBox: function(){
       this.$clueBox.css('display', 'block');
+    },
+
+
+    confirmClue: function(){
+      const clueEntry = this.$clueEntry.val();
+      if (clueEntry)
+        this.saveClueAsJSON(clueEntry);
+    },
+
+
+    saveClueAsJSON: function(clueEntry){
+      function Clue(word, reference, ids, clueEntry){
+        this.word = word;
+        this.reference = reference;
+        this.ids = ids;
+        this.clueEntry = clueEntry;
+      } 
+
+      const clue = new Clue(this.sCurrentWord, 
+                            (this.clueCounter - 1) + ' ' + this.orientation, 
+                            this.currentIds,
+                            clueEntry);
+
+      this.json.push(clue);
+      console.log(clue);
+    },
+
+
+    cancelClue: function(){
+      this.$clueBox.css('display', 'none');
+      this.clueCounter --;
+      this.sCurrentWord = '';
     }
 
   }//end object
