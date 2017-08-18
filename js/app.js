@@ -315,6 +315,7 @@ function confirmClue(){
         getClueList.appendChild(wrap);
     }
 
+    //update classes
     for (let i=0; i<initWord.length; i++){
         const cell = document.getElementById(initWord[i]);
         const notEP = !cell.hasAttribute('data-ep');

@@ -38,6 +38,7 @@
       this.$confirmClueBtn = this.$wrapper.find('#confirmClue');
       this.$clueEntry = this.$wrapper.find('#clueEntry');
       this.$cancelClueBtn = this.$wrapper.find('#cancelClue');
+      this.$clueList = this.$wrapper.find('#clueList');
     },
 
 
@@ -209,7 +210,6 @@
         this.validateWordStructure();
         this.validateReset();
       }
-      console.log(this.currentIds);
     },
 
 
@@ -319,6 +319,8 @@
       this.saveClueAsJSON();
       this.togglePromptBox('none');
       this.addNumber();
+      this.addClasses();
+      this.writeClueToPage();
     },
 
     initJSON: function(word, reference, ids, clueEntry){
@@ -340,13 +342,46 @@
     addNumber: function(){
       const $firstLetter = this.$wrapper.find('#' + this.currentIds[0]);
       const newItem = (`<div class="number-wrapper">${this.clueCounter}</div>`);
-      console.log($firstLetter.parent().prepend(newItem));
+      $firstLetter.parent().prepend(newItem);
+      //##add condition in case cross point
+    },
+
+    addClasses: function(){
+      for(let id of this.currentIds){
+        const cell = this.$wrapper.find('#' + id);
+        const isSaved = cell.className.includes('savedWord');
+        if(!savedWord)
+          cell.classList += 'savedWord';
+        else
+          cell.classList += 'cross-point';
+      }
+    },
+
+    writeClueToPage: function(){
+      const $clueList = this.$wrapper.find('#' + this.orientation);
+      const newItem = (`<div id="${this.clueCounter}-${this.orientation}" class="clue-wrapper"\>
+                          <p class="font-clue">${this.clueCounter}. ${this.$clueEntry.val() || '-'}</p>\
+                          <div>\
+                            <button class="edit-button">\
+                              <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>\
+                            </button>\
+                            <button class="delete-button">\
+                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>\
+                            </button>\
+                          </div>\
+                        </div>`);
+      if(this.clueCounter === 1) this.$clueList.css('display', 'block');
+      $clueList.append(newItem);
     },
 
     cancelClue: function(){
       this.$clueBox.css('display', 'none');
       this.clueCounter --;
       this.sCurrentWord = '';
+    },
+
+    resetGrid: function(){
+
     }
 
   }//end object

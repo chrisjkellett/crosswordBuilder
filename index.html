@@ -32,37 +32,39 @@
       </header>
       <div id="holdsCross" class="form-group">
         <div class="row">
-          <div id="crosswordWrapper" class="col-md-6">
-            <p class="raleway font-small sub-heading">Add your crossword</p>
-            <div id="crossword"></div>
-            <div id="toolbar">
-              <button class="btn btn-default flex-btn" id="addWordBtn" disabled>Add word</button>
-              <button class="rounded" id="decreaseBtn"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button>
-              <button class="rounded" id="increaseBtn"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
-            </div><!--end toolbar-->
-            <div id="clueBox">
-              <p class="raleway font-small">Add clue for <strong><span id="insertClue"></span></strong> at <strong><span id="insertReference"></span></strong>:</p>
-              <div>
-                <input type="text" id="clueEntry"/>
-              </div>       
-              <button class="btn btn-default flex-btn" id="confirmClue">Confirm</button>
-              <button class="btn btn-default flex-btn" id="cancelClue">Cancel</button>
-            </div><!--end cluebox-->
-            <div id="alertBox">
-              <p class="raleway font-small"><span id="alertMessage"></span></p>       
-              <button class="btn btn-default flex-btn" id="okAlert">Ok</button>
-            </div><!--end alertbox-->
-            <button class="btn btn-default flex-btn" id="makeCrossword" disabled>Make crossword</button>
-            <div id="clueList" class="raleway font-small col-md-6">
-              <div class="row">
-                <div id="across" class="col-sm-6">
-                  <p class="sub-heading">Across</p>
-                </div><!--end across-->
-                <div id="down" class="col-sm-6">
-                  <p class="sub-heading">Down</p>
-                </div><!--end down-->
-              </div><!--end row-->
-            </div><!--end clueList-->
+          <div id="crosswordWrapper">
+            <div id="withoutClueList" class="col-md-6">
+              <p class="raleway font-small sub-heading">Add your crossword</p>
+              <div id="crossword"></div>
+              <div id="toolbar">
+                <button class="btn btn-default flex-btn" id="addWordBtn" disabled>Add word</button>
+                <button class="rounded" id="decreaseBtn"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button>
+                <button class="rounded" id="increaseBtn"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+              </div><!--end toolbar-->
+              <div id="clueBox">
+                <p class="raleway font-small">Add clue for <strong><span id="insertClue"></span></strong> at <strong><span id="insertReference"></span></strong>:</p>
+                <div>
+                  <input type="text" id="clueEntry"/>
+                </div>       
+                <button class="btn btn-default flex-btn" id="confirmClue">Confirm</button>
+                <button class="btn btn-default flex-btn" id="cancelClue">Cancel</button>
+              </div><!--end cluebox-->
+              <div id="alertBox">
+                <p class="raleway font-small"><span id="alertMessage"></span></p>       
+                <button class="btn btn-default flex-btn" id="okAlert">Ok</button>
+              </div><!--end alertbox-->
+              <button class="btn btn-default flex-btn" id="makeCrossword" disabled>Make crossword</button>
+            </div><!--end without ClueList-->
+              <div id="clueList" class="raleway font-small col-md-6">
+                <div class="row">
+                  <div id="across" class="col-sm-6">
+                    <p class="sub-heading">Across</p>
+                  </div><!--end across-->
+                  <div id="down" class="col-sm-6">
+                    <p class="sub-heading">Down</p>
+                  </div><!--end down-->
+                </div><!--end row-->
+              </div><!--end clueList-->
           </div><!--end crosswordWrapper-->
         </div><!--end row-->
       </div><!--end holdsCross-->
