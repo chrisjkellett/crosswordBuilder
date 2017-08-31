@@ -217,7 +217,6 @@
       const sp = id.split("-");
       const col = sp[0];
       const row = sp[1];
-      let list = [];
       for (let cell of this.$allCells){
         let $sp = cell.id.split("-");
         let $col = $sp[0];
@@ -290,11 +289,17 @@
 
 
     renderClue: function(){
+      this.disableButtons(true, true);
       this.captureClue();
       this.addClueAndReference();
       this.togglePromptBox('block');
     },
 
+    disableButtons: function(b1, b2){
+      this.$addWordBtn.attr('disabled', b1);
+      this.$increaseBtn.attr('disabled', b2);
+      this.$decreaseBtn.attr('disabled', b2);
+    },
 
     captureClue: function(){
       for(let id of this.currentIds){
@@ -321,6 +326,7 @@
       this.addNumber();
       this.addClasses();
       this.writeClueToPage();
+      this.resetGrid();
     },
 
     initJSON: function(word, reference, ids, clueEntry){
@@ -336,7 +342,6 @@
                   this.currentIds,
                   this.$clueEntry.val());
       this.json.push(clue);
-      console.log(clue);
     },
 
     addNumber: function(){
@@ -349,11 +354,13 @@
     addClasses: function(){
       for(let id of this.currentIds){
         const cell = this.$wrapper.find('#' + id);
-        const isSaved = cell.className.includes('savedWord');
-        if(!savedWord)
-          cell.classList += 'savedWord';
+        const isSaved = cell.hasClass('savedWord')
+        cell.removeClass('selected');
+        cell.removeClass('cell');
+        if(!isSaved)
+          cell.addClass('savedWord');
         else
-          cell.classList += 'cross-point';
+          cell.addClass('cross-point');
       }
     },
 
@@ -376,12 +383,17 @@
 
     cancelClue: function(){
       this.$clueBox.css('display', 'none');
-      this.clueCounter --;
+      //this.clueCounter --;
       this.sCurrentWord = '';
+      this.disableButtons(false, false);
     },
 
     resetGrid: function(){
-
+      for (let cell of this.$allCells)
+            cell.disabled = false;
+      this.currentIds = [];
+      this.$addWordBtn.attr('disabled', true);
+      this.disableButtons(true, false);
     }
 
   }//end object
