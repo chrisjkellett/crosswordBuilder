@@ -295,6 +295,7 @@
       this.togglePromptBox('block');
     },
 
+
     disableButtons: function(b1, b2){
       this.$addWordBtn.attr('disabled', b1);
       this.$increaseBtn.attr('disabled', b2);
@@ -323,6 +324,7 @@
     confirmClue: function(){
       this.saveClueAsJSON();
       this.togglePromptBox('none');
+      this.validateEndPoint();
       this.addNumber();
       this.addClasses();
       this.writeClueToPage();
@@ -349,6 +351,40 @@
       const newItem = (`<div class="number-wrapper">${this.clueCounter}</div>`);
       $firstLetter.parent().prepend(newItem);
       //##add condition in case cross point
+    },
+
+    validateEndPoint: function(){
+      const sp1 = this.currentIds[0].split("-");
+      const sp2 = this.currentIds[this.currentIds.length - 1].split("-");
+
+      function blackOutCell(id){
+        const cell = module.$wrapper.find('#' + id);
+        cell.removeClass('cell');
+        cell.addClass('dead-cell');
+        cell.prop('disabled', true);
+      }
+  
+      if (this.orientation === 'across') {
+        const row = +sp1[0];
+        const l = +sp1[1]; 
+        const r = +sp2[1];
+        const lId = row + "-" + (l - 1);
+        const rId = row + '-' + (r + 1);
+  
+        if (r < this.rows) blackOutCell(rId);
+        if ((l - 1) !== 0) blackOutCell(lId);    
+  
+      }else if (this.orientation === 'down') {
+        const col = +sp1[1];
+        const u = +sp1[0];
+        const d = +sp2[0];
+        const dId = (d + 1) + '-' + col;
+        const uId = (u - 1) + '-' + col;
+  
+        if (d <= this.rows) blackOutCell(dId);
+        if ((u - 1) !== 0) blackOutCell(uId);
+      }
+      this.cacheCells();
     },
 
     addClasses: function(){
@@ -389,8 +425,9 @@
     },
 
     resetGrid: function(){
-      for (let cell of this.$allCells)
-            cell.disabled = false;
+      for (let cell of this.$allCells){
+        cell.disabled = false;
+      }
       this.currentIds = [];
       this.$addWordBtn.attr('disabled', true);
       this.disableButtons(true, false);
