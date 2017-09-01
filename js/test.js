@@ -225,6 +225,7 @@
         this.validateWordLength();
         this.validateWordStructure();
         this.validateReset();
+        this.setNoReinits(e.target.id);
       }else if(isSaved && isSelected){
         $el.removeClass('selected');
         this.newCrossPoint = false;
@@ -234,6 +235,7 @@
         this.validateWordLength();
         this.validateWordStructure();
         this.validateReset();
+        this.resetNoReinits(e.target.id);
       }
     },
 
@@ -309,6 +311,56 @@
       }
       if (this.currentIds.length === 1)
         this.validateGrid(this.currentIds[0]);
+    },
+
+    setNoReinits: function(xpid){
+      function checkIds(ref, pos){
+        for (let i = 1; i < module.rows + 1; i++){
+          if(pos === 'across'){
+            const cell = module.$wrapper.find('#' + ref + '-' + i);
+            if (cell.hasClass('cell')){
+              cell.prop('disabled', true);
+            } else if (!cell.hasClass('selected')){
+              cell.addClass('no-reinit');
+            }
+          }else{
+            const cell = module.$wrapper.find('#' + i + '-' + ref);
+            console.log(cell);
+          }
+          //check cell classes
+
+        }
+      }
+
+      if(this.orientation === 'across'){
+        const colRef = (xpid.split("-"))[0];
+        checkIds(colRef, 'across');
+      }else{
+        const rowRef = (xpid.split("-"))[1];
+        checkIds(rowRef, 'down');
+      }
+    },
+
+    resetNoReinits: function(xpid){
+      function checkIds(ref, pos){
+        for (let i = 1; i < module.rows + 1; i++){
+          if(pos === 'across'){
+            const cell = module.$wrapper.find('#' + ref + '-' + i);
+            cell.removeClass('no-reinit');
+          }else{
+            const cell = module.$wrapper.find('#' + i + '-' + ref);
+            cell.removeClass('no-reinit');
+          }
+        }
+      }
+
+      if(this.orientation === 'across'){
+        const colRef = (xpid.split("-"))[0];
+        checkIds(colRef, 'across');
+      }else{
+        const rowRef = (xpid.split("-"))[1];
+        checkIds(rowRef, 'down');
+      }
     },
 
 
@@ -453,6 +505,7 @@
       this.currentIds = [];
       this.$addWordBtn.attr('disabled', true);
       this.disableButtons(true, false);
+      this.newCrossPoint = false;
     }
 
   }//end object
