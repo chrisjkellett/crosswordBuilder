@@ -6,11 +6,12 @@
       this.init = 1;
       this.max = 10;
       this.min = 4;
-      this.currentIds = [];
       this.sCurrentWord = '';
       this.clueCounter = 1;
       this.orientation = 'across';
+      this.currentIds = [];
       this.json = [];
+      this.newCrossPoint = false;
     },
 
     
@@ -139,7 +140,6 @@
       }
 
       if(this.currentIds.length > 0){
-        console.log('running');
         let sp = this.currentIds[this.currentIds.length - 1].split("-");
         let lastRow = sp[1];
         let lastCol = sp[0];
@@ -212,6 +212,30 @@
       }
     },
 
+    validateClicks: function(e){
+      const $el = this.$wrapper.find('#' + e.target.id);
+      const isSaved = $el.hasClass('savedWord');
+      const isSelected = $el.hasClass('selected');
+      if (isSaved && !isSelected && !this.newCrossPoint){
+        $el.addClass('selected');
+        this.newCrossPoint = true;
+        this.currentIds.push(e.target.id);
+        this.currentIds.sort();
+        this.validateGrid(e.target.id);
+        this.validateWordLength();
+        this.validateWordStructure();
+        this.validateReset();
+      }else if(isSaved && isSelected){
+        $el.removeClass('selected');
+        this.newCrossPoint = false;
+        const i = this.currentIds.indexOf(e.target.id);
+        this.currentIds.splice(i, 1);
+        this.validateGrid(e.target.id);
+        this.validateWordLength();
+        this.validateWordStructure();
+        this.validateReset();
+      }
+    },
 
     validateGrid: function(id){
       const sp = id.split("-");
@@ -305,7 +329,7 @@
     captureClue: function(){
       for(let id of this.currentIds){
         let letter = this.$wrapper.find('#' + id).val();
-        this.sCurrentWord += letter;
+        this.sCurrentWord += letter.toLowerCase();
       }
     },
 
@@ -393,6 +417,7 @@
         const isSaved = cell.hasClass('savedWord')
         cell.removeClass('selected');
         cell.removeClass('cell');
+        cell.click(this.validateClicks.bind(this));
         if(!isSaved)
           cell.addClass('savedWord');
         else
@@ -405,9 +430,6 @@
       const newItem = (`<div id="${this.clueCounter}-${this.orientation}" class="clue-wrapper"\>
                           <p class="font-clue">${this.clueCounter}. ${this.$clueEntry.val() || '-'}</p>\
                           <div>\
-                            <button class="edit-button">\
-                              <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>\
-                            </button>\
                             <button class="delete-button">\
                             <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>\
                             </button>\
