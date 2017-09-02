@@ -11,6 +11,7 @@
       this.orientation = 'across';
       this.currentIds = [];
       this.json = [];
+      this.noreinits = [];
       this.newCrossPoint = false;
     },
 
@@ -224,8 +225,8 @@
         this.validateGrid(e.target.id);
         this.validateWordLength();
         this.validateWordStructure();
-        this.validateReset();
         this.setNoReinits(e.target.id);
+        this.validateReset();
       }else if(isSaved && isSelected){
         $el.removeClass('selected');
         this.newCrossPoint = false;
@@ -234,8 +235,8 @@
         this.validateGrid(e.target.id);
         this.validateWordLength();
         this.validateWordStructure();
-        this.validateReset();
         this.resetNoReinits(e.target.id);
+        this.validateReset();
       }
     },
 
@@ -303,11 +304,14 @@
 
 
     validateReset: function(){
-      if(this.currentIds.length < 2){
+      //to clear validation there must be 1 or 0 cells selected (and one deleted)
+      //to ensure noreinits runs there must be no selected crosspoints
+      if(this.currentIds.length < 2 && !this.newCrossPoint){
         for (let cell of this.$allCells){
           cell.disabled = false;
           //##this area needs work to avoid unnecessary 2 step resets
         }
+
       }
       if (this.currentIds.length === 1)
         this.validateGrid(this.currentIds[0]);
@@ -320,19 +324,24 @@
             const cell = module.$wrapper.find('#' + ref + '-' + i);
             if (cell.hasClass('cell')){
               cell.prop('disabled', true);
-            } else if (!cell.hasClass('selected')){
+            } else if (!cell.hasClass('selected') && !cell.hasClass('dead-cell') && !cell.hasClass('cross-point')){
               cell.addClass('no-reinit');
+              module.noreinits.push(cell);
             }
           }else{
             const cell = module.$wrapper.find('#' + i + '-' + ref);
-            console.log(cell);
+            if (cell.hasClass('cell')){
+              cell.prop('disabled', true);
+            } else if (!cell.hasClass('selected') && !cell.hasClass('dead-cell') && !cell.hasClass('cross-point')){
+              cell.addClass('no-reinit');
+              module.noreinits.push(cell);
+            }
           }
-          //check cell classes
-
         }
       }
 
-      if(this.orientation === 'across'){
+      const cell = this.$wrapper.find('#' + xpid);
+      if(cell.hasClass('across')){
         const colRef = (xpid.split("-"))[0];
         checkIds(colRef, 'across');
       }else{
@@ -354,7 +363,8 @@
         }
       }
 
-      if(this.orientation === 'across'){
+      const cell = this.$wrapper.find('#' + xpid);
+      if(cell.hasClass('across')){
         const colRef = (xpid.split("-"))[0];
         checkIds(colRef, 'across');
       }else{
@@ -401,8 +411,10 @@
       this.saveClueAsJSON();
       this.togglePromptBox('none');
       this.validateEndPoint();
+      //this.validateCrossPoint();
       this.addNumber();
       this.addClasses();
+      this.addAttributes();
       this.writeClueToPage();
       this.resetGrid();
     },
@@ -425,7 +437,11 @@
     addNumber: function(){
       const $firstLetter = this.$wrapper.find('#' + this.currentIds[0]);
       const newItem = (`<div class="number-wrapper">${this.clueCounter}</div>`);
-      $firstLetter.parent().prepend(newItem);
+      const hasSibling = $firstLetter.siblings().length === 1;
+      if (!hasSibling){
+        $firstLetter.parent().prepend(newItem);
+        this.clueCounter ++;
+      };
       //##add condition in case cross point
     },
 
@@ -463,17 +479,42 @@
       this.cacheCells();
     },
 
+    validateCrossPoint: function(){
+      console.log('crossy');
+    },
+
     addClasses: function(){
       for(let id of this.currentIds){
         const cell = this.$wrapper.find('#' + id);
-        const isSaved = cell.hasClass('savedWord')
+        const isSaved = cell.hasClass('savedWord');
         cell.removeClass('selected');
         cell.removeClass('cell');
-        cell.click(this.validateClicks.bind(this));
-        if(!isSaved)
+        if(!isSaved){
           cell.addClass('savedWord');
-        else
+          cell.addClass(this.orientation);
+          cell.click(this.validateClicks.bind(this));
+        }else{
           cell.addClass('cross-point');
+          const getOrientation = cell.hasClass('across') ? 'across' : 'down';
+          cell.removeClass(getOrientation);
+          cell.off();
+        }
+      }
+    },
+
+    addAttributes: function(){
+      for(let i = 0; i < this.currentIds.length; i++){
+        const cell = this.$wrapper.find('#' + this.currentIds[i]);
+        const hasAttr = cell.attr('data-ep');
+        if (i === 0 && !hasAttr){
+          cell.attr('data-ep', 'sp');
+        }else if (i === this.currentIds.length - 1 && !hasAttr){
+          cell.attr('data-ep', 'fp');
+        }else if (!hasAttr){
+          cell.attr('data-ep', 'mp');
+        }else{
+          cell.attr('data-ep', 'xp');
+        }
       }
     },
 
@@ -493,7 +534,7 @@
 
     cancelClue: function(){
       this.$clueBox.css('display', 'none');
-      //this.clueCounter --;
+      this.clueCounter --;
       this.sCurrentWord = '';
       this.disableButtons(false, false);
     },
@@ -501,6 +542,11 @@
     resetGrid: function(){
       for (let cell of this.$allCells){
         cell.disabled = false;
+      }
+
+      for (let cell of this.noreinits){
+        cell.removeClass('no-reinit');
+        cell.prop('disabled', false);
       }
       this.currentIds = [];
       this.$addWordBtn.attr('disabled', true);

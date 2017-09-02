@@ -252,7 +252,7 @@ input[disabled]{
 }
 
 .cross-point, .no-reinit, .no-reinit-on-reset{
-    background: #e4e4e4;
+    background: #e4e4e4 !important;
      -webkit-appearance: none;
     outline:0;
     max-width:45px;
