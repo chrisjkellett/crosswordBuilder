@@ -354,11 +354,9 @@
       function checkIds(ref, pos){
         for (let i = 1; i < module.rows + 1; i++){
           if(pos === 'across'){
-            console.log('clear across');
             const cell = module.$wrapper.find('#' + ref + '-' + i);
             cell.removeClass('no-reinit');
           }else{
-            console.log('clear down');
             const cell = module.$wrapper.find('#' + i + '-' + ref);
             cell.removeClass('no-reinit');
           }
@@ -494,10 +492,84 @@
               this.helperFunctions.noreinitOnReset(x, model = 1);
             }else if (ep === 'fp'){
               this.helperFunctions.deadCellsForCrossPoint.topRight(x);
-              this.helperFunctions.noreinitOnReset(x, 7);
+              this.helperFunctions.noreinitOnReset(x, model = 7);
+            }else{
+              this.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
+              this.helperFunctions.deadCellsForCrossPoint.topRight(x);
+              this.helperFunctions.noreinitOnReset(x, model = 4);
+            }
+          }else if(id === this.currentIds[this.currentIds.length - 1]){
+            if (ep === 'sp'){
+              this.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
+              this.helperFunctions.noreinitOnReset(x, model = 3);
+            }else if (ep === 'fp'){
+              this.helperFunctions.deadCellsForCrossPoint.topLeft(x);
+              this.helperFunctions.noreinitOnReset(x, model = 9);
+            }else{
+              this.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
+              this.helperFunctions.deadCellsForCrossPoint.topLeft(x);
+              this.helperFunctions.noreinitOnReset(x, model = 6);
+            }
+          }else{
+            if (ep === 'sp'){
+              this.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
+              this.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
+              this.helperFunctions.noreinitOnReset(x, model = 2);
+            }else if (ep === 'fp'){
+              this.helperFunctions.deadCellsForCrossPoint.topLeft(x);
+              this.helperFunctions.deadCellsForCrossPoint.topRight(x);
+              this.helperFunctions.noreinitOnReset(x, model = 8);
+            }else{
+              this.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
+              this.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
+              this.helperFunctions.deadCellsForCrossPoint.topLeft(x);
+              this.helperFunctions.deadCellsForCrossPoint.topRight(x);
+              this.helperFunctions.noreinitOnReset(x, model = 5);
             }
           }
-        }  
+        }else if (this.orientation === 'down' && isCrossPoint){
+          if(id === this.currentIds[0]){
+            if (ep === 'sp'){
+              this.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
+              this.helperFunctions.noreinitOnReset(x, model = 1);
+            }else if (ep === 'fp'){
+              this.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
+              this.helperFunctions.noreinitOnReset(x, model = 3);
+            }else{
+              this.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
+              this.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
+              this.helperFunctions.noreinitOnReset(x, model = 2);
+            }
+          }else if(id === this.currentIds[this.currentIds.length - 1]){
+            if (ep === 'sp'){
+              this.helperFunctions.deadCellsForCrossPoint.topRight(x);
+              this.helperFunctions.noreinitOnReset(x, model = 7);
+            }else if (ep === 'fp'){
+              this.helperFunctions.deadCellsForCrossPoint.topLeft(x);
+              this.helperFunctions.noreinitOnReset(x, model = 9);
+            }else{
+              this.helperFunctions.deadCellsForCrossPoint.topRight(x);
+              this.helperFunctions.deadCellsForCrossPoint.topLeft(x);
+              this.helperFunctions.noreinitOnReset(x, model = 8);
+            }
+          }else{
+            if (ep === 'sp'){
+              this.helperFunctions.deadCellsForCrossPoint.topRight(x);
+              this.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
+              this.helperFunctions.noreinitOnReset(x, model = 4);
+            }else if (ep === 'fp'){
+              this.helperFunctions.deadCellsForCrossPoint.topLeft(x);
+              this.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
+              this.helperFunctions.noreinitOnReset(x, model = 6);
+            }else{
+              this.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
+              this.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
+              this.helperFunctions.deadCellsForCrossPoint.topLeft(x);
+              this.helperFunctions.deadCellsForCrossPoint.topRight(x);
+              this.helperFunctions.noreinitOnReset(x, model = 5);
+            }
+          }
+        }    
       }
     },
 
@@ -605,22 +677,22 @@
           }
         }else if(model === 3){
             //reverse_reinit.push(d);
-          if (colAdd > rowSize && rowSub < 1){
+          if (colAdd > module.rows && rowSub < 1){
               tlrd.push(l);
               tlrd.push(d);
-          }else if(colAdd > rowSize){
+          }else if(colAdd > module.rows){
               tlrd.push(d);
           }else if (rowSub < 1){
               tlrd.push(l);
           }   
         }else if(model === 4){
-          if(colAdd < 1){
-            //model 4.1
+          console.log('running 4');
+          console.log(colAdd);
+          if(colAdd < 3){
             tlrd.push(t);
             tlrd.push(r);
             tlrd.push(d);
           }else{
-            //model 4.2 
             tlrd.push(r);
           }
         }else if(model === 5){
@@ -631,7 +703,7 @@
         }else if(model === 6){
           // reverse_reinit.push(t);
           // reverse_reinit.push(d);
-          if(colAdd > rowSize){
+          if(colAdd > module.rows){
             tlrd.push(t);
             tlrd.push(l);
             tlrd.push(d);
@@ -639,18 +711,19 @@
             tlrd.push(l);
           }
         }else if(model === 7){
-          if(colSub < 1 && rowAdd > rowSize){
+          console.log('running model 7');
+          if(colSub < 1 && rowAdd > module.rows){
             tlrd.push(t);
             tlrd.push(r);
           }else if(colSub < 1){
             tlrd.push(t);
-          }else if(rowAdd > rowSize){
+          }else if(rowAdd > module.rows){
             tlrd.push(r)
           }
         }else if(model === 8){
           // reverse_reinit.push(r);
           // reverse_reinit.push(l);
-          if(rowAdd > rowSize){
+          if(rowAdd > module.rows){
             tlrd.push(t);
             tlrd.push(l);
             tlrd.push(r);
@@ -658,15 +731,15 @@
             tlrd.push(t);
           }
         }else if(model === 9){
-          if (colAdd > rowSize && rowAdd > rowSize){
+          if (colAdd > module.rows && rowAdd > module.rows){
             tlrd.push(l);
             tlrd.push(t);
             // reverse_reinit.push(l);
             // reverse_reinit.push(t);
-          }else if(colAdd > rowSize){
+          }else if(colAdd > module.rows){
             tlrd.push(t);
             // reverse_reinit.push(t);
-          }else if (rowAdd > rowSize){
+          }else if (rowAdd > module.rows){
             tlrd.push(l);
             // reverse_reinit.push(l);
           }else{
@@ -677,6 +750,7 @@
     
         for (let id of tlrd){
           const cell = module.$wrapper.find('#' + id);
+          console.log(id);
           cell.addClass('no-reinit-on-reset');
           const i = module.noreinits.indexOf(id);
           if (i !== -1) module.noreinits.splice(i, 1);

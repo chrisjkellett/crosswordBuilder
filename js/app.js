@@ -651,8 +651,14 @@ function crossPoint(){
             allIds.push(id);
         }else{
             const ep = document.getElementById(id).getAttribute('data-ep');
-            
-            
+            const x = id.split(".");
+            if (orientation == 'across'){
+                if(id == initWord[0]){
+                    if (ep == 'sp'){
+                        bottomRight(x);
+                        const model = 1;
+                        reinit(x, model);
+                        //top left L shaped clue - model 1
                     }else if(ep == 'fp'){
                         topRight(x);
                         const model = 7;
@@ -713,18 +719,15 @@ function crossPoint(){
                         bottomRight(x);
                         const model = 1;
                         reinit(x, model);
-                        //top left L shaped clue - model 1
                     }else if(ep == 'fp'){
                         bottomLeft(x);
                         let model = 3;
                         reinit(x, model);
-                        //top-right L - model 7
                     }else{
                         bottomLeft(x);
                         bottomRight(x);
                         const model = 2;
                         reinit(x, model);
-                        //top mid T - model 2
                     };
                 }else if(id == initWord[initWord.length - 1]){
                     if (ep == 'sp'){
