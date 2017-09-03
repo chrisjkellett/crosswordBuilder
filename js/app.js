@@ -1,6 +1,6 @@
 
 (function(){
-  const module = {
+  const root = {
     settings: function(){
       this.rows = 6;
       this.init = 1;
@@ -13,6 +13,7 @@
       this.json = [];
       this.noreinits = [];
       this.reverse_reinit = [];
+      this.savedCells = [];
       this.newCrossPoint = false;
     },
 
@@ -136,23 +137,23 @@
 
     decreaseSize: function(){
       function decreaseSize(){
-        const row = module.$wrapper.find('#r-' + (module.rows));
+        const row = root.$wrapper.find('#r-' + (root.rows));
         row.remove();
-        for (let i = 1; i < module.rows; i++){
-          let row = module.$wrapper.find('#r-' + i);
+        for (let i = 1; i < root.rows; i++){
+          let row = root.$wrapper.find('#r-' + i);
           row.children().last().remove();
         } 
 
-        for (let id of module.reverse_reinit){
-          const el = module.$wrapper.find('#' + id);
+        for (let id of root.reverse_reinit){
+          const el = root.$wrapper.find('#' + id);
           el.addClass('no-reinit-on-reset');
           el.off();
           el.prop('disabled', 'true');
         }
 
-        module.rows --;
-        module.init --;
-        module.cacheCells();
+        root.rows --;
+        root.init --;
+        root.cacheCells();
       }
 
       if(this.currentIds.length > 0){
@@ -242,6 +243,7 @@
         this.validateWordLength();
         this.validateWordStructure();
         this.setNoReinits(e.target.id);
+        this.validateInWord.setup(e.target.id);
         this.validateReset();
       }else if(isSaved && isSelected){
         $el.removeClass('selected');
@@ -333,24 +335,48 @@
         this.validateGrid(this.currentIds[0]);
     },
 
+    validateInWord: {
+      setup: function(targetId){
+        for (let id of root.savedCells){
+          let obj = {
+            cell: root.$wrapper.find('#' + id),
+            id: id,
+            sp: id.split("-"),
+            $id: targetId,
+            $sp: targetId.split("-"),
+          }
+        if (obj.cell.hasClass('across') ? this.run(col = 0, obj) : this.run(row = 1, obj));
+        }
+      },
+
+      run: function(index, obj){
+        if (obj.$id !== obj.id){
+          if (obj.$sp[index] !== obj.sp[index]){
+            //obj.cell.addClass('no-reinit');
+            //console.log(obj.$sp[index] + " " + obj.$id + " / " + obj.sp[index] + " " + obj.id + ' tested');
+          }
+        }
+      }
+    },
+
     setNoReinits: function(xpid){
       function checkIds(ref, pos){
-        for (let i = 1; i < module.rows + 1; i++){
+        for (let i = 1; i < root.rows + 1; i++){
           if(pos === 'across'){
-            const cell = module.$wrapper.find('#' + ref + '-' + i);
+            const cell = root.$wrapper.find('#' + ref + '-' + i);
             if (cell.hasClass('cell')){
               cell.prop('disabled', true);
             } else if (!cell.hasClass('selected') && !cell.hasClass('dead-cell') && !cell.hasClass('cross-point')){
               cell.addClass('no-reinit');
-              module.noreinits.push(ref + '-' + i);
+              root.noreinits.push(ref + '-' + i);
             }
           }else{
-            const cell = module.$wrapper.find('#' + i + '-' + ref);
+            const cell = root.$wrapper.find('#' + i + '-' + ref);
             if (cell.hasClass('cell')){
               cell.prop('disabled', true);
             } else if (!cell.hasClass('selected') && !cell.hasClass('dead-cell') && !cell.hasClass('cross-point')){
               cell.addClass('no-reinit');
-              module.noreinits.push(i + '-' + ref);
+              root.noreinits.push(i + '-' + ref);
             }
           }
         }
@@ -368,12 +394,12 @@
 
     resetNoReinits: function(xpid){
       function checkIds(ref, pos){
-        for (let i = 1; i < module.rows + 1; i++){
+        for (let i = 1; i < root.rows + 1; i++){
           if(pos === 'across'){
-            const cell = module.$wrapper.find('#' + ref + '-' + i);
+            const cell = root.$wrapper.find('#' + ref + '-' + i);
             cell.removeClass('no-reinit');
           }else{
-            const cell = module.$wrapper.find('#' + i + '-' + ref);
+            const cell = root.$wrapper.find('#' + i + '-' + ref);
             cell.removeClass('no-reinit');
           }
         }
@@ -432,7 +458,7 @@
       this.addAttributes();
       this.validateCrossPoint();
       this.writeClueToPage();
-      this.resetGrid();
+      this.resetGrid.init();
     },
 
     saveAsJSON:{
@@ -444,12 +470,11 @@
       },
   
       save: function(){
-        const clue = new this.newClue(module.sCurrentWord, 
-                    (module.clueCounter) + ' ' + module.orientation, 
-                    module.currentIds,
-                    module.$clueEntry.val());
-        module.json.push(clue);
-        console.log(module.json);
+        const clue = new this.newClue(root.sCurrentWord, 
+                    (root.clueCounter) + ' ' + root.orientation, 
+                    root.currentIds,
+                    root.$clueEntry.val());
+        root.json.push(clue);
       }
     },
 
@@ -467,7 +492,7 @@
       const sp2 = this.currentIds[this.currentIds.length - 1].split("-");
 
       function blackOutCell(id){
-        const cell = module.$wrapper.find('#' + id);
+        const cell = root.$wrapper.find('#' + id);
         cell.removeClass('cell');
         cell.addClass('dead-cell');
         cell.prop('disabled', true);
@@ -625,10 +650,9 @@
     },
 
     writeClueToPage: function(){
-      console.log('running');
       const $clueList = this.$wrapper.find('#' + this.orientation);
       const newItem = (`<div id="${this.clueCounter}-${this.orientation}" class="clue-wrapper"\>
-                          <p class="font-clue">${module.clueCounter}. ${this.$clueEntry.val() || '-'}</p>\
+                          <p class="font-clue">${root.clueCounter}. ${this.$clueEntry.val() || '-'}</p>\
                           <div>\
                             <button class="delete-button">\
                             <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>\
@@ -645,22 +669,42 @@
       this.disableButtons(false, false);
     },
 
-    resetGrid: function(){
-      for (let cell of this.$allCells){
-        cell.disabled = false;
-      }
+    resetGrid: {
+      init: function(){
+        this.disableAll();
+        this.resetNoReinits();
+        this.cacheSavedCells();
+        this.resetSettings();
+      },
 
-      for (let id of this.noreinits){
-        const cell = this.$wrapper.find('#' + id);
-        cell.removeClass('no-reinit');
-        cell.prop('disabled', false);
+      disableAll: function(){
+        for (let cell of root.$allCells){
+          cell.disabled = false;
+        }
+      },
+
+      resetNoReinits: function(){
+        for (let id of root.noreinits){
+          const cell = root.$wrapper.find('#' + id);
+          cell.removeClass('no-reinit');
+          cell.prop('disabled', false);
+        }
+      },
+
+      cacheSavedCells: function(){
+        for (let id of root.currentIds){
+          if (!root.savedCells.includes(id)) root.savedCells.push(id);
+        }
+      },
+
+      resetSettings: function(){
+        root.currentIds = [];
+        if (root.newCrossPoint) this.clueCounter ++;
+        root.sCurrentWord = '';
+        root.$addWordBtn.attr('disabled', true);
+        root.disableButtons(true, false);
+        root.newCrossPoint = false;
       }
-      this.currentIds = [];
-      if (this.newCrossPoint) this.clueCounter ++;
-      this.sCurrentWord = '';
-      this.$addWordBtn.attr('disabled', true);
-      this.disableButtons(true, false);
-      this.newCrossPoint = false;
     },
 
     helperFunctions: {
@@ -695,12 +739,11 @@
               tlrd.push(d);
           }
         }else if(model === 3){
-            module.reverse_reinit.push(d);
-            console.log(module.reverse_reinit);
-          if (colAdd > module.rows && rowSub < 1){
+            root.reverse_reinit.push(d);
+          if (colAdd > root.rows && rowSub < 1){
               tlrd.push(l);
               tlrd.push(d);
-          }else if(colAdd > module.rows){
+          }else if(colAdd > root.rows){
               tlrd.push(d);
           }else if (rowSub < 1){
               tlrd.push(l);
@@ -719,9 +762,11 @@
           tlrd.push(r);
           tlrd.push(d);
         }else if(model === 6){
-          // reverse_reinit.push(t);
-          // reverse_reinit.push(d);
-          if(colAdd > module.rows){
+          console.log('running model 6');
+          root.reverse_reinit.push(t);
+          root.reverse_reinit.push(d);
+          console.log(root.reverse_reinit);
+          if(colAdd > root.rows){
             tlrd.push(t);
             tlrd.push(l);
             tlrd.push(d);
@@ -729,18 +774,18 @@
             tlrd.push(l);
           }
         }else if(model === 7){
-          if(colSub < 1 && rowAdd > module.rows){
+          if(colSub < 1 && rowAdd > root.rows){
             tlrd.push(t);
             tlrd.push(r);
           }else if(colSub < 1){
             tlrd.push(t);
-          }else if(rowAdd > module.rows){
+          }else if(rowAdd > root.rows){
             tlrd.push(r)
           }
         }else if(model === 8){
-          // reverse_reinit.push(r);
-          // reverse_reinit.push(l);
-          if(rowAdd > module.rows){
+          root.reverse_reinit.push(r);
+          root.reverse_reinit.push(l);
+          if(rowAdd > root.rows){
             tlrd.push(t);
             tlrd.push(l);
             tlrd.push(r);
@@ -748,40 +793,41 @@
             tlrd.push(t);
           }
         }else if(model === 9){
-          if (colAdd > module.rows && rowAdd > module.rows){
+          if (colAdd > root.rows && rowAdd > root.rows){
             tlrd.push(l);
             tlrd.push(t);
-            // reverse_reinit.push(l);
-            // reverse_reinit.push(t);
-          }else if(colAdd > module.rows){
+            root.reverse_reinit.push(l);
+            root.reverse_reinit.push(t);
+          }else if(colAdd > root.rows){
             tlrd.push(t);
-            // reverse_reinit.push(t);
-          }else if (rowAdd > module.rows){
+            root.reverse_reinit.push(t);
+          }else if (rowAdd > root.rows){
             tlrd.push(l);
-            // reverse_reinit.push(l);
+            root.reverse_reinit.push(l);
           }else{
-            // reverse_reinit.push(l);
-            // reverse_reinit.push(t);
+            root.reverse_reinit.push(l);
+            root.reverse_reinit.push(t);
           }
         }
     
         for (let id of tlrd){
-          const cell = module.$wrapper.find('#' + id);
+          const cell = root.$wrapper.find('#' + id);
+          cell.removeClass('no-reinit');
           cell.addClass('no-reinit-on-reset');
           cell.off();
           cell.prop('disabled', true);
-          const i = module.noreinits.indexOf(id);
-          if (i !== -1) module.noreinits.splice(i, 1);
+          const i = root.noreinits.indexOf(id);
+          if (i !== -1) root.noreinits.splice(i, 1);
         }
 
       },//end helperFunctions.noreinitOnReset
     
       deadCellsForCrossPoint: {
         updateClassesAndCache: function(id){
-          const cell = module.$wrapper.find('#' + id);
+          const cell = root.$wrapper.find('#' + id);
           cell.removeClass('cell');
           cell.addClass('dead-cell');
-          module.cacheCells();
+          root.cacheCells();
         },
 
         topLeft: function(x){
@@ -813,7 +859,7 @@
 
   }//end object
 
-  module.init();
+  root.init();
 })();
 
 
