@@ -62,7 +62,6 @@
       this.navigateGrid(e);
     },
     
-
     generateGrid: function(){
       for (let i = 1; i < this.rows + 1; i++){
         let newItem = $(`<div id="r-${i}" class="_row"></div>`);
@@ -327,7 +326,7 @@
               cell.prop('disabled', true);
             } else if (!cell.hasClass('selected') && !cell.hasClass('dead-cell') && !cell.hasClass('cross-point')){
               cell.addClass('no-reinit');
-              module.noreinits.push(cell);
+              module.noreinits.push(ref + '-' + i);
             }
           }else{
             const cell = module.$wrapper.find('#' + i + '-' + ref);
@@ -335,7 +334,7 @@
               cell.prop('disabled', true);
             } else if (!cell.hasClass('selected') && !cell.hasClass('dead-cell') && !cell.hasClass('cross-point')){
               cell.addClass('no-reinit');
-              module.noreinits.push(cell);
+              module.noreinits.push(i + '-' + ref);
             }
           }
         }
@@ -355,9 +354,11 @@
       function checkIds(ref, pos){
         for (let i = 1; i < module.rows + 1; i++){
           if(pos === 'across'){
+            console.log('clear across');
             const cell = module.$wrapper.find('#' + ref + '-' + i);
             cell.removeClass('no-reinit');
           }else{
+            console.log('clear down');
             const cell = module.$wrapper.find('#' + i + '-' + ref);
             cell.removeClass('no-reinit');
           }
@@ -412,10 +413,10 @@
       this.saveClueAsJSON();
       this.togglePromptBox('none');
       this.validateEndPoint();
-      //this.validateCrossPoint();
       this.addNumber();
       this.addClasses();
       this.addAttributes();
+      this.validateCrossPoint();
       this.writeClueToPage();
       this.resetGrid();
     },
@@ -480,7 +481,24 @@
     },
 
     validateCrossPoint: function(){
-      console.log('crossy');
+      for (let id of this.currentIds){
+        const el = this.$wrapper.find('#' + id);
+        const isCrossPoint = el.hasClass('cross-point');
+        const ep = el.attr('data-ep');
+        const x = id.split("-");
+        let model;
+        if (this.orientation === 'across' && isCrossPoint){
+          if(id === this.currentIds[0]){
+            if (ep === 'sp'){
+              this.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
+              this.helperFunctions.noreinitOnReset(x, model = 1);
+            }else if (ep === 'fp'){
+              this.helperFunctions.deadCellsForCrossPoint.topRight(x);
+              this.helperFunctions.noreinitOnReset(x, 7);
+            }
+          }
+        }  
+      }
     },
 
     addClasses: function(){
@@ -512,8 +530,6 @@
           cell.attr('data-ep', 'fp');
         }else if (!hasAttr){
           cell.attr('data-ep', 'mp');
-        }else{
-          cell.attr('data-ep', 'xp');
         }
       }
     },
@@ -544,7 +560,8 @@
         cell.disabled = false;
       }
 
-      for (let cell of this.noreinits){
+      for (let id of this.noreinits){
+        const cell = this.$wrapper.find('#' + id);
         cell.removeClass('no-reinit');
         cell.prop('disabled', false);
       }
@@ -553,7 +570,154 @@
       this.$addWordBtn.attr('disabled', true);
       this.disableButtons(true, false);
       this.newCrossPoint = false;
-    }
+    },
+
+    helperFunctions: {
+      noreinitOnReset: function(x, model){
+        const row = +x[0];
+        const col = +x[1];
+        const t = (row - 1) + "-" + col;
+        const l = row + "-" + (col - 1);
+        const r = row + "-" + (col + 1);
+        const d = (row + 1) + "-" + col;
+        const colSub = col - 1;
+        const colAdd = col + 1;
+        const rowSub = row - 1;
+        const rowAdd = row + 1;
+        let tlrd = [];
+    
+        if(model === 1){
+          if(colSub < 1 && rowSub < 1){
+            tlrd.push(d); 
+            tlrd.push(r);
+          }else if(colSub < 1){
+            tlrd.push(d);
+          }else if(rowAdd < 1){
+            tlrd.push(r)
+          }
+        }else if(model === 2){
+          if(rowSub < 1){
+              tlrd.push(l);
+              tlrd.push(r);
+              tlrd.push(d);
+          }else{
+              tlrd.push(d);
+          }
+        }else if(model === 3){
+            //reverse_reinit.push(d);
+          if (colAdd > rowSize && rowSub < 1){
+              tlrd.push(l);
+              tlrd.push(d);
+          }else if(colAdd > rowSize){
+              tlrd.push(d);
+          }else if (rowSub < 1){
+              tlrd.push(l);
+          }   
+        }else if(model === 4){
+          if(colAdd < 1){
+            //model 4.1
+            tlrd.push(t);
+            tlrd.push(r);
+            tlrd.push(d);
+          }else{
+            //model 4.2 
+            tlrd.push(r);
+          }
+        }else if(model === 5){
+          tlrd.push(t);
+          tlrd.push(l);
+          tlrd.push(r);
+          tlrd.push(d);
+        }else if(model === 6){
+          // reverse_reinit.push(t);
+          // reverse_reinit.push(d);
+          if(colAdd > rowSize){
+            tlrd.push(t);
+            tlrd.push(l);
+            tlrd.push(d);
+          }else{
+            tlrd.push(l);
+          }
+        }else if(model === 7){
+          if(colSub < 1 && rowAdd > rowSize){
+            tlrd.push(t);
+            tlrd.push(r);
+          }else if(colSub < 1){
+            tlrd.push(t);
+          }else if(rowAdd > rowSize){
+            tlrd.push(r)
+          }
+        }else if(model === 8){
+          // reverse_reinit.push(r);
+          // reverse_reinit.push(l);
+          if(rowAdd > rowSize){
+            tlrd.push(t);
+            tlrd.push(l);
+            tlrd.push(r);
+          }else{
+            tlrd.push(t);
+          }
+        }else if(model === 9){
+          if (colAdd > rowSize && rowAdd > rowSize){
+            tlrd.push(l);
+            tlrd.push(t);
+            // reverse_reinit.push(l);
+            // reverse_reinit.push(t);
+          }else if(colAdd > rowSize){
+            tlrd.push(t);
+            // reverse_reinit.push(t);
+          }else if (rowAdd > rowSize){
+            tlrd.push(l);
+            // reverse_reinit.push(l);
+          }else{
+            // reverse_reinit.push(l);
+            // reverse_reinit.push(t);
+          }
+        }
+    
+        for (let id of tlrd){
+          const cell = module.$wrapper.find('#' + id);
+          cell.addClass('no-reinit-on-reset');
+          const i = module.noreinits.indexOf(id);
+          if (i !== -1) module.noreinits.splice(i, 1);
+        }
+
+      },//end helperFunctions.noreinitOnReset
+    
+      deadCellsForCrossPoint: {
+        updateClassesAndCache: function(id){
+          const cell = module.$wrapper.find('#' + id);
+          cell.removeClass('cell');
+          cell.addClass('dead-cell');
+          module.cacheCells();
+        },
+
+        topLeft: function(x){
+          const col = +x[0] - 1;
+          const row = +x[1] - 1;
+          this.updateClassesAndCache(col + "-" + row);
+        },
+
+        topRight: function(x){
+          const row = +x[0] - 1;
+          const col = +x[1] + 1;
+          this.updateClassesAndCache(row + "-" + col);
+        },
+
+        bottomLeft: function(x){
+          const row = +x[0] + 1;
+          const col = +x[1] - 1;
+          this.updateClassesAndCache(row + "-" + col);
+        },
+
+        bottomRight: function(x){
+          const row = +x[0] + 1;
+          const col = +x[1] + 1;  
+          this.updateClassesAndCache(row + "-" + col);
+        }
+      }//end helperFunctions.deadCellsForCrossPoint
+    
+    },
 
   }//end object
 

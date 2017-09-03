@@ -651,14 +651,8 @@ function crossPoint(){
             allIds.push(id);
         }else{
             const ep = document.getElementById(id).getAttribute('data-ep');
-            const x = id.split(".");
-            if (orientation == 'across'){
-                if(id == initWord[0]){
-                    if (ep == 'sp'){
-                        bottomRight(x);
-                        const model = 1;
-                        reinit(x, model);
-                        //top left L shaped clue - model 1
+            
+            
                     }else if(ep == 'fp'){
                         topRight(x);
                         const model = 7;
