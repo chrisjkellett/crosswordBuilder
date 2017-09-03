@@ -1,935 +1,803 @@
-const getCrossword = document.querySelector('#crossword');
-const increaseBtn = document.querySelector('#rowPlus');
-const decreaseBtn = document.querySelector('#rowMinus');
-const allIds = [];
-const maxSize = 12;
-const minSize = 4;
-let allCells;
-let rowSize = 6;
-let gridinit = 1;
-let orientation;
-let counter = 0;
-let initWord = [];
-const addWordBtn = document.querySelector('#addWord');
-const cancelClueBtn = document.querySelector('#cancelClue');
-const confirmClueBtn = document.querySelector('#confirmClue');
-let invalids = [];
-let savedBoxList = [];
-const noreinits = [];
-const reverse_reinit = [];
-let noReinitOnReset = [];
+
+(function(){
+  const module = {
+    settings: function(){
+      this.rows = 6;
+      this.init = 1;
+      this.max = 10;
+      this.min = 4;
+      this.sCurrentWord = '';
+      this.clueCounter = 1;
+      this.orientation = 'across';
+      this.currentIds = [];
+      this.json = [];
+      this.noreinits = [];
+      this.newCrossPoint = false;
+    },
+
+    
+    init: function(){
+      this.settings();
+      this.cacheDOM();
+      this.bindEvents();
+      this.generateGrid();
+    },
 
 
+    cacheDOM: function(){
+      this.$wrapper = $('#crosswordWrapper');
+      this.$crossword = this.$wrapper.find('#crossword');
+      this.$increaseBtn = this.$wrapper.find('#increaseBtn');
+      this.$decreaseBtn = this.$wrapper.find('#decreaseBtn');
+      this.$allCells = this.$wrapper.find('.cell');
+      this.$alertBox = this.$wrapper.find('#alertBox');
+      this.$clueBox = this.$wrapper.find('#clueBox');
+      this.$insertClue = this.$wrapper.find('#insertClue');
+      this.$insertReference = this.$wrapper.find('#insertReference');
+      this.$alertMessage = this.$wrapper.find('#alertMessage');
+      this.$alertConfirm = this.$wrapper.find('#okAlert');
+      this.$addWordBtn = this.$wrapper.find('#addWordBtn');
+      this.$confirmClueBtn = this.$wrapper.find('#confirmClue');
+      this.$clueEntry = this.$wrapper.find('#clueEntry');
+      this.$cancelClueBtn = this.$wrapper.find('#cancelClue');
+      this.$clueList = this.$wrapper.find('#clueList');
+    },
 
-function makeCells(){
-    for (let i=gridinit; i<rowSize + 1; i++){
-        let getRow = document.querySelector('#r-' + i);
-        gridinit = rowSize + 1;
-        for (let j=1; j<rowSize + 1; j++){
-            getRow.innerHTML += `<div class="cell-wrapper">
-            <input type="text" maxlength="1" id="${i}.${j}" class="cell row-${i} col-${j}" /></div>`;
-            }
+
+    bindEvents: function(){
+      this.$crossword.keyup(this.validateCells.bind(this));
+      this.$crossword.keyup(this.navigateGrid.bind(this));
+      this.$crossword.keypress(this.validateInput.bind(this));
+      this.$increaseBtn.click(this.increaseSize.bind(this));
+      this.$decreaseBtn.click(this.decreaseSize.bind(this));
+      this.$alertConfirm.click(this.alertBoxConfirm.bind(this));
+      this.$addWordBtn.click(this.renderClue.bind(this));
+      this.$cancelClueBtn.click(this.cancelClue.bind(this));
+      this.$confirmClueBtn.click(this.confirmClue.bind(this));
+    },
+
+
+    runCrosswordEvents: function(e){
+      this.validateCells(e);
+      this.navigateGrid(e);
+    },
+    
+    generateGrid: function(){
+      for (let i = 1; i < this.rows + 1; i++){
+        let newItem = $(`<div id="r-${i}" class="_row"></div>`);
+        this.$crossword.append(newItem);
+      }
+      this.makeCells();
+    },
+
+
+    makeCells: function(){
+      for (let i = this.init; i < this.rows + 1; i++){
+        let $row = this.$wrapper.find('#r-' + i);
+        this.init = this.rows + 1;
+        for (let j = 1; j < this.rows + 1; j++){
+          let newItem = $(`<div class="cell-wrapper">\
+          <input type="text" maxlength="1" id="${i}-${j}" class="cell row-${i} col-${j}" /></div>`);
+          $row.append(newItem);
         }
-        updateAllCells();
-}
-
-function updateAllCells(){
-    allCells = document.querySelectorAll('.cell');
-}
+      }
+      this.cacheCells();
+    },
 
 
-function removeClasses(cell, $class){
-        for (let i = 0; i < $class.length; i++){
-            cell.classList.remove($class[i]);
-            if ($class == 'no-reinit'){
-                cell.style.background = '#ffffff';
-            }
+    cacheCells: function(){
+      this.$allCells = this.$wrapper.find('.cell');
+    },
+
+
+    alertBox: function(message){
+      this.$alertMessage.text(message);
+      this.$alertBox.css('display', 'block');
+    },
+
+
+    alertBoxConfirm: function(){
+      this.$alertBox.css('display', 'none');
+    },
+
+
+    increaseSize: function(){
+      if (this.rows < this.max){
+        this.rows ++;
+        let newItem = $(`<div id="r-${this.rows}" class="_row"></div>`);
+        this.$crossword.append(newItem);
+        for (let i = 1; i < this.rows; i++){
+          let $row = this.$wrapper.find('#r-' + i);
+          let newItem = $(`<div class="cell-wrapper">\
+          <input type="text" maxlength="1" id="${i}-${this.rows}"\
+           class="cell row-${i} col-${this.rows}" /></div>`);
+          $row.append(newItem);
         }
-    }
-
-function updateClass(cell, newClass){
-        cell.classList.add(newClass);
-
-        if(newClass == 'savedWord'){
-            cell.style.background = '#ffffff';
-            cell.classList += ` ${counter}-${orientation}`;
-            cell.disabled = true;
+        this.makeCells(this.rows, this.init);
+        for (let id of this.currentIds){
+          this.validateGrid(id);
         }
-
-        if(newClass == 'cross-point' || newClass == 'no-reinit' || newClass == 'no-reinit-on-reset'){
-            cell.style.background = '';
-            cell.style.background = '#e4e4e4';
-        }
-
-        if(newClass == 'dead-cell' || newClass == 'no-reinit'){
-            cell.disabled = true;
-        }
-
-        if(newClass == 'dead-cell'){
-            if(!invalids.includes(cell.id)){
-            invalids.push(cell.id);
-            }
-        }
-    }
-
-// //-----------Generate grid --------------------------------------------------------------------------
-function generateGrid(){
-    for (let i=1; i<rowSize + 1; i++){
-            getCrossword.innerHTML += `<div id="r-${i}" class="_row"></div>`;
-        }
-        makeCells();
-        updateAllCells();
-    }
+      }
+      
+      else{
+        const message = 'Exceeds maximum grid size';
+        this.alertBox(message);
+      }
+    },
 
 
-// //-----------Change grid size --------------------------------------------------------------------------
-function increaseGridSize(){
-if (rowSize < maxSize){
-        rowSize += 1;
-        const addNewRow = getCrossword.insertAdjacentHTML('beforeend', 
-        `<div id="r-${rowSize}" class="_row"></div>`);
-        for (let i=1; i<rowSize; i++){
-        let getRow = document.querySelector('#r-' + i);
-            getRow.insertAdjacentHTML('beforeend', 
-            `<div class="cell-wrapper">
-            <input type="text" maxlength="1" id="${i}.${rowSize}" class="cell row-${i} col-${rowSize}" /></div>`);
-        };
-        makeCells();
-        updateAllCells();
-        checkInvalids();
-    }
-}
+    decreaseSize: function(){
+      function decreaseSize(){
+        const row = module.$wrapper.find('#r-' + (module.rows));
+        row.remove();
+        for (let i = 1; i < module.rows; i++){
+          let row = module.$wrapper.find('#r-' + i);
+          row.children().last().remove();
+        } 
+        module.rows --;
+        module.init --;
+        module.cacheCells();
+      }
 
-
-//
-function decreaseGridSize(){
-    function decreaseSize(){
-        const row = document.querySelector('#r-' + (rowSize - 1));
-        row.nextElementSibling.remove();
-        for (let i=1; i<rowSize; i++){
-            let row = document.querySelector('#r-' + i);
-            row.lastElementChild.remove();
-        }
-        rowSize -= 1;
-        gridinit -=1;
-        updateAllCells();
-    }
-
-    if(!allIds.length == 0){
-        let sp = allIds[allIds.length - 1].split(".");
+      if(this.currentIds.length > 0){
+        let sp = this.currentIds[this.currentIds.length - 1].split("-");
         let lastRow = sp[1];
         let lastCol = sp[0];
-        if ((rowSize > minSize) && (lastCol < rowSize) && (lastRow < rowSize)){
-            decreaseSize();
-        }else if(rowSize >= minSize){
-            console.log('PROMPT: reducing size would delete clues');
-        }else if (rowSize <= minSize){
-            console.log('PROMPT: min size is currently set at 4');
+        if ((this.rows > this.min) && (lastCol < this.rows) && (lastRow < this.rows))
+          decreaseSize();
+        else if(this.rows >= this.min){
+          const message = 'Reducing size would delete clues.';
+          this.alertBox(message);
         }
-    }else if(rowSize <= minSize){
-        console.log('PROMPT: min size is currently set at 4');
-    }else{
-        decreaseSize();
-    }
-}
-
-//
-function resetGrid(){
-    for (let cell of allCells){
-        if(!(invalids.includes(cell.id)) || (noReinitOnReset.includes(cell.id))){
-            cell.disabled = false;
+        else if (this.rows <= this.min){
+          const message = 'Cannot reduce further. Minimum size for this crossword is set to 4.';
+          this.alertBox(message);
         }
-    }
-
-    for (let id of initWord){
-        if(!allIds.includes(id)){
-            allIds.push(id);
-        }
-    }
-
-    for (let id of allIds){
-        const cell = document.getElementById(id);
-        if(cell.className.includes('no-reinit')){
-            removeClasses(cell, ['no-reinit']);
-        }
-    }
-
-    allIds.sort();
-    initWord = [];
-    savedBoxList = [];
-    increaseBtn.disabled = '';
-    decreaseBtn.disabled = '';
-}
-
-function disOrEnableAll(bool){
-    let answer = '';
-    addWordBtn.disabled = bool;
-    increaseBtn.disabled = bool;
-    decreaseBtn.disabled = bool;
-        for (let cell of allCells){
-            let isSelected = cell.className.includes('selected');
-            if (isSelected){
-                answer += cell.value;
-            }else{
-                cell.disabled = bool;
-            }
-        }
-    return answer;
-}
-
-function promptClue(block, sum, answer){
-    const $clue = document.getElementById('insertClue');
-    const $location = document.getElementById('insertLocation');
-    const cluebox = document.getElementById('cluebox');
-    const notClue = !document.getElementById(initWord[0]).previousElementSibling;
-        if (notClue){
-            counter = sum;
-        }
-    $clue.textContent = answer;
-    $location.textContent = counter + " " + orientation;
-    cluebox.style.display = block;
-}
-
-function selectCell(e) {
-    function sortAndValidate(id){
-        initWord.sort();
-        validateCrossword(id);
-        wordLength();
-        checkGaps();
-        resetValidation();
-        validateClue();
-    }
+      }
+      else if(this.rows <= this.min){
+        const message = 'Cannot reduce further. Minimum size for this crossword is set to 4.';
+        this.alertBox(message);
+      }
+      else
+          decreaseSize();
+    },
 
 
-    const cell = e.target;
-    const id = e.target.id;
-    const isSelected = cell.className.includes('selected');
-    const notInList = !initWord.includes(id);
-    const $class = cell.classList;
-    const hasValue = cell.value === '';
+    navigateGrid: function(e){
+      if (e.keyCode === 37){
+        const i = this.$allCells.index(e.target);
+        const item = this.$allCells.get(i - 1);
+        item.focus();
+      }
+      else if (e.keyCode === 38){
+        const i = this.$allCells.index(e.target);
+        const item = this.$allCells.get(i - this.rows);
+        item.focus();
+      }
+      else if (e.keyCode === 39){
+        const i = this.$allCells.index(e.target);
+        const item = this.$allCells.get(i + 1);
+        if (item ? item.focus() : console.log('cannot go further'));
+      }
+      else if (e.keyCode === 40){
+        const i = this.$allCells.index(e.target);
+        const item = this.$allCells.get(i + this.rows);
+        if (item ? item.focus() : console.log('cannot go further'));
+      }
+    },
 
-    if (!isSelected && !hasValue && notInList){
-        $class.add('selected');
-        initWord.push(id);
-        sortAndValidate(id);
-    }else if (isSelected && hasValue){
-        $class.remove('selected');
-        initWord.pop(id);
-        sortAndValidate(id);
-        }
-   }
+    validateCells: function(e){
+      const cell = e.target;
+      const id = cell.id;
+      const a = cell.className.includes('selected');
+      const b = e.target.value === '';
+      const c = this.currentIds.includes(id);
+      const isTab = e.key === 'Tab';
 
-//F1b - select cells by click
-function clickCell(e){
-    const el = e.target;
-    const id = e.target.id;
-    const $class = el.className;
-    const isCrossPoint = $class.includes('cross-point');
-    const isNoReinit = $class.includes('no-reinit');
-    const isSaved = $class.includes('savedWord');
-    const isSelected = $class.includes('selected');
-    if (isSaved && !isSelected && !(isCrossPoint || isNoReinit)){
-        el.classList.add('selected');
-        initWord.push(id);
-        initWord.sort();
-        savedBoxList.push(id);
-    }else if(isSaved && isSelected){
-        el.classList.remove('selected');
-        initWord.pop(id);
-        savedBoxList.pop(id);
-        }
-    e.stopPropagation();
-    resetValidation();
-    validateClue();
-    }
+      if (!a && !b && !c && !isTab){
+        cell.classList.add('selected');
+        this.currentIds.push(id);
+        this.validateGrid(id);
+        this.validateWordLength();
+        this.validateWordStructure();
+        this.validateReset();
+      }
+      else if (a && b && !isTab){
+        cell.classList.remove('selected');
+        const i = this.currentIds.indexOf(id);
+        this.currentIds.splice(i, 1);
+        this.validateGrid(id);
+        this.validateWordLength();
+        this.validateWordStructure();
+        this.validateReset();
+      }
+    },
 
+    validateClicks: function(e){
+      const $el = this.$wrapper.find('#' + e.target.id);
+      const isSaved = $el.hasClass('savedWord');
+      const isSelected = $el.hasClass('selected');
+      if (isSaved && !isSelected && !this.newCrossPoint){
+        $el.addClass('selected');
+        this.newCrossPoint = true;
+        this.currentIds.push(e.target.id);
+        this.currentIds.sort();
+        this.validateGrid(e.target.id);
+        this.validateWordLength();
+        this.validateWordStructure();
+        this.setNoReinits(e.target.id);
+        this.validateReset();
+      }else if(isSaved && isSelected){
+        $el.removeClass('selected');
+        this.newCrossPoint = false;
+        const i = this.currentIds.indexOf(e.target.id);
+        this.currentIds.splice(i, 1);
+        this.validateGrid(e.target.id);
+        this.validateWordLength();
+        this.validateWordStructure();
+        this.resetNoReinits(e.target.id);
+        this.validateReset();
+      }
+    },
 
-//F2a. initialise clue
-function initialiseClue() {
-    const bool = true;
-    const block = 'block';
-    const sum = counter += 1;
-    const answer = disOrEnableAll(bool);
-    promptClue(block, sum, answer);
-
-}
-
-
-//F2b. cancel clue
-function cancelClue(){
-    const clueInput = document.getElementById('clueEntry').value;
-    const bool = false;
-    const block = '';
-    const answer = '';
-    const sum = (counter -= 1);
-    disOrEnableAll(bool);
-    promptClue(block, sum, answer);
-    clueInput.value = '';
-    // resetValidation(initWordId);
-    // for (let i=0; i<initWordId.length; i++){
-    //     validateCrossword(initWordId[i]);
-    // };
-}
-
-
-//3. confirm clue and add to clueList
-function confirmClue(){
-    function addNumber(){
-        const firstLetter = document.getElementById(initWord[0]);
-        const hasNoClue = !firstLetter.previousElementSibling;
-        if(hasNoClue){
-        firstLetter.insertAdjacentHTML('beforeBegin',
-            `<div class="number-wrapper">${counter}</div>`);
-        }
-    }
-
-    function writeClue(){
-        const getClueList = document.getElementById(`${orientation}`);
-        const $clue = document.getElementById('clueEntry');
-        const clue = $clue.value;
-        cluebox.style.display = '';
-        $clue.value = '';
-        if (counter == 1){
-            const clueListBlock = document.querySelector('#clueList');
-            clueListBlock.style.display = 'block';
-        }
-
-        //create wrapper
-        wrap = document.createElement('div');
-        wrap.id = `${counter}-${orientation}`;
-        wrap.className = 'clue-wrapper';
-
-        //create p
-        el = document.createElement('p');
-        el.className = 'font-clue';
-        el.textContent = `${counter}. ${clue}`;
-        wrap.insertAdjacentElement('afterbegin', el);
-
-        //create btn
-        deleteBtn = document.createElement('button');
-        deleteBtn.className = 'delete-button';
-        deleteBtn.innerHTML = '<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>';
-
-        //add elements
-        wrap.insertAdjacentElement('beforeend', deleteBtn);
-        getClueList.appendChild(wrap);
-    }
-
-    //update classes
-    for (let i=0; i<initWord.length; i++){
-        const cell = document.getElementById(initWord[i]);
-        const notEP = !cell.hasAttribute('data-ep');
-        const isSaved  = cell.className.includes('savedWord');
-        if(!isSaved){
-            updateClass(cell, 'savedWord');
-
-        }else{
-            updateClass(cell, 'cross-point');
-        }
-        removeClasses(cell, ['selected', 'cell']);
-
-        //refactor ends here
-        if(i == 0){
-            if(notEP){
-                cell.setAttribute('data-ep', 'sp');
-            }
-        }else if (i == initWord.length - 1){
-            if(notEP){
-                cell.setAttribute('data-ep', 'fp');
-            }
-        }else{
-            if(notEP){
-            cell.setAttribute('data-ep', 'mp');
-            }
-        }
-    }
-    updateAllCells();
-    endPoint();
-    crossPoint();
-
-    //ii. adds number to firstLetter
-    addNumber();
-
-    //iii. adds clues to clueList
-    writeClue();
-
-    //iv. resets grid for next clue
-    resetGrid();
-}
-
-function setHTML(dir, sDir){
-    const cells = document.querySelectorAll('.' + sDir + '-' + dir);
-    for (let cell of cells){
-        const c = cell.className; 
-        const isSelected = c.includes('selected');
-        const isCell = c.includes('cell');
-        const isCross = c.includes('cross-point');
-        if(isCell){
-            cell.disabled = true;
-        }else if(!isSelected && !isCross){
-            updateClass(cell, 'no-reinit');
-            if(!noreinits.includes(cell.id)){
-                noreinits.push(cell.id);
-                }
-            }
-        }
-    }
-
-
-//1. prevent caps and non-alphanumeric characters
-function preventIllegalChars(e){
-    const x = e.charCode;
-    if(x != 13){
-        if (x < 97 || x > 122) {
-            e.preventDefault();
-            console.log("PROMPT: illegal char found: ", x);
-            }
-        }
-}
-
-// //2. not in row or col
-function validateCrossword(id){
-    const sp = id.split(".");
-    const col = sp[0];
-    const row = sp[1];
-    for(cell of allCells){
-        let $sp = cell.id.split(".");
+    validateGrid: function(id){
+      const sp = id.split("-");
+      const col = sp[0];
+      const row = sp[1];
+      for (let cell of this.$allCells){
+        let $sp = cell.id.split("-");
         let $col = $sp[0];
         let $row = $sp[1];
-        if (!(row == $row || col == $col) || cell.className.includes('dead')){
-            cell.disabled = true;
-        }
-    }
-}
-
-//1c resets when clue length 1 or 0
-function resetValidation(){
-    const len = initWord.length;
-    if(len < 2){
-        for (let cell of allCells){
-            if(!invalids.includes(cell.id)){
-            cell.disabled = false;
-            }
-        }
-        if (len == 1){
-            validateCrossword(initWord[0]);
-        }
-    }
-    // reactivateUnselectables(unselectables);
-    // unselectables = [];
-}
-
-function validateClue(){
-    if (savedBoxList.length == 1){
-        setNoReinit(savedBoxList);
-        inWordValidation(savedBoxList);
-    }else if(savedBoxList.length == 0){
-        for(let id of noreinits){
-            cell = document.getElementById(id);
-            removeClasses(cell, ['no-reinit']);
-            }
-        }
-    }
+        if (!(row === $row || col === $col) || cell.className.includes('dead'))
+          cell.disabled = true;
+      }
+    },
 
 
-//3. check word is at least 2 characters
-function wordLength(){
-    if (initWord.length < 2){
-        addWordBtn.disabled = true;
-    }else{
-        addWordBtn.disabled = false;
-    }
-}
+    validateWordLength: function(){
+      if (this.currentIds.length < 2)
+        this.$addWordBtn.attr('disabled', true);
+      else
+        this.$addWordBtn.removeAttr('disabled');
+    },
 
-//4. make sure there are no gaps in words and return false if there is
-function checkGaps(){
-    let cols = [];
-    let rows = [];
-    let fail, row, column;
-    for (id of initWord){
-        let sp = id.split(".");
+
+    validateWordStructure: function(){
+      this.currentIds.sort();
+      let cols = []; 
+      let rows = [];
+      let testFails, isRow, isColumn;
+      for (let id of this.currentIds){
+        let sp = id.split("-");
         cols.push(parseInt(sp[0]));
         rows.push(parseInt(sp[1]));
-    }
-
-    for (let i=cols.length - 1; i > 0; i--){
+      }
+      for (let i = cols.length - 1; i > 0; i--){
         let j = i - 1;
-        if (cols[i] - cols[j] > 1){
-            fail = true;
-        }else if (rows[i] - rows[j] > 1){
-            fail = true;
-        }else if (cols[i] - cols[j] == 0){
-            row = true;
-        }else if (rows[i] - rows[j] == 0){
-            column = true;
-        }
-    }
+        if (cols[i] - cols[j] > 1)
+          testFails = true;
+        else if (rows[i] - rows[j] > 1)
+          testFails = true;
+        else if (cols[i] - cols[j] === 0)
+          isRow = true;
+        else if (rows[i] - rows[j] === 0)
+          isColumn = true;
+      }
+      if(testFails)
+        this.$addWordBtn.attr('disabled', true);
+      else if(isRow){
+        this.orientation = 'across';
+      }
+      else if(isColumn){
+        this.orientation = 'down';
+      }
+    },
 
-    if(fail){
-        addWordBtn.disabled = true;
-    }else if(row){
-        orientation = 'across';
-    }else if(column){
-        orientation = 'down';
-    }
-}
+
+    validateInput: function(e){
+      if (e.charCode < 64 || e.charCode > 122) {
+        const message = 'Non alphanumeric characters cannot form part of a word';
+        e.preventDefault();
+        this.alertBox(message);
+      }
+    },
 
 
-//5. endPoint validation (v5)
-function endPoint(){
-    const sp1 = initWord[0].split(".");
-    const sp2 = initWord[initWord.length - 1].split(".");
-
-    if(orientation == 'across'){
-        const row = parseInt(sp1[0]);
-        const l = parseInt(sp1[1]); 
-        const r = parseInt(sp2[1]);
-        const lId = row + "." + (l - 1);
-        const rId = row + '.' + (r + 1);
-
-        if (r < rowSize){
-            const cell = document.getElementById(rId);
-            removeClasses(cell, ['cell']);
-            updateClass(cell, 'dead-cell');
-            if(!invalids.includes(rId)){
-                invalids.push(rId);
-            }  
-        }else if (l != 0){
-            if(!invalids.includes(rId)){
-                invalids.push(rId);
-            }
+    validateReset: function(){
+      //to clear validation there must be 1 or 0 cells selected (and one deleted)
+      //to ensure noreinits runs there must be no selected crosspoints
+      if(this.currentIds.length < 2 && !this.newCrossPoint){
+        for (let cell of this.$allCells){
+          cell.disabled = false;
+          //##this area needs work to avoid unnecessary 2 step resets
         }
 
-        if ((l - 1) != 0){
-            const cell = document.getElementById(lId);
-            removeClasses(cell, ['cell']);
-            updateClass(cell, 'dead-cell');
-            if(!invalids.includes(lId)){
-                invalids.push(lId);
+      }
+      if (this.currentIds.length === 1)
+        this.validateGrid(this.currentIds[0]);
+    },
+
+    setNoReinits: function(xpid){
+      function checkIds(ref, pos){
+        for (let i = 1; i < module.rows + 1; i++){
+          if(pos === 'across'){
+            const cell = module.$wrapper.find('#' + ref + '-' + i);
+            if (cell.hasClass('cell')){
+              cell.prop('disabled', true);
+            } else if (!cell.hasClass('selected') && !cell.hasClass('dead-cell') && !cell.hasClass('cross-point')){
+              cell.addClass('no-reinit');
+              module.noreinits.push(ref + '-' + i);
             }
+          }else{
+            const cell = module.$wrapper.find('#' + i + '-' + ref);
+            if (cell.hasClass('cell')){
+              cell.prop('disabled', true);
+            } else if (!cell.hasClass('selected') && !cell.hasClass('dead-cell') && !cell.hasClass('cross-point')){
+              cell.addClass('no-reinit');
+              module.noreinits.push(i + '-' + ref);
+            }
+          }
         }
-    
+      }
 
-    }else if(orientation == 'down'){
-        const col = parseInt(sp1[1]);
-        const u = parseInt(sp1[0]);
-        const d = parseInt(sp2[0]);
-        const dId = (d + 1) + '.' + col;
-        const uId = (u - 1) + '.' + col;
+      const cell = this.$wrapper.find('#' + xpid);
+      if(cell.hasClass('across')){
+        const colRef = (xpid.split("-"))[0];
+        checkIds(colRef, 'across');
+      }else{
+        const rowRef = (xpid.split("-"))[1];
+        checkIds(rowRef, 'down');
+      }
+    },
 
-        if (d <= rowSize){
-            const cell = document.getElementById(dId);
-            removeClasses(cell, ['cell']);
-            updateClass(cell, 'dead-cell');
-            if(!invalids.includes(dId)){
-                invalids.push(dId);
-            }
-        }else if (u != 0){
-            if(!invalids.includes(dId)){
-                invalids.push(dId);
-            }
+    resetNoReinits: function(xpid){
+      function checkIds(ref, pos){
+        for (let i = 1; i < module.rows + 1; i++){
+          if(pos === 'across'){
+            const cell = module.$wrapper.find('#' + ref + '-' + i);
+            cell.removeClass('no-reinit');
+          }else{
+            const cell = module.$wrapper.find('#' + i + '-' + ref);
+            cell.removeClass('no-reinit');
+          }
         }
+      }
+
+      const cell = this.$wrapper.find('#' + xpid);
+      if(cell.hasClass('across')){
+        const colRef = (xpid.split("-"))[0];
+        checkIds(colRef, 'across');
+      }else{
+        const rowRef = (xpid.split("-"))[1];
+        checkIds(rowRef, 'down');
+      }
+    },
 
 
-        if ((u - 1) != 0){
-            const cell = document.getElementById(uId);
-            removeClasses(cell, ['cell']);
-            updateClass(cell, 'dead-cell');
-            if(!invalids.includes(uId)){
-                invalids.push(uId);
-            }
-        }
-     }
-}
-
-//6. check invalids list on increase grid size or on clue reset
-function checkInvalids(){
-    for (let i = 0; i < invalids.length; i++){
-        const cell = document.getElementById(invalids[i]);
-        removeClasses(cell, ['cell']);
-        updateClass(cell, 'dead-cell');
-    }
-    invalids.sort();
-}
-
-//7. set no reinits on selection 
-function setNoReinit(ids){
-    for (let id of ids){
-        const sp = savedBoxList[0].split(".");
-        const col = sp[1];
-        const row = sp[0];
-        const $cell = document.getElementById(savedBoxList[0]);
-        const $class = $cell.className;
-        const isAcross = $class.includes('across');
-        const isCross = $class.includes('cross-point');
-    if(!isCross){
-        if(isAcross){
-            setHTML(row, 'row');
-        }else if (!isAcross){
-            setHTML(col, 'col');
-            }
-        }
-    }
-}    
-    
+    renderClue: function(){
+      this.disableButtons(true, true);
+      this.captureClue();
+      this.addClueAndReference();
+      this.togglePromptBox('block');
+    },
 
 
-//7. check inword for no reinits
-function inWordValidation($ids){
-    function checkIds(i, $dir, $id){
-        for (let id of allIds){
-            const sp = id.split(".");
-            const dir = sp[i];
-            if(dir == $dir || id == $id){
-                //console.log(id);
+    disableButtons: function(b1, b2){
+      this.$addWordBtn.attr('disabled', b1);
+      this.$increaseBtn.attr('disabled', b2);
+      this.$decreaseBtn.attr('disabled', b2);
+    },
+
+    captureClue: function(){
+      for(let id of this.currentIds){
+        let letter = this.$wrapper.find('#' + id).val();
+        this.sCurrentWord += letter.toLowerCase();
+      }
+    },
+
+
+    addClueAndReference: function(){
+      this.$insertClue.text(this.sCurrentWord);
+      this.$insertReference.text(this.clueCounter + ' ' + this.orientation);
+    },
+
+
+    togglePromptBox: function(x){
+      this.$clueBox.css('display', x);
+    },
+
+
+    confirmClue: function(){
+      this.saveClueAsJSON();
+      this.togglePromptBox('none');
+      this.validateEndPoint();
+      this.addNumber();
+      this.addClasses();
+      this.addAttributes();
+      this.validateCrossPoint();
+      this.writeClueToPage();
+      this.resetGrid();
+    },
+
+    initJSON: function(word, reference, ids, clueEntry){
+      this.word = word;
+      this.reference = reference;
+      this.ids = ids;
+      this.clueEntry = clueEntry;
+    },
+
+    saveClueAsJSON: function(){
+      const clue = new this.initJSON(this.sCurrentWord, 
+                  (this.clueCounter) + ' ' + this.orientation, 
+                  this.currentIds,
+                  this.$clueEntry.val());
+      this.json.push(clue);
+    },
+
+    addNumber: function(){
+      const $firstLetter = this.$wrapper.find('#' + this.currentIds[0]);
+      const newItem = (`<div class="number-wrapper">${this.clueCounter}</div>`);
+      const hasSibling = $firstLetter.siblings().length === 1;
+      if (!hasSibling){
+        $firstLetter.parent().prepend(newItem);
+        this.clueCounter ++;
+      }
+    },
+
+    validateEndPoint: function(){
+      const sp1 = this.currentIds[0].split("-");
+      const sp2 = this.currentIds[this.currentIds.length - 1].split("-");
+
+      function blackOutCell(id){
+        const cell = module.$wrapper.find('#' + id);
+        cell.removeClass('cell');
+        cell.addClass('dead-cell');
+        cell.prop('disabled', true);
+      }
+  
+      if (this.orientation === 'across') {
+        const row = +sp1[0];
+        const l = +sp1[1]; 
+        const r = +sp2[1];
+        const lId = row + "-" + (l - 1);
+        const rId = row + '-' + (r + 1);
+  
+        if (r < this.rows) blackOutCell(rId);
+        if ((l - 1) !== 0) blackOutCell(lId);    
+  
+      }else if (this.orientation === 'down') {
+        const col = +sp1[1];
+        const u = +sp1[0];
+        const d = +sp2[0];
+        const dId = (d + 1) + '-' + col;
+        const uId = (u - 1) + '-' + col;
+  
+        if (d <= this.rows) blackOutCell(dId);
+        if ((u - 1) !== 0) blackOutCell(uId);
+      }
+      this.cacheCells();
+    },
+
+    validateCrossPoint: function(){
+      for (let id of this.currentIds){
+        const el = this.$wrapper.find('#' + id);
+        const isCrossPoint = el.hasClass('cross-point');
+        const ep = el.attr('data-ep');
+        const x = id.split("-");
+        let model;
+        if (this.orientation === 'across' && isCrossPoint){
+          if(id === this.currentIds[0]){
+            if (ep === 'sp'){
+              this.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
+              this.helperFunctions.noreinitOnReset(x, model = 1);
+            }else if (ep === 'fp'){
+              this.helperFunctions.deadCellsForCrossPoint.topRight(x);
+              this.helperFunctions.noreinitOnReset(x, model = 7);
             }else{
-                const cell = document.getElementById(id);
-                const $class = cell.className;
-                const noReinit = $class.includes('no-reinit');
-                const isCross = $class.includes('cross-point');
-                if(!(noReinit || isCross)){
-                    updateClass(cell, 'no-reinit');
-                }
+              this.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
+              this.helperFunctions.deadCellsForCrossPoint.topRight(x);
+              this.helperFunctions.noreinitOnReset(x, model = 4);
             }
-        }
-    }
+          }else if(id === this.currentIds[this.currentIds.length - 1]){
+            if (ep === 'sp'){
+              this.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
+              this.helperFunctions.noreinitOnReset(x, model = 3);
+            }else if (ep === 'fp'){
+              this.helperFunctions.deadCellsForCrossPoint.topLeft(x);
+              this.helperFunctions.noreinitOnReset(x, model = 9);
+            }else{
+              this.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
+              this.helperFunctions.deadCellsForCrossPoint.topLeft(x);
+              this.helperFunctions.noreinitOnReset(x, model = 6);
+            }
+          }else{
+            if (ep === 'sp'){
+              this.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
+              this.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
+              this.helperFunctions.noreinitOnReset(x, model = 2);
+            }else if (ep === 'fp'){
+              this.helperFunctions.deadCellsForCrossPoint.topLeft(x);
+              this.helperFunctions.deadCellsForCrossPoint.topRight(x);
+              this.helperFunctions.noreinitOnReset(x, model = 8);
+            }else{
+              this.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
+              this.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
+              this.helperFunctions.deadCellsForCrossPoint.topLeft(x);
+              this.helperFunctions.deadCellsForCrossPoint.topRight(x);
+              this.helperFunctions.noreinitOnReset(x, model = 5);
+            }
+          }
+        }else if (this.orientation === 'down' && isCrossPoint){
+          if(id === this.currentIds[0]){
+            if (ep === 'sp'){
+              this.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
+              this.helperFunctions.noreinitOnReset(x, model = 1);
+            }else if (ep === 'fp'){
+              this.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
+              this.helperFunctions.noreinitOnReset(x, model = 3);
+            }else{
+              this.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
+              this.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
+              this.helperFunctions.noreinitOnReset(x, model = 2);
+            }
+          }else if(id === this.currentIds[this.currentIds.length - 1]){
+            if (ep === 'sp'){
+              this.helperFunctions.deadCellsForCrossPoint.topRight(x);
+              this.helperFunctions.noreinitOnReset(x, model = 7);
+            }else if (ep === 'fp'){
+              this.helperFunctions.deadCellsForCrossPoint.topLeft(x);
+              this.helperFunctions.noreinitOnReset(x, model = 9);
+            }else{
+              this.helperFunctions.deadCellsForCrossPoint.topRight(x);
+              this.helperFunctions.deadCellsForCrossPoint.topLeft(x);
+              this.helperFunctions.noreinitOnReset(x, model = 8);
+            }
+          }else{
+            if (ep === 'sp'){
+              this.helperFunctions.deadCellsForCrossPoint.topRight(x);
+              this.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
+              this.helperFunctions.noreinitOnReset(x, model = 4);
+            }else if (ep === 'fp'){
+              this.helperFunctions.deadCellsForCrossPoint.topLeft(x);
+              this.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
+              this.helperFunctions.noreinitOnReset(x, model = 6);
+            }else{
+              this.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
+              this.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
+              this.helperFunctions.deadCellsForCrossPoint.topLeft(x);
+              this.helperFunctions.deadCellsForCrossPoint.topRight(x);
+              this.helperFunctions.noreinitOnReset(x, model = 5);
+            }
+          }
+        }    
+      }
+    },
 
-    for (let $id of $ids){
-        const cell = document.getElementById($id);
-        //console.log($ids);
-        const $sp = $id.split(".");
-        const isAcross = cell.className.includes('across');
-        if(isAcross){
-            checkIds(1, $sp[1], $id); //checks against cols
+    addClasses: function(){
+      for(let id of this.currentIds){
+        const cell = this.$wrapper.find('#' + id);
+        const isSaved = cell.hasClass('savedWord');
+        cell.removeClass('selected');
+        cell.removeClass('cell');
+        if(!isSaved){
+          cell.addClass('savedWord');
+          cell.addClass(this.orientation);
+          cell.click(this.validateClicks.bind(this));
         }else{
-            checkIds(0, $sp[0], $id); //checks against rows
+          cell.addClass('cross-point');
+          const getOrientation = cell.hasClass('across') ? 'across' : 'down';
+          cell.removeClass(getOrientation);
+          cell.off();
         }
-    }
-}
+      }
+    },
 
-function crossPoint(){
-    function topLeft(x){
-        let col = x[0] - 1;
-        let row = x[1] - 1;
-        let id = col + "." + row;
-        let cell = document.getElementById(id);
-        removeClasses(cell, ['cell']);
-        updateClass(cell, 'dead-cell');
+    addAttributes: function(){
+      for(let i = 0; i < this.currentIds.length; i++){
+        const cell = this.$wrapper.find('#' + this.currentIds[i]);
+        const hasAttr = cell.attr('data-ep');
+        if (i === 0 && !hasAttr){
+          cell.attr('data-ep', 'sp');
+        }else if (i === this.currentIds.length - 1 && !hasAttr){
+          cell.attr('data-ep', 'fp');
+        }else if (!hasAttr){
+          cell.attr('data-ep', 'mp');
         }
+      }
+    },
 
-    function topRight(x){
-        let row = x[0] - 1;
-        let col = parseInt(x[1]) + 1;
-        let id =  row + "." + col;
-        let cell = document.getElementById(id);
-        removeClasses(cell, ['cell']);
-        updateClass(cell, 'dead-cell');
-        }
+    writeClueToPage: function(){
+      const $clueList = this.$wrapper.find('#' + this.orientation);
+      const newItem = (`<div id="${this.clueCounter}-${this.orientation}" class="clue-wrapper"\>
+                          <p class="font-clue">${this.clueCounter}. ${this.$clueEntry.val() || '-'}</p>\
+                          <div>\
+                            <button class="delete-button">\
+                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>\
+                            </button>\
+                          </div>\
+                        </div>`);
+      if(this.clueCounter === 1) this.$clueList.css('display', 'block');
+      $clueList.append(newItem);
+    },
 
-    function bottomLeft(x){
-        let row = parseInt(x[0]) + 1;
-        let col = x[1] - 1;
-        let id =  row + "." + col;
-        let cell = document.getElementById(id);
-        removeClasses(cell, ['cell']);
-        updateClass(cell, 'dead-cell');
-    }
+    cancelClue: function(){
+      this.$clueBox.css('display', 'none');
+      this.clueCounter --;
+      this.sCurrentWord = '';
+      this.disableButtons(false, false);
+    },
 
-    function bottomRight(x){
-        let row = parseInt(x[0]) + 1;
-        let col = parseInt(x[1]) + 1;
-        let id =  row + "." + col;
-        let cell = document.getElementById(id);
-        removeClasses(cell, ['cell']);
-        updateClass(cell, 'dead-cell');
-    }
+    resetGrid: function(){
+      for (let cell of this.$allCells){
+        cell.disabled = false;
+      }
 
+      for (let id of this.noreinits){
+        const cell = this.$wrapper.find('#' + id);
+        cell.removeClass('no-reinit');
+        cell.prop('disabled', false);
+      }
+      this.currentIds = [];
+      this.sCurrentWord = '';
+      this.$addWordBtn.attr('disabled', true);
+      this.disableButtons(true, false);
+      this.newCrossPoint = false;
+    },
 
-    //--------------------------------------BODY--------------------------------------
-    for (let id of initWord){
-        if(!allIds.includes(id)){
-            allIds.push(id);
-        }else{
-            const ep = document.getElementById(id).getAttribute('data-ep');
-            const x = id.split(".");
-            if (orientation == 'across'){
-                if(id == initWord[0]){
-                    if (ep == 'sp'){
-                        bottomRight(x);
-                        const model = 1;
-                        reinit(x, model);
-                        //top left L shaped clue - model 1
-                    }else if(ep == 'fp'){
-                        topRight(x);
-                        const model = 7;
-                        reinit(x, model);
-                        //bottom left L shaped clue - model 7 (3)
-                    }else{
-                        topRight(x);
-                        bottomRight(x);
-                        const model = 4;
-                        reinit(x, model);
-                        //mid left T - model 2 (4)
-                    };
-                }else if(id == initWord[initWord.length - 1]){
-                    if (ep == 'sp'){
-                        bottomLeft(x);
-                        let model = 3;
-                        reinit(x, model);
-                        //top right L - model 3 (7)
-                    }else if(ep == 'fp'){
-                        topLeft(x);
-                        const model = 9;
-                        reinit(x, model);
-                        //bottom right L - model 9
-                    }else{
-                        bottomLeft(x);
-                        topLeft(x);
-                        const model = 6;
-                        reinit(x, model);
-                        //mid right T - model 6 (8)
-                    };
-                }else{
-                    if (ep == 'sp'){
-                        bottomLeft(x);
-                        bottomRight(x);
-                        let model = 2;
-                        reinit(x, model);
-                        //top mid T - model 2 (4)
-                    }else if(ep == 'fp'){
-                        topLeft(x);
-                        topRight(x);
-                        const model = 8;
-                        reinit(x, model);
-                    //bottom mid T - model 8 (6)
-                    }else{
-                        bottomLeft(x);
-                        bottomRight(x);
-                        topLeft(x);
-                        topRight(x);
-                        const model = 5;
-                        reinit(x, model);
-                    //center - model 5'
-                        };
-                    };
-            }else if (orientation == 'down'){
-                if(id == initWord[0]){
-                    if (ep == 'sp'){
-                        console.log("running model 1");
-                        bottomRight(x);
-                        const model = 1;
-                        reinit(x, model);
-                    }else if(ep == 'fp'){
-                        bottomLeft(x);
-                        let model = 3;
-                        reinit(x, model);
-                    }else{
-                        bottomLeft(x);
-                        bottomRight(x);
-                        const model = 2;
-                        reinit(x, model);
-                    };
-                }else if(id == initWord[initWord.length - 1]){
-                    if (ep == 'sp'){
-                        topRight(x);
-                        const model = 7;
-                        reinit(x, model);
-                        //bottom left L - model 7
-                    }else if(ep == 'fp'){
-                        topLeft(x);
-                        const model = 9;
-                        reinit(x, model);
-                        //bottom right L - model 9
-                    }else{
-                        topRight(x);
-                        topLeft(x);
-                        const model = 8;
-                        reinit(x, model);
-                        //bottom mid T - model 8
-                    };
-                }else{
-                    if (ep == 'sp'){
-                        topRight(x);
-                        bottomRight(x);
-                        const model = 4;
-                        reinit(x, model);
-                        //mid left T - model 4 (2)
-                    }else if(ep == 'fp'){
-                        topLeft(x);
-                        bottomLeft(x);
-                        const model = 6;
-                        reinit(x, model);
-                    //right mid T - model 6 (8)
-                    }else{
-                        bottomLeft(x);
-                        bottomRight(x);
-                        topLeft(x);
-                        topRight(x);
-                        const model = 5;
-                        reinit(x, model);
-                    //center - model 5'
-                        };
-                    };
-                };
-            };
-        };
-    allIds.sort();
-}
+    helperFunctions: {
+      noreinitOnReset: function(x, model){
+        const row = +x[0];
+        const col = +x[1];
+        const t = (row - 1) + "-" + col;
+        const l = row + "-" + (col - 1);
+        const r = row + "-" + (col + 1);
+        const d = (row + 1) + "-" + col;
+        const colSub = col - 1;
+        const colAdd = col + 1;
+        const rowSub = row - 1;
+        const rowAdd = row + 1;
+        let tlrd = [];
     
-//cross-point for reinitialisation    
-function reinit(x, model){
-    let row = x[0];
-    let col = x[1];
-    let t = (row - 1) + "." + col;
-    let l = row + "." + (col - 1);
-    let r = row + "." + (parseInt(col) + 1);
-    let d = (parseInt(row) + 1) + "." + col;
-    let colSub = col - 1;
-    let colAdd = parseInt(col) + 1;
-    let rowSub = row - 1;
-    let rowAdd = parseInt(row) + 1;
-    let tlrd = [];
-
-
-    if(model == '1'){
-        console.log("model 1");
-        if(colSub < 1 && rowSub < 1){
-            //model 1.1
-            tlrd.push(d);
+        if(model === 1){
+          if(colSub < 1 && rowSub < 1){
+            tlrd.push(d); 
             tlrd.push(r);
-        }else if(colSub < 1){
-            //model 1.2
+          }else if(colSub < 1){
             tlrd.push(d);
-        }else if(rowAdd < 1){
-            //model 1.3
+          }else if(rowAdd < 1){
             tlrd.push(r)
-        };
-
-
-    }else if(model == '2'){
-        console.log("model 2");
-        if(rowSub < 1){
-            //model 2.1
-            tlrd.push(l);
-            tlrd.push(r);
-            tlrd.push(d);
-        }else{
-            //model 2.2 
-            tlrd.push(d);
-    };
-
-}else if(model == '3'){
-        reverse_reinit.push(d);
-        if (colAdd > rowSize && rowSub < 1){
-            //model 3.1
-            tlrd.push(l);
-            tlrd.push(d);
-        }else if(colAdd > rowSize){
-            //model 3.2
-            tlrd.push(d);
-        }else if (rowSub < 1){
-            //model 3.3
-            tlrd.push(l);
-    };
-        
-    }else if(model == '4'){
-        if(colAdd < 1){
-            //model 4.1
+          }
+        }else if(model === 2){
+          if(rowSub < 1){
+              tlrd.push(l);
+              tlrd.push(r);
+              tlrd.push(d);
+          }else{
+              tlrd.push(d);
+          }
+        }else if(model === 3){
+            //reverse_reinit.push(d);
+          if (colAdd > module.rows && rowSub < 1){
+              tlrd.push(l);
+              tlrd.push(d);
+          }else if(colAdd > module.rows){
+              tlrd.push(d);
+          }else if (rowSub < 1){
+              tlrd.push(l);
+          }   
+        }else if(model === 4){
+          console.log('running 4');
+          console.log(colAdd);
+          if(colAdd < 3){
             tlrd.push(t);
             tlrd.push(r);
             tlrd.push(d);
-        }else{
-            //model 4.2 
+          }else{
             tlrd.push(r);
-    };
-
-    }else if(model == '5'){
-            //model 5
-            tlrd.push(t);
-            tlrd.push(l);
-            tlrd.push(r);
-            tlrd.push(d);
-    
-    }else if(model == '6'){
-        reverse_reinit.push(t);
-        reverse_reinit.push(d);
-        if(colAdd > rowSize){
-            //model 6.1
+          }
+        }else if(model === 5){
+          tlrd.push(t);
+          tlrd.push(l);
+          tlrd.push(r);
+          tlrd.push(d);
+        }else if(model === 6){
+          // reverse_reinit.push(t);
+          // reverse_reinit.push(d);
+          if(colAdd > module.rows){
             tlrd.push(t);
             tlrd.push(l);
             tlrd.push(d);
-        }else{
-            //model 6.2
+          }else{
             tlrd.push(l);
-        };
-
-    }else if(model == '7'){
-        if(colSub < 1 && rowAdd > rowSize){
-            //model 7.1
+          }
+        }else if(model === 7){
+          console.log('running model 7');
+          if(colSub < 1 && rowAdd > module.rows){
             tlrd.push(t);
             tlrd.push(r);
-        }else if(colSub < 1){
-            //model 7.2
+          }else if(colSub < 1){
             tlrd.push(t);
-        }else if(rowAdd > rowSize){
-            //model 7.3
+          }else if(rowAdd > module.rows){
             tlrd.push(r)
-        };
-
-    }else if(model == '8'){
-        reverse_reinit.push(r);
-        reverse_reinit.push(l);
-        if(rowAdd > rowSize){
-            //model 8.1
+          }
+        }else if(model === 8){
+          // reverse_reinit.push(r);
+          // reverse_reinit.push(l);
+          if(rowAdd > module.rows){
             tlrd.push(t);
             tlrd.push(l);
             tlrd.push(r);
-        }else{
-            //model 8.2
+          }else{
             tlrd.push(t);
-        };
-
-    }else if(model == '9'){
-        if (colAdd > rowSize && rowAdd > rowSize){
-            //model 9.1
+          }
+        }else if(model === 9){
+          if (colAdd > module.rows && rowAdd > module.rows){
             tlrd.push(l);
             tlrd.push(t);
-            reverse_reinit.push(l);
-            reverse_reinit.push(t);
-        }else if(colAdd > rowSize){
-            //model 9.2
+            // reverse_reinit.push(l);
+            // reverse_reinit.push(t);
+          }else if(colAdd > module.rows){
             tlrd.push(t);
-            reverse_reinit.push(t);
-        }else if (rowAdd > rowSize){
-            //model 9.3
+            // reverse_reinit.push(t);
+          }else if (rowAdd > module.rows){
             tlrd.push(l);
-            reverse_reinit.push(l);
-        }else{
-            //model 9.4
-            reverse_reinit.push(l);
-            reverse_reinit.push(t);
+            // reverse_reinit.push(l);
+          }else{
+            // reverse_reinit.push(l);
+            // reverse_reinit.push(t);
+          }
         }
-    }
+    
+        for (let id of tlrd){
+          const cell = module.$wrapper.find('#' + id);
+          console.log(id);
+          cell.addClass('no-reinit-on-reset');
+          const i = module.noreinits.indexOf(id);
+          if (i !== -1) module.noreinits.splice(i, 1);
+        }
 
-    for (let id of tlrd){
-        let cell = document.getElementById(id);
-        console.log(cell);
-        updateClass(cell, 'no-reinit-on-reset'); 
-        //noReinitOnReset.push(id);
-        // el.classList += ' no-reinit';
-        cell.style.backgroundColor = '#E4E4E4';
-    }
-}
+      },//end helperFunctions.noreinitOnReset
+    
+      deadCellsForCrossPoint: {
+        updateClassesAndCache: function(id){
+          const cell = module.$wrapper.find('#' + id);
+          cell.removeClass('cell');
+          cell.addClass('dead-cell');
+          module.cacheCells();
+        },
 
-getCrossword.addEventListener('keypress', preventIllegalChars, false);
-// increaseBtn.addEventListener('click', increaseGridSize, false);
-decreaseBtn.addEventListener('click', decreaseGridSize, false);
-getCrossword.addEventListener('keyup', selectCell, false);
-getCrossword.addEventListener('click', clickCell, false);
-addWordBtn.addEventListener('click', initialiseClue, false);
-cancelClueBtn.addEventListener('click', cancelClue, false);
-confirmClueBtn.addEventListener('click', confirmClue, false);
+        topLeft: function(x){
+          const col = +x[0] - 1;
+          const row = +x[1] - 1;
+          this.updateClassesAndCache(col + "-" + row);
+        },
+
+        topRight: function(x){
+          const row = +x[0] - 1;
+          const col = +x[1] + 1;
+          this.updateClassesAndCache(row + "-" + col);
+        },
+
+        bottomLeft: function(x){
+          const row = +x[0] + 1;
+          const col = +x[1] - 1;
+          this.updateClassesAndCache(row + "-" + col);
+        },
+
+        bottomRight: function(x){
+          const row = +x[0] + 1;
+          const col = +x[1] + 1;  
+          this.updateClassesAndCache(row + "-" + col);
+        }
+      }//end helperFunctions.deadCellsForCrossPoint
+    
+    },
+
+  }//end object
+
+  module.init();
+})();
 
 
-//-----------run APP --------------------------------------------------------------------------
-generateGrid();
+
+
