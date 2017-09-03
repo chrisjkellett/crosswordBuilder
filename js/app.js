@@ -12,6 +12,7 @@
       this.currentIds = [];
       this.json = [];
       this.noreinits = [];
+      this.reverse_reinit = [];
       this.newCrossPoint = false;
     },
 
@@ -117,6 +118,13 @@
         for (let id of this.currentIds){
           this.validateGrid(id);
         }
+
+        for (let id of this.reverse_reinit){
+          const el = this.$wrapper.find('#' + id);
+          el.removeClass('no-reinit-on-reset');
+          el.prop('disabled', false);
+          el.click(this.validateClicks.bind(this));
+        }
       }
       
       else{
@@ -134,6 +142,14 @@
           let row = module.$wrapper.find('#r-' + i);
           row.children().last().remove();
         } 
+
+        for (let id of module.reverse_reinit){
+          const el = module.$wrapper.find('#' + id);
+          el.addClass('no-reinit-on-reset');
+          el.off();
+          el.prop('disabled', 'true');
+        }
+
         module.rows --;
         module.init --;
         module.cacheCells();
@@ -408,7 +424,7 @@
 
 
     confirmClue: function(){
-      this.saveClueAsJSON();
+      this.saveAsJSON.save();
       this.togglePromptBox('none');
       this.validateEndPoint();
       this.addNumber();
@@ -419,19 +435,22 @@
       this.resetGrid();
     },
 
-    initJSON: function(word, reference, ids, clueEntry){
-      this.word = word;
-      this.reference = reference;
-      this.ids = ids;
-      this.clueEntry = clueEntry;
-    },
-
-    saveClueAsJSON: function(){
-      const clue = new this.initJSON(this.sCurrentWord, 
-                  (this.clueCounter) + ' ' + this.orientation, 
-                  this.currentIds,
-                  this.$clueEntry.val());
-      this.json.push(clue);
+    saveAsJSON:{
+      newClue: function(word, reference, ids, clueEntry){
+        this.word = word;
+        this.reference = reference;
+        this.ids = ids;
+        this.clueEntry = clueEntry;
+      },
+  
+      save: function(){
+        const clue = new this.newClue(module.sCurrentWord, 
+                    (module.clueCounter) + ' ' + module.orientation, 
+                    module.currentIds,
+                    module.$clueEntry.val());
+        module.json.push(clue);
+        console.log(module.json);
+      }
     },
 
     addNumber: function(){
@@ -440,7 +459,6 @@
       const hasSibling = $firstLetter.siblings().length === 1;
       if (!hasSibling){
         $firstLetter.parent().prepend(newItem);
-        this.clueCounter ++;
       }
     },
 
@@ -607,9 +625,10 @@
     },
 
     writeClueToPage: function(){
+      console.log('running');
       const $clueList = this.$wrapper.find('#' + this.orientation);
       const newItem = (`<div id="${this.clueCounter}-${this.orientation}" class="clue-wrapper"\>
-                          <p class="font-clue">${this.clueCounter}. ${this.$clueEntry.val() || '-'}</p>\
+                          <p class="font-clue">${module.clueCounter}. ${this.$clueEntry.val() || '-'}</p>\
                           <div>\
                             <button class="delete-button">\
                             <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>\
@@ -622,7 +641,6 @@
 
     cancelClue: function(){
       this.$clueBox.css('display', 'none');
-      this.clueCounter --;
       this.sCurrentWord = '';
       this.disableButtons(false, false);
     },
@@ -638,6 +656,7 @@
         cell.prop('disabled', false);
       }
       this.currentIds = [];
+      if (this.newCrossPoint) this.clueCounter ++;
       this.sCurrentWord = '';
       this.$addWordBtn.attr('disabled', true);
       this.disableButtons(true, false);
@@ -676,7 +695,8 @@
               tlrd.push(d);
           }
         }else if(model === 3){
-            //reverse_reinit.push(d);
+            module.reverse_reinit.push(d);
+            console.log(module.reverse_reinit);
           if (colAdd > module.rows && rowSub < 1){
               tlrd.push(l);
               tlrd.push(d);
@@ -686,8 +706,6 @@
               tlrd.push(l);
           }   
         }else if(model === 4){
-          console.log('running 4');
-          console.log(colAdd);
           if(colAdd < 3){
             tlrd.push(t);
             tlrd.push(r);
@@ -711,7 +729,6 @@
             tlrd.push(l);
           }
         }else if(model === 7){
-          console.log('running model 7');
           if(colSub < 1 && rowAdd > module.rows){
             tlrd.push(t);
             tlrd.push(r);
@@ -750,8 +767,9 @@
     
         for (let id of tlrd){
           const cell = module.$wrapper.find('#' + id);
-          console.log(id);
           cell.addClass('no-reinit-on-reset');
+          cell.off();
+          cell.prop('disabled', true);
           const i = module.noreinits.indexOf(id);
           if (i !== -1) module.noreinits.splice(i, 1);
         }
