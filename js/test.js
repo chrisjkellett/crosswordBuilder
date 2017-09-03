@@ -193,8 +193,9 @@
       const a = cell.className.includes('selected');
       const b = e.target.value === '';
       const c = this.currentIds.includes(id);
+      const isTab = e.key === 'Tab';
 
-      if (!a && !b && !c){
+      if (!a && !b && !c && !isTab){
         cell.classList.add('selected');
         this.currentIds.push(id);
         this.validateGrid(id);
@@ -202,7 +203,7 @@
         this.validateWordStructure();
         this.validateReset();
       }
-      else if (a && b){
+      else if (a && b && !isTab){
         cell.classList.remove('selected');
         const i = this.currentIds.indexOf(id);
         this.currentIds.splice(i, 1);
@@ -441,8 +442,7 @@
       if (!hasSibling){
         $firstLetter.parent().prepend(newItem);
         this.clueCounter ++;
-      };
-      //##add condition in case cross point
+      }
     },
 
     validateEndPoint: function(){
@@ -549,6 +549,7 @@
         cell.prop('disabled', false);
       }
       this.currentIds = [];
+      this.sCurrentWord = '';
       this.$addWordBtn.attr('disabled', true);
       this.disableButtons(true, false);
       this.newCrossPoint = false;
