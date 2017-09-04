@@ -253,7 +253,7 @@
         this.validateGrid(e.target.id);
         this.validateWordLength();
         this.validateWordStructure();
-        //this.resetNoReinits(e.target.id);
+        this.resetNoReinits(e.target.id);
         this.validateReset();
       }
     },
@@ -360,72 +360,59 @@
     },
 
     setNoReinits: {
-      init: function(xpid){
-        const cell = root.$wrapper.find('#' + xpid);
-        if(cell.hasClass('across')){
-          const colRef = (xpid.split("-"))[0];
-          this.checkIds(colRef, 'across');
+      init: function(targetId){
+        const sp = targetId.split("-");
+        const cell = root.$wrapper.find('#' + targetId);
+        if(root.$wrapper.find('#' + targetId).hasClass('across')){
+          this.getOrientation(targetId, ref = sp[0], position = 'across');
+          this.validateOtherCells(targetId, ref = sp[0], 0);
         }else{
-          const rowRef = (xpid.split("-"))[1];
-          this.checkIds(rowRef, 'down');
+          this.getOrientation(targetId, ref = sp[1], position = 'down');
+          this.validateOtherCells(targetId, ref = sp[1], 1);
         }
       },
 
-      checkIds: function(ref, pos){
+      getOrientation: function(targetId, ref, position){
+        const sp = targetId.split("-");
         for (let i = 1; i < root.rows + 1; i++){
-          if(pos === 'across'){
-            const cell = root.$wrapper.find('#' + ref + '-' + i);
-            if (cell.hasClass('cell')){
-              cell.prop('disabled', true);
-            } else if (!cell.hasClass('selected') && !cell.hasClass('dead-cell') && !cell.hasClass('cross-point')){
-              cell.addClass('no-reinit');
-              root.noreinits.push(ref + '-' + i);
-            }
+          if(position === 'across'){
+            this.validateLine(id = ref + '-' + i, index = ref + '-' + i);
           }else{
-            const cell = root.$wrapper.find('#' + i + '-' + ref);
-            if (cell.hasClass('cell')){
-              cell.prop('disabled', true);
-            } else if (!cell.hasClass('selected') && !cell.hasClass('dead-cell') && !cell.hasClass('cross-point')){
-              cell.addClass('no-reinit');
-              root.noreinits.push(i + '-' + ref);
+            this.validateLine(id = i + '-' + ref, index = i + '-' + ref);
+            }
+          }
+        },
+
+      validateLine: function(id, index){
+        const cell = root.$wrapper.find('#' + id);
+        if (cell.hasClass('cell')){
+          cell.prop('disabled', true);
+        } else if (!cell.hasClass('selected') && !cell.hasClass('dead-cell') && !cell.hasClass('cross-point')){
+          this.updateDOM(id);
+        }
+      },
+
+      validateOtherCells: function(targetId, ref, i){
+        for (let id of root.savedCells){
+          if (targetId !== id){
+            let loopedRef = id.split("-");
+            if(ref !== loopedRef[i]){
+              this.updateDOM(id);
             }
           }
         }
+      },
+
+      updateDOM: function(id){
+        const cell = root.$wrapper.find('#' + id);
+        if(!cell.hasClass('no-reinit-on-reset')){
+          console.log(cell);
+          cell.prop('disabled', true);
+          cell.addClass('no-reinit');
+          root.noreinits.push(id);
+        }
       }
     },
-
-    // setNoReinits: function(xpid){
-    //   function checkIds(ref, pos){
-    //     for (let i = 1; i < root.rows + 1; i++){
-    //       if(pos === 'across'){
-    //         const cell = root.$wrapper.find('#' + ref + '-' + i);
-    //         if (cell.hasClass('cell')){
-    //           cell.prop('disabled', true);
-    //         } else if (!cell.hasClass('selected') && !cell.hasClass('dead-cell') && !cell.hasClass('cross-point')){
-    //           cell.addClass('no-reinit');
-    //           root.noreinits.push(ref + '-' + i);
-    //         }
-    //       }else{
-    //         const cell = root.$wrapper.find('#' + i + '-' + ref);
-    //         if (cell.hasClass('cell')){
-    //           cell.prop('disabled', true);
-    //         } else if (!cell.hasClass('selected') && !cell.hasClass('dead-cell') && !cell.hasClass('cross-point')){
-    //           cell.addClass('no-reinit');
-    //           root.noreinits.push(i + '-' + ref);
-    //         }
-    //       }
-    //     }
-    //   }
-
-    //   const cell = this.$wrapper.find('#' + xpid);
-    //   if(cell.hasClass('across')){
-    //     const colRef = (xpid.split("-"))[0];
-    //     checkIds(colRef, 'across');
-    //   }else{
-    //     const rowRef = (xpid.split("-"))[1];
-    //     checkIds(rowRef, 'down');
-    //   }
-    // },
 
     resetNoReinits: function(xpid){
       function checkIds(ref, pos){
