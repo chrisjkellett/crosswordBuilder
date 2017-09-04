@@ -57,12 +57,6 @@
       this.$cancelClueBtn.click(this.cancelClue.bind(this));
       this.$confirmClueBtn.click(this.confirmClue.bind(this));
     },
-
-
-    runCrosswordEvents: function(e){
-      this.validateCells(e);
-      this.navigateGrid(e);
-    },
     
     generateGrid: function(){
       for (let i = 1; i < this.rows + 1; i++){
@@ -108,6 +102,7 @@
         this.rows ++;
         let newItem = $(`<div id="r-${this.rows}" class="_row"></div>`);
         this.$crossword.append(newItem);
+
         for (let i = 1; i < this.rows; i++){
           let $row = this.$wrapper.find('#r-' + i);
           let newItem = $(`<div class="cell-wrapper">\
@@ -115,7 +110,9 @@
            class="cell row-${i} col-${this.rows}" /></div>`);
           $row.append(newItem);
         }
+
         this.makeCells(this.rows, this.init);
+
         for (let id of this.currentIds){
           this.validateGrid(id);
         }
@@ -126,14 +123,12 @@
           el.prop('disabled', false);
           el.click(this.validateClicks.bind(this));
         }
-      }
-      
-      else{
+
+      }else{
         const message = 'Exceeds maximum grid size';
         this.alertBox(message);
       }
     },
-
 
     decreaseSize: function(){
       function decreaseSize(){
@@ -322,8 +317,6 @@
 
 
     validateReset: function(){
-      //to clear validation there must be 1 or 0 cells selected (and one deleted)
-      //to ensure noreinits runs there must be no selected crosspoints
       if(this.currentIds.length < 2 && !this.newCrossPoint){
         for (let cell of this.$allCells){
           cell.disabled = false;
@@ -335,40 +328,16 @@
         this.validateGrid(this.currentIds[0]);
     },
 
-    validateInWord: {
-      setup: function(targetId){
-        for (let id of root.savedCells){
-          let obj = {
-            cell: root.$wrapper.find('#' + id),
-            id: id,
-            sp: id.split("-"),
-            $id: targetId,
-            $sp: targetId.split("-"),
-          }
-        if (obj.cell.hasClass('across') ? this.run(col = 0, obj) : this.run(row = 1, obj));
-        }
-      },
-
-      run: function(index, obj){
-        if (obj.$id !== obj.id){
-          if (obj.$sp[index] !== obj.sp[index]){
-            //obj.cell.addClass('no-reinit');
-            //console.log(obj.$sp[index] + " " + obj.$id + " / " + obj.sp[index] + " " + obj.id + ' tested');
-          }
-        }
-      }
-    },
-
     setNoReinits: {
       init: function(targetId){
         const sp = targetId.split("-");
         const cell = root.$wrapper.find('#' + targetId);
         if(root.$wrapper.find('#' + targetId).hasClass('across')){
           this.getOrientation(targetId, ref = sp[0], position = 'across');
-          this.validateOtherCells(targetId, ref = sp[0], 0);
+          this.validateOtherCells(targetId, ref = sp[1], 1);
         }else{
           this.getOrientation(targetId, ref = sp[1], position = 'down');
-          this.validateOtherCells(targetId, ref = sp[1], 1);
+          this.validateOtherCells(targetId, ref = sp[0], 0);
         }
       },
 
@@ -406,7 +375,6 @@
       updateDOM: function(id){
         const cell = root.$wrapper.find('#' + id);
         if(!cell.hasClass('no-reinit-on-reset')){
-          console.log(cell);
           cell.prop('disabled', true);
           cell.addClass('no-reinit');
           root.noreinits.push(id);
@@ -414,29 +382,14 @@
       }
     },
 
-    resetNoReinits: function(xpid){
-      function checkIds(ref, pos){
-        for (let i = 1; i < root.rows + 1; i++){
-          if(pos === 'across'){
-            const cell = root.$wrapper.find('#' + ref + '-' + i);
-            cell.removeClass('no-reinit');
-          }else{
-            const cell = root.$wrapper.find('#' + i + '-' + ref);
-            cell.removeClass('no-reinit');
-          }
-        }
-      }
-
-      const cell = this.$wrapper.find('#' + xpid);
-      if(cell.hasClass('across')){
-        const colRef = (xpid.split("-"))[0];
-        checkIds(colRef, 'across');
-      }else{
-        const rowRef = (xpid.split("-"))[1];
-        checkIds(rowRef, 'down');
+    resetNoReinits: function(){
+      for (let id of root.noreinits){
+        console.log(id);
+        const cell = root.$wrapper.find('#' + id);
+        cell.removeClass('no-reinit');
+        cell.prop('disabled', false);
       }
     },
-
 
     renderClue: function(){
       this.disableButtons(true, true);
@@ -694,7 +647,7 @@
     resetGrid: {
       init: function(){
         this.disableAll();
-        this.resetNoReinits();
+        root.resetNoReinits();
         this.cacheSavedCells();
         this.resetSettings();
       },
@@ -705,13 +658,6 @@
         }
       },
 
-      resetNoReinits: function(){
-        for (let id of root.noreinits){
-          const cell = root.$wrapper.find('#' + id);
-          cell.removeClass('no-reinit');
-          cell.prop('disabled', false);
-        }
-      },
 
       cacheSavedCells: function(){
         for (let id of root.currentIds){
@@ -784,10 +730,8 @@
           tlrd.push(r);
           tlrd.push(d);
         }else if(model === 6){
-          console.log('running model 6');
           root.reverse_reinit.push(t);
           root.reverse_reinit.push(d);
-          console.log(root.reverse_reinit);
           if(colAdd > root.rows){
             tlrd.push(t);
             tlrd.push(l);
