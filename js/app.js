@@ -242,8 +242,8 @@
         this.validateGrid(e.target.id);
         this.validateWordLength();
         this.validateWordStructure();
-        this.setNoReinits(e.target.id);
-        this.validateInWord.setup(e.target.id);
+        this.setNoReinits.init(e.target.id);
+        // this.validateInWord.setup(e.target.id);
         this.validateReset();
       }else if(isSaved && isSelected){
         $el.removeClass('selected');
@@ -253,7 +253,7 @@
         this.validateGrid(e.target.id);
         this.validateWordLength();
         this.validateWordStructure();
-        this.resetNoReinits(e.target.id);
+        //this.resetNoReinits(e.target.id);
         this.validateReset();
       }
     },
@@ -359,8 +359,19 @@
       }
     },
 
-    setNoReinits: function(xpid){
-      function checkIds(ref, pos){
+    setNoReinits: {
+      init: function(xpid){
+        const cell = root.$wrapper.find('#' + xpid);
+        if(cell.hasClass('across')){
+          const colRef = (xpid.split("-"))[0];
+          this.checkIds(colRef, 'across');
+        }else{
+          const rowRef = (xpid.split("-"))[1];
+          this.checkIds(rowRef, 'down');
+        }
+      },
+
+      checkIds: function(ref, pos){
         for (let i = 1; i < root.rows + 1; i++){
           if(pos === 'across'){
             const cell = root.$wrapper.find('#' + ref + '-' + i);
@@ -381,16 +392,40 @@
           }
         }
       }
-
-      const cell = this.$wrapper.find('#' + xpid);
-      if(cell.hasClass('across')){
-        const colRef = (xpid.split("-"))[0];
-        checkIds(colRef, 'across');
-      }else{
-        const rowRef = (xpid.split("-"))[1];
-        checkIds(rowRef, 'down');
-      }
     },
+
+    // setNoReinits: function(xpid){
+    //   function checkIds(ref, pos){
+    //     for (let i = 1; i < root.rows + 1; i++){
+    //       if(pos === 'across'){
+    //         const cell = root.$wrapper.find('#' + ref + '-' + i);
+    //         if (cell.hasClass('cell')){
+    //           cell.prop('disabled', true);
+    //         } else if (!cell.hasClass('selected') && !cell.hasClass('dead-cell') && !cell.hasClass('cross-point')){
+    //           cell.addClass('no-reinit');
+    //           root.noreinits.push(ref + '-' + i);
+    //         }
+    //       }else{
+    //         const cell = root.$wrapper.find('#' + i + '-' + ref);
+    //         if (cell.hasClass('cell')){
+    //           cell.prop('disabled', true);
+    //         } else if (!cell.hasClass('selected') && !cell.hasClass('dead-cell') && !cell.hasClass('cross-point')){
+    //           cell.addClass('no-reinit');
+    //           root.noreinits.push(i + '-' + ref);
+    //         }
+    //       }
+    //     }
+    //   }
+
+    //   const cell = this.$wrapper.find('#' + xpid);
+    //   if(cell.hasClass('across')){
+    //     const colRef = (xpid.split("-"))[0];
+    //     checkIds(colRef, 'across');
+    //   }else{
+    //     const rowRef = (xpid.split("-"))[1];
+    //     checkIds(rowRef, 'down');
+    //   }
+    // },
 
     resetNoReinits: function(xpid){
       function checkIds(ref, pos){
