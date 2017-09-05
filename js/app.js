@@ -46,14 +46,13 @@
 
 
     bindEvents: function(){
-      //this.$crossword.keyup(this.validateCells.bind(this));
       this.$crossword.keyup(this.cellInputHandler.init.bind(this.cellInputHandler));
       this.$crossword.keyup(this.navigateGrid.bind(this));
       this.$crossword.keypress(this.validateInput.bind(this));
       this.$increaseBtn.click(this.increaseSize.init.bind(this.increaseSize));
       this.$decreaseBtn.click(this.decreaseSize.bind(this));
       this.$alertConfirm.click(this.alertBoxConfirm.bind(this));
-      this.$addWordBtn.click(this.renderClue.bind(this));
+      this.$addWordBtn.click(this.renderClue.init.bind(this.renderClue));
       this.$cancelClueBtn.click(this.cancelClue.bind(this));
       this.$confirmClueBtn.click(this.confirmClue.bind(this));
     },
@@ -427,6 +426,18 @@
         const cell = root.$wrapper.find('#' + id);
         cell.removeClass('no-reinit');
         cell.prop('disabled', false);
+      }
+    },
+
+    renderClue: {
+      init: function(){
+        disableButtons()
+      },
+
+      disableButtons: function(b1, b2){
+        root.$addWordBtn.attr('disabled', b1);
+        root.$increaseBtn.attr('disabled', b2);
+        root.$decreaseBtn.attr('disabled', b2);
       }
     },
 
