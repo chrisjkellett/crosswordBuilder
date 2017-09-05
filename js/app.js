@@ -8,6 +8,7 @@
       this.min = 4;
       this.sCurrentWord = '';
       this.clueCounter = 1;
+      this.validationCounter = 0;
       this.orientation = 'across';
       this.currentIds = [];
       this.json = [];
@@ -16,7 +17,7 @@
       this.savedCells = [];
       this.newCrossPoint = false;
     },
-    
+
     init: function(){
       this.settings();
       this.cacheDOM();
@@ -45,7 +46,8 @@
 
 
     bindEvents: function(){
-      this.$crossword.keyup(this.validateCells.bind(this));
+      //this.$crossword.keyup(this.validateCells.bind(this));
+      this.$crossword.keyup(this.cellInputHandler.init.bind(this.cellInputHandler));
       this.$crossword.keyup(this.navigateGrid.bind(this));
       this.$crossword.keypress(this.validateInput.bind(this));
       this.$increaseBtn.click(this.increaseSize.init.bind(this.increaseSize));
@@ -138,39 +140,6 @@
           el.prop('disabled', false);
           el.click(root.validateClicks.bind(root));
         }
-      }
-    },
-
-    increaseSize2: function(){
-      if (this.rows < this.max){
-        this.rows ++;
-        let newItem = $(`<div id="r-${this.rows}" class="_row"></div>`);
-        this.$crossword.append(newItem);
-
-        for (let i = 1; i < this.rows; i++){
-          let $row = this.$wrapper.find('#r-' + i);
-          let newItem = $(`<div class="cell-wrapper">\
-          <input type="text" maxlength="1" id="${i}-${this.rows}"\
-           class="cell row-${i} col-${this.rows}" /></div>`);
-          $row.append(newItem);
-        }
-
-        this.makeCells(this.rows, this.init);
-
-        for (let id of this.currentIds){
-          this.validateGrid(id);
-        }
-
-        for (let id of this.reverse_reinit){
-          const el = this.$wrapper.find('#' + id);
-          el.removeClass('no-reinit-on-reset');
-          el.prop('disabled', false);
-          el.click(this.validateClicks.bind(this));
-        }
-
-      }else{
-        const message = 'Exceeds maximum grid size';
-        this.alertBox(message);
       }
     },
 
@@ -269,6 +238,44 @@
       }
     },
 
+    cellInputHandler: {
+      init: function(e){
+        this.settings(e);
+        this.toggleClasses();
+      },
+
+      settings: function(e){
+        this.cell = e.target;
+        this.id = this.cell.id;
+        this.isSelected = this.cell.className.includes('selected');
+        this.noValue = this.cell.value === '';
+        this.inList = root.currentIds.includes(this.id);
+        this.isTab = e.key === 'Tab';
+      },
+
+      toggleClasses: function(){
+        if(!this.isSelected && !this.noValue && !this.inList && !this.isTab){
+          this.cell.classList.add('selected');
+          root.currentIds.push(this.id);
+          this.validate(this.id);
+        }else if (this.isSelected && this.noValue && !this.isTab){
+          this.cell.classList.remove('selected');
+          const i = root.currentIds.indexOf(this.id);
+          root.currentIds.splice(i, 1);
+          this.validate(this.id);
+        }
+      },
+
+      validate: function(id){
+        root.validateGrid(id);
+        root.validateWordLength();
+        root.validateWordStructure();
+        root.validateReset();
+        root.validationCounter ++;
+      }
+
+    },
+
     validateClicks: function(e){
       const $el = this.$wrapper.find('#' + e.target.id);
       const isSaved = $el.hasClass('savedWord');
@@ -295,6 +302,7 @@
         this.validateReset();
       }
     },
+
 
     validateGrid: function(id){
       const sp = id.split("-");
@@ -360,15 +368,19 @@
 
 
     validateReset: function(){
-      if(this.currentIds.length < 2 && !this.newCrossPoint){
+      if(this.currentIds.length < 2 && !this.newCrossPoint && this.validationCounter > 1){
         for (let cell of this.$allCells){
           cell.disabled = false;
-          //##this area needs work to avoid unnecessary 2 step resets
         }
 
       }
-      if (this.currentIds.length === 1)
+      if (this.currentIds.length === 1){
         this.validateGrid(this.currentIds[0]);
+      }
+
+      if(this.currentIds.length === 0){
+        root.validationCounter = 0;
+      }
     },
 
     setNoReinits: {
@@ -427,7 +439,6 @@
 
     resetNoReinits: function(){
       for (let id of root.noreinits){
-        console.log(id);
         const cell = root.$wrapper.find('#' + id);
         cell.removeClass('no-reinit');
         cell.prop('disabled', false);
@@ -701,20 +712,22 @@
         }
       },
 
-
       cacheSavedCells: function(){
         for (let id of root.currentIds){
-          if (!root.savedCells.includes(id)) root.savedCells.push(id);
+          if (!root.savedCells.includes(id)) {
+            root.savedCells.push(id);
+          }
         }
       },
 
       resetSettings: function(){
         root.currentIds = [];
-        if (root.newCrossPoint) this.clueCounter ++;
+        root.clueCounter ++;
         root.sCurrentWord = '';
         root.$addWordBtn.attr('disabled', true);
         root.disableButtons(true, false);
         root.newCrossPoint = false;
+        root.validationCounter = 0;
       }
     },
 
