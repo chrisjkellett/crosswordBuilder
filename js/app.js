@@ -211,33 +211,6 @@
       }
     },
 
-    validateCells: function(e){
-      const cell = e.target;
-      const id = cell.id;
-      const a = cell.className.includes('selected');
-      const b = e.target.value === '';
-      const c = this.currentIds.includes(id);
-      const isTab = e.key === 'Tab';
-
-      if (!a && !b && !c && !isTab){
-        cell.classList.add('selected');
-        this.currentIds.push(id);
-        this.validateGrid(id);
-        this.validateWordLength();
-        this.validateWordStructure();
-        this.validateReset();
-      }
-      else if (a && b && !isTab){
-        cell.classList.remove('selected');
-        const i = this.currentIds.indexOf(id);
-        this.currentIds.splice(i, 1);
-        this.validateGrid(id);
-        this.validateWordLength();
-        this.validateWordStructure();
-        this.validateReset();
-      }
-    },
-
     cellInputHandler: {
       init: function(e){
         this.settings(e);
@@ -276,33 +249,45 @@
 
     },
 
-    validateClicks: function(e){
-      const $el = this.$wrapper.find('#' + e.target.id);
-      const isSaved = $el.hasClass('savedWord');
-      const isSelected = $el.hasClass('selected');
-      if (isSaved && !isSelected && !this.newCrossPoint){
-        $el.addClass('selected');
-        this.newCrossPoint = true;
-        this.currentIds.push(e.target.id);
-        this.currentIds.sort();
-        this.validateGrid(e.target.id);
-        this.validateWordLength();
-        this.validateWordStructure();
-        this.setNoReinits.init(e.target.id);
-        this.validateReset();
-      }else if(isSaved && isSelected){
-        $el.removeClass('selected');
-        this.newCrossPoint = false;
-        const i = this.currentIds.indexOf(e.target.id);
-        this.currentIds.splice(i, 1);
-        this.validateGrid(e.target.id);
-        this.validateWordLength();
-        this.validateWordStructure();
-        this.resetNoReinits(e.target.id);
-        this.validateReset();
-      }
-    },
+    cellClickHandler: {
+      init: function(e){
+        this.settings(e);
+        this.toggleClasses();
+      },
 
+      settings: function(e){
+        this.cell = e.target;
+        this.id = this.cell.id;
+        this.isSelected = this.cell.className.includes('selected');
+        this.isSaved = this.cell.className.includes('savedWord');
+        this.noValue = this.cell.value === '';
+        this.inList = root.currentIds.includes(this.id);
+        this.isTab = e.key === 'Tab';
+      },
+
+      toggleClasses: function(){
+        if(!this.isSelected && this.isSaved){
+          this.cell.classList.add('selected');
+          root.currentIds.push(this.id);
+          this.validate(this.id, true);
+        }else if (this.isSelected && this.isSaved){
+          this.cell.classList.remove('selected');
+          const i = root.currentIds.indexOf(this.id);
+          root.currentIds.splice(i, 1);
+          this.validate(this.id, false);
+        }
+      },
+
+      validate: function(id, required){
+        root.validateGrid(id);
+        root.validateWordLength();
+        root.validateWordStructure();
+        if(required ? root.setNoReinits.init(id) : root.resetNoReinits(id));
+        root.validationCounter ++;
+        root.validateReset();
+      }
+
+    },
 
     validateGrid: function(id){
       const sp = id.split("-");
@@ -654,7 +639,7 @@
         if(!isSaved){
           cell.addClass('savedWord');
           cell.addClass(this.orientation);
-          cell.click(this.validateClicks.bind(this));
+          cell.click(this.cellClickHandler.init.bind(this.cellClickHandler));
         }else{
           cell.addClass('cross-point');
           const getOrientation = cell.hasClass('across') ? 'across' : 'down';
