@@ -15,6 +15,7 @@
       this.noreinits = [];
       this.reverse_reinit = [];
       this.savedCells = [];
+      this.deadCells = [];
       this.newCrossPoint = false;
     },
 
@@ -103,6 +104,7 @@
           this.addCellstoColumn();
           root.cacheCells();
           this.revalidate();
+          this.runNoReinits();
           this.checkinvalids();
         }else{
           const message = 'Exceeds maximum grid size';
@@ -129,6 +131,13 @@
       revalidate: function(){
         for (let id of root.currentIds){
           root.validateGrid(id);
+        }
+      },
+
+      runNoReinits: function(){
+        if (root.currentIds.length !== 0){
+          root.setNoReinits.init(root.currentIds[0]);
+          //##flaw - needs to be cycled through?
         }
       },
 
@@ -283,6 +292,7 @@
         root.validateWordStructure();
         if(required ? root.setNoReinits.init(id) : root.resetNoReinits(id));
         root.validationCounter ++;
+        if(root.json.length > 1) root.validateByAxis.init(id);
         root.validateReset();
       }
 
@@ -301,6 +311,37 @@
       }
     },
 
+
+    validateByAxis: {
+      init: function(id){
+        this.settings(id);
+        this.locateDeadCells();
+        if (root.deadCells.length > 0) this.validate(id);
+      },
+
+      settings: function(id){
+        this.sp = id.split("-");
+        this.cell = root.$wrapper.find('#' + id);
+        this.orientation = this.cell.hasClass('across') ? 'down' : 'across';
+        this.index = this.orientation === 'down' ? 1 : 0;
+        this.list = [];
+      },
+
+      locateDeadCells: function(){
+        for (let i = 1; i < root.rows + 1; i++){
+          let id = this.orientation === 'down' ? this.sp[this.index] + '-' + i : i + '-' + this.sp[this.index];
+          this.list.push(id);
+        }
+      },
+
+      validate: function(){
+        console.log(id);
+        console.log(this.list);
+        console.log(root.deadCells);
+      }
+
+    },
+    
 
     validateWordLength: function(){
       if (this.currentIds.length < 2)
@@ -474,7 +515,6 @@
         const firstCellHasNumber = this.checkFirstCell();
         if (firstCellHasNumber) root.clueCounter ++;
       },
-      
     },
 
     confirmClue: function(){
@@ -523,6 +563,7 @@
         const cell = root.$wrapper.find('#' + id);
         cell.removeClass('cell');
         cell.addClass('dead-cell');
+        root.deadCells.push(id);
         cell.prop('disabled', true);
       }
   
@@ -842,6 +883,7 @@
           const cell = root.$wrapper.find('#' + id);
           cell.removeClass('cell');
           cell.addClass('dead-cell');
+          root.deadCells.push(id);
           root.cacheCells();
         },
 
