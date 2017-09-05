@@ -17,7 +17,6 @@
       this.newCrossPoint = false;
     },
 
-    
     init: function(){
       this.settings();
       this.cacheDOM();
