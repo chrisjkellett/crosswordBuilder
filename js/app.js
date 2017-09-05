@@ -53,7 +53,7 @@
       this.$decreaseBtn.click(this.decreaseSize.bind(this));
       this.$alertConfirm.click(this.alertBoxConfirm.bind(this));
       this.$addWordBtn.click(this.renderClue.init.bind(this.renderClue));
-      this.$cancelClueBtn.click(this.cancelClue.bind(this));
+      this.$cancelClueBtn.click(this.renderClue.cancelClue.bind(this.renderClue));
       this.$confirmClueBtn.click(this.confirmClue.bind(this));
     },
     
@@ -431,52 +431,55 @@
 
     renderClue: {
       init: function(){
-        disableButtons()
+        this.disableButtons(true, true);
+        this.captureText();
+        this.addClueAndReference();
+        this.togglePromptBox('block');
       },
 
       disableButtons: function(b1, b2){
         root.$addWordBtn.attr('disabled', b1);
         root.$increaseBtn.attr('disabled', b2);
         root.$decreaseBtn.attr('disabled', b2);
-      }
+      },
+
+      captureText: function(){
+        for(let id of root.currentIds){
+          let letter = root.$wrapper.find('#' + id).val();
+          root.sCurrentWord += letter.toLowerCase();
+        }
+      },
+
+      addClueAndReference: function(){
+        root.$insertClue.text(root.sCurrentWord);
+        const firstCellHasNumber = this.checkFirstCell();
+        if (firstCellHasNumber) root.clueCounter --;
+        root.$insertReference.text(root.clueCounter + ' ' + root.orientation);
+      },
+
+      checkFirstCell: function(){
+        const firstCell = root.$wrapper.find('#' + root.currentIds[0]);
+        const firstCellHasNumber = firstCell.attr('data-ep') === 'sp';
+        return firstCellHasNumber;
+      },
+
+      togglePromptBox: function(x){
+        root.$clueBox.css('display', x);
+      },
+
+      cancelClue: function(){
+        root.$clueBox.css('display', 'none');
+        root.sCurrentWord = '';
+        this.disableButtons(false, false);
+        const firstCellHasNumber = this.checkFirstCell();
+        if (firstCellHasNumber) root.clueCounter ++;
+      },
+      
     },
-
-    renderClue: function(){
-      this.disableButtons(true, true);
-      this.captureClue();
-      this.addClueAndReference();
-      this.togglePromptBox('block');
-    },
-
-
-    disableButtons: function(b1, b2){
-      this.$addWordBtn.attr('disabled', b1);
-      this.$increaseBtn.attr('disabled', b2);
-      this.$decreaseBtn.attr('disabled', b2);
-    },
-
-    captureClue: function(){
-      for(let id of this.currentIds){
-        let letter = this.$wrapper.find('#' + id).val();
-        this.sCurrentWord += letter.toLowerCase();
-      }
-    },
-
-
-    addClueAndReference: function(){
-      this.$insertClue.text(this.sCurrentWord);
-      this.$insertReference.text(this.clueCounter + ' ' + this.orientation);
-    },
-
-
-    togglePromptBox: function(x){
-      this.$clueBox.css('display', x);
-    },
-
 
     confirmClue: function(){
       this.saveAsJSON.save();
-      this.togglePromptBox('none');
+      this.renderClue.togglePromptBox('none');
       this.validateEndPoint();
       this.addNumber();
       this.addClasses();
@@ -688,12 +691,6 @@
       $clueList.append(newItem);
     },
 
-    cancelClue: function(){
-      this.$clueBox.css('display', 'none');
-      this.sCurrentWord = '';
-      this.disableButtons(false, false);
-    },
-
     resetGrid: {
       init: function(){
         this.disableAll();
@@ -721,7 +718,7 @@
         root.clueCounter ++;
         root.sCurrentWord = '';
         root.$addWordBtn.attr('disabled', true);
-        root.disableButtons(true, false);
+        root.renderClue.disableButtons(true, false);
         root.newCrossPoint = false;
         root.validationCounter = 0;
       }
