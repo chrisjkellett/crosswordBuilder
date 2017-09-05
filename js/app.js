@@ -16,14 +16,13 @@
       this.savedCells = [];
       this.newCrossPoint = false;
     },
-
+    
     init: function(){
       this.settings();
       this.cacheDOM();
       this.bindEvents();
       this.generateGrid();
     },
-
 
     cacheDOM: function(){
       this.$wrapper = $('#crosswordWrapper');
@@ -49,7 +48,7 @@
       this.$crossword.keyup(this.validateCells.bind(this));
       this.$crossword.keyup(this.navigateGrid.bind(this));
       this.$crossword.keypress(this.validateInput.bind(this));
-      this.$increaseBtn.click(this.increaseSize.bind(this));
+      this.$increaseBtn.click(this.increaseSize.init.bind(this.increaseSize));
       this.$decreaseBtn.click(this.decreaseSize.bind(this));
       this.$alertConfirm.click(this.alertBoxConfirm.bind(this));
       this.$addWordBtn.click(this.renderClue.bind(this));
@@ -59,7 +58,7 @@
     
     generateGrid: function(){
       for (let i = 1; i < this.rows + 1; i++){
-        let newItem = $(`<div id="r-${i}" class="_row"></div>`);
+        let newItem = $(`<div id="r-${i}"></div>`);
         this.$crossword.append(newItem);
       }
       this.makeCells();
@@ -95,8 +94,54 @@
       this.$alertBox.css('display', 'none');
     },
 
+    increaseSize: {
+      init: function(){
+        if (root.rows < root.max){
+          this.addRow();
+          root.makeCells();
+          this.addCellstoColumn();
+          root.cacheCells();
+          this.revalidate();
+          this.checkinvalids();
+        }else{
+          const message = 'Exceeds maximum grid size';
+          root.alertBox(message);
+        }
+      },
 
-    increaseSize: function(){
+      addRow: function(){
+        root.rows ++;
+        const newItem = $(`<div id="r-${root.rows}"></div>`);
+        root.$crossword.append(newItem);
+      },
+
+      addCellstoColumn: function(){
+        for (let i = 1; i < root.rows; i++){
+          let row = root.$wrapper.find('#r-' + i);
+          let newItem = $(`<div class="cell-wrapper">\
+          <input type="text" maxlength="1" id="${i}-${root.rows}"\
+           class="cell row-${i} col-${root.rows}" /></div>`);
+          row.append(newItem);
+        }
+      },
+
+      revalidate: function(){
+        for (let id of root.currentIds){
+          root.validateGrid(id);
+        }
+      },
+
+      checkinvalids: function(){
+        for (let id of root.reverse_reinit){
+          const el = root.$wrapper.find('#' + id);
+          el.removeClass('no-reinit-on-reset');
+          el.prop('disabled', false);
+          el.click(root.validateClicks.bind(root));
+        }
+      }
+    },
+
+    increaseSize2: function(){
       if (this.rows < this.max){
         this.rows ++;
         let newItem = $(`<div id="r-${this.rows}" class="_row"></div>`);
@@ -237,7 +282,6 @@
         this.validateWordLength();
         this.validateWordStructure();
         this.setNoReinits.init(e.target.id);
-        // this.validateInWord.setup(e.target.id);
         this.validateReset();
       }else if(isSaved && isSelected){
         $el.removeClass('selected');
