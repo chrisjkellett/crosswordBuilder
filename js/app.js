@@ -554,7 +554,7 @@
       this.addClasses();
       this.addAttributes();
       this.validateCrossPoint();
-      this.writeClueToPage();
+      this.writeClueToPage.init();
       this.resetGrid.init();
     },
 
@@ -568,7 +568,7 @@
   
       save: function(){
         const clue = new this.newClue(root.sCurrentWord, 
-                    (root.clueCounter) + ' ' + root.orientation, 
+                    (root.clueCounter) + '-' + root.orientation, 
                     root.currentIds,
                     root.$clueEntry.val());
         root.json.push(clue);
@@ -747,9 +747,9 @@
       }
     },
 
-    writeClueToPage: function(){
+    writeClueToPage2: function(){
       const $clueList = this.$wrapper.find('#' + this.orientation);
-      const newItem = (`<div id="${this.clueCounter}-${this.orientation}" class="clue-wrapper"\>
+      const newItem = $(`<div id="${this.clueCounter}-${this.orientation}" class="clue-wrapper"\>
                           <p class="font-clue">${root.clueCounter}. ${this.$clueEntry.val() || '-'}</p>\
                           <div>\
                             <button class="delete-button">\
@@ -757,8 +757,59 @@
                             </button>\
                           </div>\
                         </div>`);
+      const $button = newItem.find('.delete-button');
+      $button.click(root.deleteClue);
       if(this.clueCounter === 1) this.$clueList.css('display', 'block');
       $clueList.append(newItem);
+    },
+
+    writeClueToPage: {
+      init: function(){
+        const clueList = this.getClueList();
+        const newItem = this.createElement();
+        this.bindEvent(newItem);
+        this.updateDOM(clueList, newItem);
+      },
+
+      getClueList: function(){
+        const $clueList = root.$wrapper.find('#' + root.orientation);
+        return $clueList;
+      },
+
+      createElement: function(){
+        const newItem = $(`<div id="${root.clueCounter}-${root.orientation}" class="clue-wrapper"\>
+                        <p class="font-clue">${root.clueCounter}. ${root.$clueEntry.val() || '-'}</p>\
+                        <div>\
+                          <span class="delete-button glyphicon glyphicon-trash" id="${root.clueCounter}-${root.orientation}"></span>\
+                        </div>\
+                      </div>`);
+        return newItem;
+      },
+
+      bindEvent: function(newItem){
+        const $button = newItem.find('.delete-button');
+        $button.click(root.deleteClue.init.bind(root.deleteClue));
+      },
+
+      updateDOM: function(clueList, newItem){
+        if(root.clueCounter === 1) root.$clueList.css('display', 'block');
+        clueList.append(newItem);
+      }
+    },
+
+    deleteClue: {
+      init: function(e){
+        const id = e.target.id;
+        let key = this.getFromJSON(id);
+      },
+
+      getFromJSON: function(id){
+        $.each(root.json, function(key, value){
+            if (value.reference === id){
+              return key;
+            }
+        });
+      }
     },
 
     resetGrid: {
