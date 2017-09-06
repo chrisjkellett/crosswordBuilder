@@ -146,7 +146,7 @@
           const el = root.$wrapper.find('#' + id);
           el.removeClass('no-reinit-on-reset');
           el.prop('disabled', false);
-          el.click(root.validateClicks.bind(root));
+          el.click(root.cellClickHandler.init.bind(root.cellClickHandler));
         }
       }
     },
@@ -292,7 +292,7 @@
         root.validateWordStructure();
         if(required ? root.setNoReinits.init(id) : root.resetNoReinits(id));
         root.validationCounter ++;
-        if(root.json.length > 1) root.validateByAxis.init(id);
+        if(root.json.length > 1 && !this.isSelected) root.validateByAxis.init(id);
         root.validateReset();
       }
 
@@ -313,33 +313,62 @@
 
 
     validateByAxis: {
-      init: function(id){
-        this.settings(id);
-        this.locateDeadCells();
-        if (root.deadCells.length > 0) this.validate(id);
+      init: function(targetId){
+        this.settings(targetId);
+        this.createArray();
+        if (this.deadIdsArray.length > 0) this.prevalidate();
       },
 
-      settings: function(id){
-        this.sp = id.split("-");
-        this.cell = root.$wrapper.find('#' + id);
+      settings: function(targetId){
+        this.sp = targetId.split("-");
+        this.cell = root.$wrapper.find('#' + targetId);
         this.orientation = this.cell.hasClass('across') ? 'down' : 'across';
         this.index = this.orientation === 'down' ? 1 : 0;
-        this.list = [];
+        this.elsArray = [];
+        this.deadIdsArray = [];
       },
 
-      locateDeadCells: function(){
+      createArray: function(){
         for (let i = 1; i < root.rows + 1; i++){
-          let id = this.orientation === 'down' ? this.sp[this.index] + '-' + i : i + '-' + this.sp[this.index];
-          this.list.push(id);
+          if(this.orientation === 'down'){
+            let id = i + '-' + this.sp[this.index];
+            let cell = root.$wrapper.find('#' + id);
+            this.getDeadCells(cell, id);
+            this.elsArray.push(cell);
+          }else{
+            let id = this.sp[this.index] + '-' + i;
+            let cell = root.$wrapper.find('#' + id);
+            this.getDeadCells(cell, id);
+            this.elsArray.push(cell);
+          }
         }
       },
 
-      validate: function(){
-        console.log(id);
-        console.log(this.list);
-        console.log(root.deadCells);
-      }
+      getDeadCells: function(cell, id){
+        if (cell.hasClass('dead-cell')){ 
+          this.deadIdsArray.push(id);
+          }
+      },
 
+      prevalidate: function(){
+        this.index = this.orientation === 'down' ? 0 : 1;
+        const $sp = this.deadIdsArray[0].split("-");
+        const target_ = this.sp[this.index];
+        const dead_ = $sp[this.index];
+        this.validate(+target_, +dead_);
+      },
+
+      validate: function(target_, dead_){
+        if (target_ > dead_){
+          for (let i = 0; i < dead_ - 1; i++){
+           this.elsArray[i].prop('disabled', true);
+          }
+        }else{
+          for (let i = target_ + 1; i < root.rows; i++){
+            this.elsArray[i].prop('disabled', true);
+          }
+        }
+      }
     },
     
 
