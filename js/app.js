@@ -43,6 +43,7 @@
       this.$clueEntry = this.$wrapper.find('#clueEntry');
       this.$cancelClueBtn = this.$wrapper.find('#cancelClue');
       this.$clueList = this.$wrapper.find('#clueList');
+      this.$makeCrossword = this.$wrapper.find('#makeCrossword');
     },
 
 
@@ -56,6 +57,7 @@
       this.$addWordBtn.click(this.renderClue.init.bind(this.renderClue));
       this.$cancelClueBtn.click(this.renderClue.cancelClue.bind(this.renderClue));
       this.$confirmClueBtn.click(this.confirmClue.bind(this));
+      this.$makeCrossword.click(this.makeCrossword.init.bind(this.makeCrossword));
     },
     
     generateGrid: function(){
@@ -371,7 +373,6 @@
       }
     },
     
-
     validateWordLength: function(){
       if (this.currentIds.length < 2)
         this.$addWordBtn.attr('disabled', true);
@@ -540,6 +541,7 @@
       cancelClue: function(){
         root.$clueBox.css('display', 'none');
         root.sCurrentWord = '';
+        root.$clueEntry.val(" ");
         this.disableButtons(false, false);
         const firstCellHasNumber = this.checkFirstCell();
         if (firstCellHasNumber) root.clueCounter ++;
@@ -801,6 +803,7 @@
       init: function(e){
         const id = e.target.id;
         let key = this.getFromJSON(id);
+        this.delete();
       },
 
       getFromJSON: function(id){
@@ -809,6 +812,11 @@
               return key;
             }
         });
+      },
+
+      delete: function(){
+        const message = 'Coming to version 1.3';
+        root.alertBox(message);
       }
     },
 
@@ -818,6 +826,7 @@
         root.resetNoReinits();
         this.cacheSavedCells();
         this.resetSettings();
+        this.validSize();
       },
 
       disableAll: function(){
@@ -836,12 +845,27 @@
 
       resetSettings: function(){
         root.currentIds = [];
+        root.$clueEntry.val(" ");
         root.clueCounter ++;
         root.sCurrentWord = '';
         root.$addWordBtn.attr('disabled', true);
         root.renderClue.disableButtons(true, false);
         root.newCrossPoint = false;
         root.validationCounter = 0;
+      },
+
+      validSize: function(){
+        if (root.json.length < 4)
+          root.$makeCrossword.attr('disabled', true);
+        else
+          root.$makeCrossword.removeAttr('disabled');
+      }
+    },
+
+    makeCrossword: {
+      init: function(){
+        const message = 'Work in progress. Clicking here generates a URL with the crossword to be completed';
+        root.alertBox(message);
       }
     },
 
