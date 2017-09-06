@@ -1,6 +1,6 @@
 
 /*imports*/
-@import url('https://fonts.googleapis.com/css?family=Raleway:300,500,600,800');
+@import url('https://fonts.googleapis.com/css?family=Raleway:300,400,500,600,800');
 @import url('https://fonts.googleapis.com/css?family=Poiret+One');
 
 
@@ -37,6 +37,10 @@ header{
 
 .wrapper{
     position:relative;
+}
+
+#withoutClueList{
+    margin-bottom: 20px;
 }
 
 .divider{
@@ -147,6 +151,10 @@ header{
 
 #clueList{
     display:none;
+},
+
+#welcomeList{
+    display: block;
 }
 
 .clue-wrapper{
@@ -381,6 +389,9 @@ input[disabled]{
 .font-small{
     font-size: 14.44px;
     font-weight: 600;
+}
+.font-lightest{
+    font-weight: 400;
 }
 
 .font-clue{

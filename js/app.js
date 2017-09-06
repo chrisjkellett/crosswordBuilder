@@ -44,6 +44,7 @@
       this.$cancelClueBtn = this.$wrapper.find('#cancelClue');
       this.$clueList = this.$wrapper.find('#clueList');
       this.$makeCrossword = this.$wrapper.find('#makeCrossword');
+      this.$welcome = this.$wrapper.find('#welcomeInfo');
     },
 
 
@@ -749,22 +750,6 @@
       }
     },
 
-    writeClueToPage2: function(){
-      const $clueList = this.$wrapper.find('#' + this.orientation);
-      const newItem = $(`<div id="${this.clueCounter}-${this.orientation}" class="clue-wrapper"\>
-                          <p class="font-clue">${root.clueCounter}. ${this.$clueEntry.val() || '-'}</p>\
-                          <div>\
-                            <button class="delete-button">\
-                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>\
-                            </button>\
-                          </div>\
-                        </div>`);
-      const $button = newItem.find('.delete-button');
-      $button.click(root.deleteClue);
-      if(this.clueCounter === 1) this.$clueList.css('display', 'block');
-      $clueList.append(newItem);
-    },
-
     writeClueToPage: {
       init: function(){
         const clueList = this.getClueList();
@@ -794,7 +779,10 @@
       },
 
       updateDOM: function(clueList, newItem){
-        if(root.clueCounter === 1) root.$clueList.css('display', 'block');
+        if(root.clueCounter === 1){
+          root.$clueList.css('display', 'block');
+          root.$welcome.css('display', 'none');
+        }
         clueList.append(newItem);
       }
     },
