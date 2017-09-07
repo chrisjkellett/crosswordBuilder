@@ -52,6 +52,7 @@
       this.$crossword.keyup(this.cellInputHandler.init.bind(this.cellInputHandler));
       this.$crossword.keyup(this.navigateGrid.bind(this));
       this.$crossword.keypress(this.validateInput.bind(this));
+      this.$crossword.keypress(this.renderByEnter.bind(this));
       this.$increaseBtn.click(this.increaseSize.init.bind(this.increaseSize));
       this.$decreaseBtn.click(this.decreaseSize.bind(this));
       this.$alertConfirm.click(this.alertBoxConfirm.bind(this));
@@ -59,6 +60,8 @@
       this.$cancelClueBtn.click(this.renderClue.cancelClue.bind(this.renderClue));
       this.$confirmClueBtn.click(this.confirmClue.bind(this));
       this.$makeCrossword.click(this.makeCrossword.init.bind(this.makeCrossword));
+      this.$clueEntry.change(this.confirmClue.bind(this));
+
     },
     
     generateGrid: function(){
@@ -263,7 +266,7 @@
     cellClickHandler: {
       init: function(e){
         this.settings(e);
-        this.toggleClasses();
+        this.toggleClasses(e);
       },
 
       settings: function(e){
@@ -276,9 +279,10 @@
         this.isTab = e.key === 'Tab';
       },
 
-      toggleClasses: function(){
+      toggleClasses: function(e){
         if(!this.isSelected && this.isSaved){
           this.cell.classList.add('selected');
+          this.cell.readOnly = true;
           root.currentIds.push(this.id);
           this.validate(this.id, true);
         }else if (this.isSelected && this.isSaved){
@@ -499,6 +503,10 @@
         cell.removeClass('no-reinit');
         cell.prop('disabled', false);
       }
+    },
+
+    renderByEnter: function(e){
+      console.log(e);
     },
 
     renderClue: {
@@ -810,14 +818,14 @@
 
     resetGrid: {
       init: function(){
-        this.disableAll();
+        this.enableAll();
         root.resetNoReinits();
         this.cacheSavedCells();
         this.resetSettings();
         this.validSize();
       },
 
-      disableAll: function(){
+      enableAll: function(){
         for (let cell of root.$allCells){
           cell.disabled = false;
         }
