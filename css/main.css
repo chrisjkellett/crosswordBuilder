@@ -265,6 +265,10 @@ input[disabled]{
     background: #ffff99 !important;
 }
 
+.selected::selection{
+    background: transparent;
+}
+
 .cross-point, .no-reinit, .no-reinit-on-reset{
     background: #e4e4e4 !important;
      -webkit-appearance: none;

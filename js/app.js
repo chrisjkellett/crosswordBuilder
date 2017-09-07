@@ -229,11 +229,14 @@
       init: function(e){
         this.settings(e);
         this.toggleClasses();
+        //this.changeFocus();
+        this.autoSelect();
       },
 
       settings: function(e){
         this.cell = e.target;
         this.id = this.cell.id;
+        this.splitId = this.id.split("-");
         this.isSelected = this.cell.className.includes('selected');
         this.noValue = this.cell.value === '';
         this.inList = root.currentIds.includes(this.id);
@@ -259,6 +262,23 @@
         root.validateWordStructure();
         root.validateReset();
         root.validationCounter ++;
+      },
+
+      changeFocus: function(){
+        //##potentially delete
+        if (root.currentIds.length > 1){
+          if(root.orientation === 'across'){
+            const nextId = this.splitId[0] + '-' + (+this.splitId[1] + 1);
+            const nextCell = root.$wrapper.find('#' + nextId);
+            nextCell.focus();
+          }else{
+
+          }
+        }
+      },
+
+      autoSelect: function(){
+        this.cell.select();
       }
 
     },
@@ -267,11 +287,13 @@
       init: function(e){
         this.settings(e);
         this.toggleClasses(e);
+        this.autoFocus();
       },
 
       settings: function(e){
         this.cell = e.target;
         this.id = this.cell.id;
+        this.splitId = this.id.split("-");
         this.isSelected = this.cell.className.includes('selected');
         this.isSaved = this.cell.className.includes('savedWord');
         this.noValue = this.cell.value === '';
@@ -301,6 +323,20 @@
         root.validationCounter ++;
         if(root.json.length > 1 && !this.isSelected) root.validateByAxis.init(id);
         root.validateReset();
+      },
+
+      autoFocus: function(){
+        if(root.currentIds.length > 0){
+          if(root.orientation === 'down'){
+            const nextId = this.splitId[0] + '-' + (+this.splitId[1] + 1);
+            const nextCell = root.$wrapper.find('#' + nextId);
+            nextCell.focus();
+          }else{
+            const nextId = (+this.splitId[0] + 1) + '-' + this.splitId[1];
+            const nextCell = root.$wrapper.find('#' + nextId);
+            nextCell.focus();
+          }
+        }
       }
 
     },
@@ -419,7 +455,7 @@
 
 
     validateInput: function(e){
-      if (e.charCode < 64 || e.charCode > 122) {
+      if (e.charCode < 64 && e.charCode !== 13|| e.charCode > 122 && e.charCode !== 13) {
         const message = 'Non alphanumeric characters cannot form part of a word';
         e.preventDefault();
         this.alertBox(message);
@@ -506,7 +542,10 @@
     },
 
     renderByEnter: function(e){
-      console.log(e);
+      if(e.charCode === 13){
+      this.renderClue.init();
+      root.$clueEntry.focus();
+      }
     },
 
     renderClue: {
@@ -563,6 +602,7 @@
       this.validateEndPoint();
       this.addNumber();
       this.addClasses();
+      this.cacheCells();
       this.addAttributes();
       this.validateCrossPoint();
       this.writeClueToPage.init();
@@ -797,22 +837,34 @@
 
     deleteClue: {
       init: function(e){
-        const id = e.target.id;
-        let key = this.getFromJSON(id);
-        this.delete();
+        const key = this.getFromJSON(e.target.id);
+        this.getHTML(e.target.id);
+        // this.alert();
+        this.delete(key);
+      },
+
+      getHTML: function(id){
+        console.log(id);
       },
 
       getFromJSON: function(id){
+        let getIndex;
         $.each(root.json, function(key, value){
             if (value.reference === id){
-              return key;
+              getIndex = key;
             }
-        });
+          });
+          return getIndex;
       },
 
-      delete: function(){
+      alert: function(){
         const message = 'Coming to version 1.3';
         root.alertBox(message);
+      },
+
+      delete: function(key){
+        const object = root.json[key];
+        console.log(object);
       }
     },
 
