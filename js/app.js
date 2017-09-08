@@ -608,6 +608,7 @@
         this.addAttributes();
         this.validateCrossPoint();
         this.saveAsJSON.save();
+        this.saveAsJSON.checkForCrossPoints();      
         this.writeClueToPage.init();
         root.resetGrid.init();
       },
@@ -768,6 +769,55 @@
                       root.$clueEntry.val(),
                       root.associatedDeadCells.sort());
           root.json.push(clue);
+        },
+
+        checkForCrossPoints: function(){
+          let cell, isCrossPoint;
+          let crosspointArray = [];
+          for (let id of root.currentIds){
+            cell = root.$wrapper.find('#' + id);
+            isCrossPoint = cell.hasClass('cross-point');
+            if (isCrossPoint){
+              crosspointArray.push(cell);
+            }
+          }
+          if (crosspointArray.length > 0) {
+            this.assessCrossPoints(crosspointArray);
+          }
+        },
+
+        assessCrossPoints: function(crosspointArray){
+          let clueIdArray = [];
+          for (let item of crosspointArray){
+            clueIdArray.push(item.attr('clueId'));
+          }
+          this.loopCrossPoints(clueIdArray);
+        },
+
+        loopCrossPoints: function(clueIdArray){
+          let getAssociation;
+          let sp;
+          let currentReference = root.clueCounter + '-' + root.orientation;
+          for (let clueId of clueIdArray){
+            sp = clueId.split('/');
+            if (currentReference === sp[0]){
+              this.getKey(sp[1]);
+            }else{
+              this.getKey(sp[0]);
+            }
+          }
+        },
+
+        getKey: function(clueId){
+          $.each(root.json, function(key, value){
+            if (value.reference === clueId){
+              root.confirmClue.saveAsJSON.getAssociatedCrossPoints(key);
+            }
+          }); 
+        },
+
+        getAssociatedCrossPoints: function(key){
+          console.log(root.json[key]);
         }
       },
   
@@ -781,11 +831,15 @@
             cell.addClass('savedWord');
             cell.addClass(root.orientation);
             cell.click(root.cellClickHandler.init.bind(root.cellClickHandler));
+            cell.attr('clueId', root.clueCounter + '-' + root.orientation);
           }else{
             cell.addClass('cross-point');
             const getOrientation = cell.hasClass('across') ? 'across' : 'down';
             cell.removeClass(getOrientation);
-            cell.off();
+            cell.off(); 
+            cell.attr('clueId', function(i, val){
+              return val + '/' + root.clueCounter + '-' + root.orientation;
+            });
           }
         }
       },
