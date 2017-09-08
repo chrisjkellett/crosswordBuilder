@@ -59,9 +59,10 @@
       this.$alertConfirm.click(this.alertBoxConfirm.bind(this));
       this.$addWordBtn.click(this.renderClue.init.bind(this.renderClue));
       this.$cancelClueBtn.click(this.renderClue.cancelClue.bind(this.renderClue));
-      this.$confirmClueBtn.click(this.confirmClue.bind(this));
+      //this.$confirmClueBtn.click(this.confirmClue.bind(this));
+      this.$confirmClueBtn.click(this.confirmClue.init.bind(this.confirmClue));
       this.$makeCrossword.click(this.makeCrossword.init.bind(this.makeCrossword));
-      this.$clueEntry.change(this.confirmClue.bind(this));
+      this.$clueEntry.change(this.confirmClue.init.bind(this.confirmClue));
 
     },
     
@@ -597,256 +598,258 @@
       },
     },
 
-    confirmClue: function(){
-      this.renderClue.togglePromptBox('none');
-      this.validateEndPoint();
-      this.addNumber();
-      this.addClasses();
-      this.cacheCells();
-      this.addAttributes();
-      this.validateCrossPoint();
-      this.saveAsJSON.save();
-      this.writeClueToPage.init();
-      this.resetGrid.init();
-    },
-
-    addNumber: function(){
-      const $firstLetter = this.$wrapper.find('#' + this.currentIds[0]);
-      const newItem = (`<div class="number-wrapper">${this.clueCounter}</div>`);
-      const hasSibling = $firstLetter.siblings().length === 1;
-      if (!hasSibling){
-        $firstLetter.parent().prepend(newItem);
-      }
-    },
-
-    validateEndPoint: function(){
-      const sp1 = this.currentIds[0].split("-");
-      const sp2 = this.currentIds[this.currentIds.length - 1].split("-");
-
-      function blackOutCell(id){
-        const cell = root.$wrapper.find('#' + id);
-        cell.removeClass('cell');
-        cell.addClass('dead-cell');
-        root.deadCells.push(id);
-        root.associatedDeadCells.push(id);
-        cell.prop('disabled', true);
-      }
-  
-      if (this.orientation === 'across') {
-        const row = +sp1[0];
-        const l = +sp1[1]; 
-        const r = +sp2[1];
-        const lId = row + "-" + (l - 1);
-        const rId = row + '-' + (r + 1);
-  
-        if (r < this.rows) blackOutCell(rId);
-        if ((l - 1) !== 0) blackOutCell(lId);    
-  
-      }else if (this.orientation === 'down') {
-        const col = +sp1[1];
-        const u = +sp1[0];
-        const d = +sp2[0];
-        const dId = (d + 1) + '-' + col;
-        const uId = (u - 1) + '-' + col;
-  
-        if (d <= this.rows) blackOutCell(dId);
-        if ((u - 1) !== 0) blackOutCell(uId);
-      }
-      this.cacheCells();
-    },
-
-    validateCrossPoint: function(){
-      for (let id of this.currentIds){
-        const el = this.$wrapper.find('#' + id);
-        const isCrossPoint = el.hasClass('cross-point');
-        const ep = el.attr('data-ep');
-        const x = id.split("-");
-        let model;
-        if (this.orientation === 'across' && isCrossPoint){
-          if(id === this.currentIds[0]){
-            if (ep === 'sp'){
-              this.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
-              this.helperFunctions.noreinitOnReset(x, model = 1);
-            }else if (ep === 'fp'){
-              this.helperFunctions.deadCellsForCrossPoint.topRight(x);
-              this.helperFunctions.noreinitOnReset(x, model = 7);
-            }else{
-              this.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
-              this.helperFunctions.deadCellsForCrossPoint.topRight(x);
-              this.helperFunctions.noreinitOnReset(x, model = 4);
-            }
-          }else if(id === this.currentIds[this.currentIds.length - 1]){
-            if (ep === 'sp'){
-              this.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
-              this.helperFunctions.noreinitOnReset(x, model = 3);
-            }else if (ep === 'fp'){
-              this.helperFunctions.deadCellsForCrossPoint.topLeft(x);
-              this.helperFunctions.noreinitOnReset(x, model = 9);
-            }else{
-              this.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
-              this.helperFunctions.deadCellsForCrossPoint.topLeft(x);
-              this.helperFunctions.noreinitOnReset(x, model = 6);
-            }
-          }else{
-            if (ep === 'sp'){
-              this.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
-              this.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
-              this.helperFunctions.noreinitOnReset(x, model = 2);
-            }else if (ep === 'fp'){
-              this.helperFunctions.deadCellsForCrossPoint.topLeft(x);
-              this.helperFunctions.deadCellsForCrossPoint.topRight(x);
-              this.helperFunctions.noreinitOnReset(x, model = 8);
-            }else{
-              this.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
-              this.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
-              this.helperFunctions.deadCellsForCrossPoint.topLeft(x);
-              this.helperFunctions.deadCellsForCrossPoint.topRight(x);
-              this.helperFunctions.noreinitOnReset(x, model = 5);
-            }
-          }
-        }else if (this.orientation === 'down' && isCrossPoint){
-          if(id === this.currentIds[0]){
-            if (ep === 'sp'){
-              this.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
-              this.helperFunctions.noreinitOnReset(x, model = 1);
-            }else if (ep === 'fp'){
-              this.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
-              this.helperFunctions.noreinitOnReset(x, model = 3);
-            }else{
-              this.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
-              this.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
-              this.helperFunctions.noreinitOnReset(x, model = 2);
-            }
-          }else if(id === this.currentIds[this.currentIds.length - 1]){
-            if (ep === 'sp'){
-              this.helperFunctions.deadCellsForCrossPoint.topRight(x);
-              this.helperFunctions.noreinitOnReset(x, model = 7);
-            }else if (ep === 'fp'){
-              this.helperFunctions.deadCellsForCrossPoint.topLeft(x);
-              this.helperFunctions.noreinitOnReset(x, model = 9);
-            }else{
-              this.helperFunctions.deadCellsForCrossPoint.topRight(x);
-              this.helperFunctions.deadCellsForCrossPoint.topLeft(x);
-              this.helperFunctions.noreinitOnReset(x, model = 8);
-            }
-          }else{
-            if (ep === 'sp'){
-              this.helperFunctions.deadCellsForCrossPoint.topRight(x);
-              this.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
-              this.helperFunctions.noreinitOnReset(x, model = 4);
-            }else if (ep === 'fp'){
-              this.helperFunctions.deadCellsForCrossPoint.topLeft(x);
-              this.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
-              this.helperFunctions.noreinitOnReset(x, model = 6);
-            }else{
-              this.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
-              this.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
-              this.helperFunctions.deadCellsForCrossPoint.topLeft(x);
-              this.helperFunctions.deadCellsForCrossPoint.topRight(x);
-              this.helperFunctions.noreinitOnReset(x, model = 5);
-            }
-          }
-        }    
-      }
-    },
-
-    saveAsJSON:{
-      newClue: function(word, reference, ids, clueEntry, associatedDeadCells){
-        this.word = word;
-        this.reference = reference;
-        this.ids = ids;
-        this.clueEntry = clueEntry;
-        this.associatedDeadCells = associatedDeadCells;
-      },
-  
-      save: function(){
-        const clue = new this.newClue(root.sCurrentWord, 
-                    (root.clueCounter) + '-' + root.orientation, 
-                    root.currentIds,
-                    root.$clueEntry.val(),
-                    root.associatedDeadCells.sort());
-        root.json.push(clue);
-        console.log(root.json);
-      }
-    },
-
-    addClasses: function(){
-      for(let id of this.currentIds){
-        const cell = this.$wrapper.find('#' + id);
-        const isSaved = cell.hasClass('savedWord');
-        cell.removeClass('selected');
-        cell.removeClass('cell');
-        if(!isSaved){
-          cell.addClass('savedWord');
-          cell.addClass(this.orientation);
-          cell.click(this.cellClickHandler.init.bind(this.cellClickHandler));
-        }else{
-          cell.addClass('cross-point');
-          const getOrientation = cell.hasClass('across') ? 'across' : 'down';
-          cell.removeClass(getOrientation);
-          cell.off();
-        }
-      }
-    },
-
-    addAttributes: function(){
-      for(let i = 0; i < this.currentIds.length; i++){
-        const cell = this.$wrapper.find('#' + this.currentIds[i]);
-        const hasAttr = cell.attr('data-ep');
-        if (i === 0 && !hasAttr){
-          cell.attr('data-ep', 'sp');
-        }else if (i === this.currentIds.length - 1 && !hasAttr){
-          cell.attr('data-ep', 'fp');
-        }else if (!hasAttr){
-          cell.attr('data-ep', 'mp');
-        }
-      }
-    },
-
-    writeClueToPage: {
+    confirmClue: {
       init: function(){
-        const clueList = this.getClueList();
-        const newItem = this.createElement();
-        this.bindEvent(newItem);
-        this.updateDOM(clueList, newItem);
+        root.renderClue.togglePromptBox('none');
+        this.validateEndPoint();
+        this.addNumber();
+        this.addClasses();
+        root.cacheCells();
+        this.addAttributes();
+        this.validateCrossPoint();
+        this.saveAsJSON.save();
+        this.writeClueToPage.init();
+        root.resetGrid.init();
       },
 
-      getClueList: function(){
-        const $clueList = root.$wrapper.find('#' + root.orientation);
-        return $clueList;
-      },
-
-      createElement: function(){
-        const newItem = $(`<div id="${root.clueCounter}-${root.orientation}" class="clue-wrapper"\>
-                        <p class="font-clue">${root.clueCounter}. ${root.$clueEntry.val() || '-'}</p>\
-                        <div>\
-                          <span class="delete-button glyphicon glyphicon-trash" id="${root.clueCounter}-${root.orientation}"></span>\
-                        </div>\
-                      </div>`);
-        return newItem;
-      },
-
-      bindEvent: function(newItem){
-        const $button = newItem.find('.delete-button');
-        $button.click(root.deleteClue.init.bind(root.deleteClue));
-      },
-
-      updateDOM: function(clueList, newItem){
-        if(root.clueCounter === 1){
-          root.$clueList.css('display', 'block');
-          root.$welcome.css('display', 'none');
+      addNumber: function(){
+        const $firstLetter = root.$wrapper.find('#' + root.currentIds[0]);
+        const newItem = (`<div class="number-wrapper">${root.clueCounter}</div>`);
+        const hasSibling = $firstLetter.siblings().length === 1;
+        if (!hasSibling){
+          $firstLetter.parent().prepend(newItem);
         }
-        clueList.append(newItem);
+      },
+
+      validateEndPoint: function(){
+        const sp1 = root.currentIds[0].split("-");
+        const sp2 = root.currentIds[root.currentIds.length - 1].split("-");
+  
+        function blackOutCell(id){
+          const cell = root.$wrapper.find('#' + id);
+          cell.removeClass('cell');
+          cell.addClass('dead-cell');
+          root.deadCells.push(id);
+          root.associatedDeadCells.push(id);
+          cell.prop('disabled', true);
+        }
+    
+        if (root.orientation === 'across') {
+          const row = +sp1[0];
+          const l = +sp1[1]; 
+          const r = +sp2[1];
+          const lId = row + "-" + (l - 1);
+          const rId = row + '-' + (r + 1);
+    
+          if (r < root.rows) blackOutCell(rId);
+          if ((l - 1) !== 0) blackOutCell(lId);    
+    
+        }else if (root.orientation === 'down') {
+          const col = +sp1[1];
+          const u = +sp1[0];
+          const d = +sp2[0];
+          const dId = (d + 1) + '-' + col;
+          const uId = (u - 1) + '-' + col;
+    
+          if (d <= root.rows) blackOutCell(dId);
+          if ((u - 1) !== 0) blackOutCell(uId);
+        }
+        root.cacheCells();
+      },
+
+      validateCrossPoint: function(){
+        for (let id of root.currentIds){
+          const el = root.$wrapper.find('#' + id);
+          const isCrossPoint = el.hasClass('cross-point');
+          const ep = el.attr('data-ep');
+          const x = id.split("-");
+          let model;
+          if (root.orientation === 'across' && isCrossPoint){
+            if(id === root.currentIds[0]){
+              if (ep === 'sp'){
+                root.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
+                root.helperFunctions.noreinitOnReset(x, model = 1);
+              }else if (ep === 'fp'){
+                root.helperFunctions.deadCellsForCrossPoint.topRight(x);
+                root.helperFunctions.noreinitOnReset(x, model = 7);
+              }else{
+                root.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
+                root.helperFunctions.deadCellsForCrossPoint.topRight(x);
+                root.helperFunctions.noreinitOnReset(x, model = 4);
+              }
+            }else if(id === root.currentIds[root.currentIds.length - 1]){
+              if (ep === 'sp'){
+                root.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
+                root.helperFunctions.noreinitOnReset(x, model = 3);
+              }else if (ep === 'fp'){
+                root.helperFunctions.deadCellsForCrossPoint.topLeft(x);
+                root.helperFunctions.noreinitOnReset(x, model = 9);
+              }else{
+                root.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
+                root.helperFunctions.deadCellsForCrossPoint.topLeft(x);
+                root.helperFunctions.noreinitOnReset(x, model = 6);
+              }
+            }else{
+              if (ep === 'sp'){
+                root.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
+                root.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
+                root.helperFunctions.noreinitOnReset(x, model = 2);
+              }else if (ep === 'fp'){
+                root.helperFunctions.deadCellsForCrossPoint.topLeft(x);
+                root.helperFunctions.deadCellsForCrossPoint.topRight(x);
+                root.helperFunctions.noreinitOnReset(x, model = 8);
+              }else{
+                root.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
+                root.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
+                root.helperFunctions.deadCellsForCrossPoint.topLeft(x);
+                root.helperFunctions.deadCellsForCrossPoint.topRight(x);
+                root.helperFunctions.noreinitOnReset(x, model = 5);
+              }
+            }
+          }else if (root.orientation === 'down' && isCrossPoint){
+            if(id === root.currentIds[0]){
+              if (ep === 'sp'){
+                root.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
+                root.helperFunctions.noreinitOnReset(x, model = 1);
+              }else if (ep === 'fp'){
+                root.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
+                root.helperFunctions.noreinitOnReset(x, model = 3);
+              }else{
+                root.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
+                root.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
+                root.helperFunctions.noreinitOnReset(x, model = 2);
+              }
+            }else if(id === root.currentIds[root.currentIds.length - 1]){
+              if (ep === 'sp'){
+                root.helperFunctions.deadCellsForCrossPoint.topRight(x);
+                root.helperFunctions.noreinitOnReset(x, model = 7);
+              }else if (ep === 'fp'){
+                root.helperFunctions.deadCellsForCrossPoint.topLeft(x);
+                root.helperFunctions.noreinitOnReset(x, model = 9);
+              }else{
+                root.helperFunctions.deadCellsForCrossPoint.topRight(x);
+                root.helperFunctions.deadCellsForCrossPoint.topLeft(x);
+                root.helperFunctions.noreinitOnReset(x, model = 8);
+              }
+            }else{
+              if (ep === 'sp'){
+                root.helperFunctions.deadCellsForCrossPoint.topRight(x);
+                root.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
+                root.helperFunctions.noreinitOnReset(x, model = 4);
+              }else if (ep === 'fp'){
+                root.helperFunctions.deadCellsForCrossPoint.topLeft(x);
+                root.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
+                root.helperFunctions.noreinitOnReset(x, model = 6);
+              }else{
+                root.helperFunctions.deadCellsForCrossPoint.bottomLeft(x);
+                root.helperFunctions.deadCellsForCrossPoint.bottomRight(x);
+                root.helperFunctions.deadCellsForCrossPoint.topLeft(x);
+                root.helperFunctions.deadCellsForCrossPoint.topRight(x);
+                root.helperFunctions.noreinitOnReset(x, model = 5);
+              }
+            }
+          }    
+        }
+      },
+  
+      saveAsJSON:{
+        newClue: function(word, reference, ids, clueEntry, associatedDeadCells){
+          this.word = word;
+          this.reference = reference;
+          this.ids = ids;
+          this.clueEntry = clueEntry;
+          this.associatedDeadCells = associatedDeadCells;
+        },
+    
+        save: function(){
+          const clue = new this.newClue(root.sCurrentWord, 
+                      (root.clueCounter) + '-' + root.orientation, 
+                      root.currentIds,
+                      root.$clueEntry.val(),
+                      root.associatedDeadCells.sort());
+          root.json.push(clue);
+        }
+      },
+  
+      addClasses: function(){
+        for(let id of root.currentIds){
+          const cell = root.$wrapper.find('#' + id);
+          const isSaved = cell.hasClass('savedWord');
+          cell.removeClass('selected');
+          cell.removeClass('cell');
+          if(!isSaved){
+            cell.addClass('savedWord');
+            cell.addClass(root.orientation);
+            cell.click(root.cellClickHandler.init.bind(root.cellClickHandler));
+          }else{
+            cell.addClass('cross-point');
+            const getOrientation = cell.hasClass('across') ? 'across' : 'down';
+            cell.removeClass(getOrientation);
+            cell.off();
+          }
+        }
+      },
+  
+      addAttributes: function(){
+        for(let i = 0; i < root.currentIds.length; i++){
+          const cell = root.$wrapper.find('#' + root.currentIds[i]);
+          const hasAttr = cell.attr('data-ep');
+          if (i === 0 && !hasAttr){
+            cell.attr('data-ep', 'sp');
+          }else if (i === root.currentIds.length - 1 && !hasAttr){
+            cell.attr('data-ep', 'fp');
+          }else if (!hasAttr){
+            cell.attr('data-ep', 'mp');
+          }
+        }
+      },
+  
+      writeClueToPage: {
+        init: function(){
+          const clueList = this.getClueList();
+          const newItem = this.createElement();
+          this.bindEvent(newItem);
+          this.updateDOM(clueList, newItem);
+        },
+  
+        getClueList: function(){
+          const $clueList = root.$wrapper.find('#' + root.orientation);
+          return $clueList;
+        },
+  
+        createElement: function(){
+          const newItem = $(`<div id="${root.clueCounter}-${root.orientation}" class="clue-wrapper"\>
+                          <p class="font-clue">${root.clueCounter}. ${root.$clueEntry.val() || '-'}</p>\
+                          <div>\
+                            <span class="delete-button glyphicon glyphicon-trash" id="${root.clueCounter}-${root.orientation}"></span>\
+                          </div>\
+                        </div>`);
+          return newItem;
+        },
+  
+        bindEvent: function(newItem){
+          const $button = newItem.find('.delete-button');
+          $button.click(root.deleteClue.init.bind(root.deleteClue));
+        },
+  
+        updateDOM: function(clueList, newItem){
+          if(root.clueCounter === 1){
+            root.$clueList.css('display', 'block');
+            root.$welcome.css('display', 'none');
+          }
+          clueList.append(newItem);
+        }
       }
     },
 
     deleteClue: {
       init: function(e){
-        const key = this.getFromJSON(e.target.id);
+        const index = this.getFromJSON(e.target.id);
         this.getHTML(e.target.id);
         // this.alert();
-        this.getCells(key);
-        this.removeFromJSON(key);
+        this.getCells(index);
+        this.removeAssociatedDeadCells(index);
+        this.removeFromJSON(index);
       },
 
       getHTML: function(id){
@@ -864,8 +867,8 @@
           return getIndex;
       },
 
-      getCells: function(key){
-        const ids = root.json[key].ids;
+      getCells: function(index){
+        const ids = root.json[index].ids;
         let $cell;
         for (let i = 0; i < ids.length; i++){
           $cell = root.$wrapper.find('#' + ids[i]);
@@ -894,7 +897,8 @@
         $cell.removeClass('savedWord');
         $cell.removeClass('across');
         $cell.removeClass('down');
-        $cell.removeClass('no-reinit-on-reset');
+        let reset = $cell.removeClass('no-reinit-on-reset');
+        if(reset) $cell.prop('disabled', false);
         $cell.addClass('cell');
       },
 
@@ -906,9 +910,20 @@
         $cell.removeAttr('data-ep');
       },
 
+      removeAssociatedDeadCells: function(index){
+        let cell;
+        for (let id of root.json[index].associatedDeadCells){
+          cell = root.$wrapper.find('#' + id);
+          cell.addClass('cell');
+          cell.removeClass('dead-cell');
+          cell.prop('disabled', false);
+          let i = root.deadCells.indexOf(id);
+          root.deadCells.splice(i, 1);
+        }
+      },
+
       removeFromJSON: function(index){
         root.json.splice(index, 1);
-        console.log(root.json);
       },
 
       alert: function(){
