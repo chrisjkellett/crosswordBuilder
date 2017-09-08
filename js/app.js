@@ -597,7 +597,6 @@
     },
 
     confirmClue: function(){
-      this.saveAsJSON.save();
       this.renderClue.togglePromptBox('none');
       this.validateEndPoint();
       this.addNumber();
@@ -605,25 +604,9 @@
       this.cacheCells();
       this.addAttributes();
       this.validateCrossPoint();
+      this.saveAsJSON.save();
       this.writeClueToPage.init();
       this.resetGrid.init();
-    },
-
-    saveAsJSON:{
-      newClue: function(word, reference, ids, clueEntry){
-        this.word = word;
-        this.reference = reference;
-        this.ids = ids;
-        this.clueEntry = clueEntry;
-      },
-  
-      save: function(){
-        const clue = new this.newClue(root.sCurrentWord, 
-                    (root.clueCounter) + '-' + root.orientation, 
-                    root.currentIds,
-                    root.$clueEntry.val());
-        root.json.push(clue);
-      }
     },
 
     addNumber: function(){
@@ -765,6 +748,24 @@
       }
     },
 
+    saveAsJSON:{
+      newClue: function(word, reference, ids, clueEntry){
+        this.word = word;
+        this.reference = reference;
+        this.ids = ids;
+        this.clueEntry = clueEntry;
+        this.associatedDeadCells = [];
+      },
+  
+      save: function(){
+        const clue = new this.newClue(root.sCurrentWord, 
+                    (root.clueCounter) + '-' + root.orientation, 
+                    root.currentIds,
+                    root.$clueEntry.val());
+        root.json.push(clue);
+      }
+    },
+
     addClasses: function(){
       for(let id of this.currentIds){
         const cell = this.$wrapper.find('#' + id);
@@ -840,11 +841,13 @@
         const key = this.getFromJSON(e.target.id);
         this.getHTML(e.target.id);
         // this.alert();
-        this.delete(key);
+        this.getCells(key);
+        this.removeFromJSON(key);
       },
 
       getHTML: function(id){
-        console.log(id);
+        const html = root.$clueList.find('#' + id);
+        html.remove();
       },
 
       getFromJSON: function(id){
@@ -857,14 +860,56 @@
           return getIndex;
       },
 
+      getCells: function(key){
+        const ids = root.json[key].ids;
+        let $cell;
+        for (let i = 0; i < ids.length; i++){
+          $cell = root.$wrapper.find('#' + ids[i]);
+          let isCrossPoint = this.isCrossPoint($cell);
+          if(!isCrossPoint){
+            if (i === 0) this.removeNumber($cell);
+            this.updateClasses($cell);
+            this.removeValue($cell);
+            this.removeAttributes($cell);
+          }else{
+            $cell.removeClass('cross-point');
+          }
+        }
+      },
+
+      isCrossPoint: function($cell){
+        return $cell.hasClass('cross-point');
+      },
+
+      removeNumber: function($cell){
+        const number = $cell.prev();
+        number.remove();
+      },
+
+      updateClasses: function($cell){
+        $cell.removeClass('savedWord');
+        $cell.removeClass('across');
+        $cell.removeClass('down');
+        $cell.removeClass('no-reinit-on-reset');
+        $cell.addClass('cell');
+      },
+
+      removeValue: function($cell){
+        $cell.val("");
+      },
+
+      removeAttributes: function($cell){
+        $cell.removeAttr('data-ep');
+      },
+
+      removeFromJSON: function(index){
+        root.json.splice(index, 1);
+        console.log(root.json);
+      },
+
       alert: function(){
         const message = 'Coming to version 1.3';
         root.alertBox(message);
-      },
-
-      delete: function(key){
-        const object = root.json[key];
-        console.log(object);
       }
     },
 
