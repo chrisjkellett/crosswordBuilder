@@ -17,6 +17,8 @@
       this.savedCells = [];
       this.deadCells = [];
       this.associatedDeadCells = [];
+      this.endPoints = [];
+      this.crossPoints = [];
       this.newCrossPoint = false;
     },
 
@@ -607,8 +609,8 @@
         root.cacheCells();
         this.addAttributes();
         this.validateCrossPoint();
-        this.saveAsJSON.save();
-        this.saveAsJSON.checkForCrossPoints();      
+        this.saveAsJSON.checkForCrossPoints();   
+        this.saveAsJSON.save();   
         this.writeClueToPage.init();
         root.resetGrid.init();
       },
@@ -632,6 +634,7 @@
           cell.addClass('dead-cell');
           root.deadCells.push(id);
           root.associatedDeadCells.push(id);
+          root.endPoints.push(id);
           cell.prop('disabled', true);
         }
     
@@ -754,12 +757,16 @@
       },
   
       saveAsJSON:{
-        newClue: function(word, reference, ids, clueEntry, associatedDeadCells){
+        associatedCrossPoints: null,
+
+        newClue: function(word, reference, ids, clueEntry, endPoints, crossPoints, associatedCrossPoints){
           this.word = word;
           this.reference = reference;
           this.ids = ids;
           this.clueEntry = clueEntry;
-          this.associatedDeadCells = associatedDeadCells;
+          this.endPoints = endPoints;
+          this.crossPoints = crossPoints;
+          this.associatedCrossPoints = associatedCrossPoints;
         },
     
         save: function(){
@@ -767,8 +774,11 @@
                       (root.clueCounter) + '-' + root.orientation, 
                       root.currentIds,
                       root.$clueEntry.val(),
-                      root.associatedDeadCells.sort());
+                      root.endPoints.sort(),
+                      root.crossPoints.sort(),
+                      root.confirmClue.saveAsJSON.associatedCrossPoints);
           root.json.push(clue);
+          console.log(clue);
         },
 
         checkForCrossPoints: function(){
@@ -817,7 +827,7 @@
         },
 
         getAssociatedCrossPoints: function(key){
-          console.log(root.json[key]);
+          root.confirmClue.saveAsJSON.associatedCrossPoints = root.json[key].crossPoints;
         }
       },
   
@@ -900,7 +910,6 @@
       init: function(e){
         const index = this.getFromJSON(e.target.id);
         this.getHTML(e.target.id);
-        // this.alert();
         this.getCells(index);
         this.removeAssociatedDeadCells(index);
         this.removeFromJSON(index);
@@ -966,7 +975,7 @@
 
       removeAssociatedDeadCells: function(index){
         let cell;
-        for (let id of root.json[index].associatedDeadCells){
+        for (let id of root.json[index].endPoints){
           cell = root.$wrapper.find('#' + id);
           cell.addClass('cell');
           cell.removeClass('dead-cell');
@@ -974,6 +983,17 @@
           let i = root.deadCells.indexOf(id);
           root.deadCells.splice(i, 1);
         }
+
+        for (let id of root.json[index].crossPoints){
+          cell = root.$wrapper.find('#' + id);
+          cell.addClass('cell');
+          cell.removeClass('dead-cell');
+          cell.prop('disabled', false);
+          let i = root.deadCells.indexOf(id);
+          root.deadCells.splice(i, 1);
+        }
+
+
       },
 
       removeFromJSON: function(index){
@@ -1019,6 +1039,8 @@
         root.newCrossPoint = false;
         root.validationCounter = 0;
         root.associatedDeadCells = [];
+        root.endPoints = [];
+        root.crossPoints = [];
       },
 
       validSize: function(){
@@ -1156,6 +1178,7 @@
           cell.addClass('dead-cell');
           root.deadCells.push(id);
           root.associatedDeadCells.push(id);
+          root.crossPoints.push(id);
           root.cacheCells();
         },
 
