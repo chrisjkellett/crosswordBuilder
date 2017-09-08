@@ -16,6 +16,7 @@
       this.reverse_reinit = [];
       this.savedCells = [];
       this.deadCells = [];
+      this.associatedDeadCells = [];
       this.newCrossPoint = false;
     },
 
@@ -627,6 +628,7 @@
         cell.removeClass('cell');
         cell.addClass('dead-cell');
         root.deadCells.push(id);
+        root.associatedDeadCells.push(id);
         cell.prop('disabled', true);
       }
   
@@ -749,20 +751,22 @@
     },
 
     saveAsJSON:{
-      newClue: function(word, reference, ids, clueEntry){
+      newClue: function(word, reference, ids, clueEntry, associatedDeadCells){
         this.word = word;
         this.reference = reference;
         this.ids = ids;
         this.clueEntry = clueEntry;
-        this.associatedDeadCells = [];
+        this.associatedDeadCells = associatedDeadCells;
       },
   
       save: function(){
         const clue = new this.newClue(root.sCurrentWord, 
                     (root.clueCounter) + '-' + root.orientation, 
                     root.currentIds,
-                    root.$clueEntry.val());
+                    root.$clueEntry.val(),
+                    root.associatedDeadCells.sort());
         root.json.push(clue);
+        console.log(root.json);
       }
     },
 
@@ -945,6 +949,7 @@
         root.renderClue.disableButtons(true, false);
         root.newCrossPoint = false;
         root.validationCounter = 0;
+        root.associatedDeadCells = [];
       },
 
       validSize: function(){
@@ -1081,6 +1086,7 @@
           cell.removeClass('cell');
           cell.addClass('dead-cell');
           root.deadCells.push(id);
+          root.associatedDeadCells.push(id);
           root.cacheCells();
         },
 
