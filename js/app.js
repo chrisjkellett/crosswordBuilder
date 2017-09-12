@@ -893,7 +893,7 @@
   
         bindEvent: function(newItem){
           const $button = newItem.find('.delete-button');
-          $button.click(root.deleteClue.init.bind(root.deleteClue));
+          $button.click(root.utilities.promptBox.bind(root.utilities));
         },
   
         updateDOM: function(clueList, newItem){
@@ -1000,7 +1000,7 @@
         root.json.splice(index, 1);
       },
 
-      alert: function(){
+      alert: function(e){
         const message = 'Coming to version 1.3';
         root.alertBox(message);
       }
@@ -1208,6 +1208,14 @@
       }//end helperFunctions.deadCellsForCrossPoint
     
     },
+
+    utilities: {
+      promptBox: function(e){
+        const message = 'Are you sure you want to delete ' + e.target.id;
+        root.alertBox(message);
+        //root.$alertConfirm.click(root.deleteClue.init.bind(root.deleteClue));
+      }
+    }
 
   }//end object
 
