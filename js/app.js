@@ -798,7 +798,7 @@
                       (root.clueCounter) + '-' + root.orientation, 
                       root.currentIds,
                       root.$clueEntry.val(),
-                      crosspointIds || null,
+                      crosspointIds || [],
                       root.endPoints.sort(),
                       root.crossPoints.sort(),
                       root.confirmClue.saveAsJSON.associatedCrossPoints);
@@ -857,7 +857,6 @@
         getAssociatedCrossPoints: function(key, crosspointIds){
           root.confirmClue.saveAsJSON.associatedCrossPoints = root.json[key].crossPoints;
           root.json[key].hasCrossPoint = crosspointIds;
-          console.log(root.json[key]);
         }
       },
   
@@ -1027,8 +1026,10 @@
 
       updateSettings: function(index){
         for (let id of root.json[index].ids){
-          let idIndex = root.savedCells.indexOf(id);
-          root.savedCells.splice(idIndex, 1);
+          if(!root.json[index].hasCrossPoint.includes(id)){
+            let idIndex = root.savedCells.indexOf(id);
+            root.savedCells.splice(idIndex, 1);
+          }
         }
         console.log(root.savedCells);
       },
