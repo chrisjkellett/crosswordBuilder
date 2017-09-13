@@ -876,6 +876,7 @@
             const getOrientation = cell.hasClass('across') ? 'across' : 'down';
             cell.removeClass(getOrientation);
             cell.off(); 
+            //CellClickFix - this unbinding of event makes cells no longer clickable.  Remove?
             cell.attr('clueId', function(i, val){
               return val + '/' + root.clueCounter + '-' + root.orientation;
             });
