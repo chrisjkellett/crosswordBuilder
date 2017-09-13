@@ -211,7 +211,11 @@
     decreaseSize: {
       init: function(){
         if(this.checkSavedCells()){
-          console.log('cannot delete as would delete clues');
+          const message = 'Reducing size would delete clues.';
+          root.alertBox(message);
+        }else if(root.rows <= root.min){
+          const message = 'Cannot reduce further. Minimum size for this crossword is set to 4.';
+          root.alertBox(message);
         }
       },
 
@@ -628,8 +632,8 @@
         root.cacheCells();
         this.addAttributes();
         this.validateCrossPoint();
-        this.saveAsJSON.checkForCrossPoints();   
-        this.saveAsJSON.save();   
+        const crosspointIds = this.saveAsJSON.checkForCrossPoints();   
+        this.saveAsJSON.save(crosspointIds);   
         this.writeClueToPage.init();
         root.resetGrid.init();
       },
@@ -778,21 +782,23 @@
       saveAsJSON:{
         associatedCrossPoints: null,
 
-        newClue: function(word, reference, ids, clueEntry, endPoints, crossPoints, associatedCrossPoints){
+        newClue: function(word, reference, ids, clueEntry, hasCrossPoint, endPoints, crossPoints, associatedCrossPoints){
           this.word = word;
           this.reference = reference;
           this.ids = ids;
           this.clueEntry = clueEntry;
+          this.hasCrossPoint = hasCrossPoint;
           this.endPoints = endPoints;
           this.crossPoints = crossPoints;
           this.associatedCrossPoints = associatedCrossPoints;
         },
     
-        save: function(){
+        save: function(crosspointIds){
           const clue = new this.newClue(root.sCurrentWord, 
                       (root.clueCounter) + '-' + root.orientation, 
                       root.currentIds,
                       root.$clueEntry.val(),
+                      crosspointIds || null,
                       root.endPoints.sort(),
                       root.crossPoints.sort(),
                       root.confirmClue.saveAsJSON.associatedCrossPoints);
@@ -803,50 +809,55 @@
         checkForCrossPoints: function(){
           let cell, isCrossPoint;
           let crosspointArray = [];
+          let crosspointIds = [];
           for (let id of root.currentIds){
             cell = root.$wrapper.find('#' + id);
             isCrossPoint = cell.hasClass('cross-point');
             if (isCrossPoint){
               crosspointArray.push(cell);
+              crosspointIds.push(id);
             }
           }
           if (crosspointArray.length > 0) {
-            this.assessCrossPoints(crosspointArray);
+            this.assessCrossPoints(crosspointArray, crosspointIds);
+            return crosspointIds;
           }
         },
 
-        assessCrossPoints: function(crosspointArray){
+        assessCrossPoints: function(crosspointArray, crosspointIds){
           let clueIdArray = [];
           for (let item of crosspointArray){
             clueIdArray.push(item.attr('clueId'));
           }
-          this.loopCrossPoints(clueIdArray);
+          this.loopCrossPoints(clueIdArray, crosspointIds);
         },
 
-        loopCrossPoints: function(clueIdArray){
+        loopCrossPoints: function(clueIdArray, crosspointIds){
           let getAssociation;
           let sp;
           let currentReference = root.clueCounter + '-' + root.orientation;
           for (let clueId of clueIdArray){
             sp = clueId.split('/');
             if (currentReference === sp[0]){
-              this.getKey(sp[1]);
+              this.getKey(sp[1], crosspointIds);
             }else{
-              this.getKey(sp[0]);
+              this.getKey(sp[0], crosspointIds);
             }
           }
         },
 
-        getKey: function(clueId){
+        getKey: function(clueId, crosspointIds){
           $.each(root.json, function(key, value){
             if (value.reference === clueId){
-              root.confirmClue.saveAsJSON.getAssociatedCrossPoints(key);
+              root.confirmClue.saveAsJSON.getAssociatedCrossPoints(key, crosspointIds);
             }
           }); 
         },
 
-        getAssociatedCrossPoints: function(key){
+        getAssociatedCrossPoints: function(key, crosspointIds){
           root.confirmClue.saveAsJSON.associatedCrossPoints = root.json[key].crossPoints;
+          root.json[key].hasCrossPoint = crosspointIds;
+          console.log(root.json[key]);
         }
       },
   
@@ -931,6 +942,7 @@
         this.getHTML(targetId);
         this.getCells(index);
         this.removeAssociatedDeadCells(index);
+        this.updateSettings(index);
         this.removeFromJSON(index);
       },
 
@@ -1011,8 +1023,14 @@
           let i = root.deadCells.indexOf(id);
           root.deadCells.splice(i, 1);
         }
+      },
 
-
+      updateSettings: function(index){
+        for (let id of root.json[index].ids){
+          let idIndex = root.savedCells.indexOf(id);
+          root.savedCells.splice(idIndex, 1);
+        }
+        console.log(root.savedCells);
       },
 
       removeFromJSON: function(index){
