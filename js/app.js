@@ -907,9 +907,9 @@
     },
 
     deleteClue: {
-      init: function(e){
-        const index = this.getFromJSON(e.target.id);
-        this.getHTML(e.target.id);
+      init: function(targetId){
+        const index = this.getFromJSON(targetId);
+        this.getHTML(targetId);
         this.getCells(index);
         this.removeAssociatedDeadCells(index);
         this.removeFromJSON(index);
@@ -1213,7 +1213,7 @@
       promptBox: function(e){
         const message = 'Are you sure you want to delete ' + e.target.id;
         root.alertBox(message);
-        //root.$alertConfirm.click(root.deleteClue.init.bind(root.deleteClue));
+        root.$alertConfirm.click(root.deleteClue.init.bind(root.deleteClue, e.target.id));
       }
     }
 
