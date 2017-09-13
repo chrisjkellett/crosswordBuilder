@@ -41,6 +41,7 @@
       this.$insertReference = this.$wrapper.find('#insertReference');
       this.$alertMessage = this.$wrapper.find('#alertMessage');
       this.$alertConfirm = this.$wrapper.find('#okAlert');
+      this.$alertCancel = this.$wrapper.find('#cancelAlert');
       this.$addWordBtn = this.$wrapper.find('#addWordBtn');
       this.$confirmClueBtn = this.$wrapper.find('#confirmClue');
       this.$clueEntry = this.$wrapper.find('#clueEntry');
@@ -1211,8 +1212,13 @@
 
     utilities: {
       promptBox: function(e){
-        const message = 'Are you sure you want to delete ' + e.target.id;
+        const message = 'Are you sure you want to delete ' + e.target.id + ' ?';
         root.alertBox(message);
+        root.$alertCancel.css('display', 'inline');
+        root.$alertCancel.click(function(){
+          root.$alertCancel.css('display', 'none');
+          root.$alertBox.css('display', 'none');
+        });
         root.$alertConfirm.click(root.deleteClue.init.bind(root.deleteClue, e.target.id));
       }
     }
