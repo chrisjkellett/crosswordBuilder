@@ -291,19 +291,6 @@
         root.validationCounter ++;
       },
 
-      changeFocus: function(){
-        //##potentially delete
-        if (root.currentIds.length > 1){
-          if(root.orientation === 'across'){
-            const nextId = this.splitId[0] + '-' + (+this.splitId[1] + 1);
-            const nextCell = root.$wrapper.find('#' + nextId);
-            nextCell.focus();
-          }else{
-
-          }
-        }
-      },
-
       autoSelect: function(){
         this.cell.select();
       }
@@ -869,14 +856,13 @@
           if(!isSaved){
             cell.addClass('savedWord');
             cell.addClass(root.orientation);
+            cell.off(); 
             cell.click(root.cellClickHandler.init.bind(root.cellClickHandler));
             cell.attr('clueId', root.clueCounter + '-' + root.orientation);
           }else{
             cell.addClass('cross-point');
             const getOrientation = cell.hasClass('across') ? 'across' : 'down';
             cell.removeClass(getOrientation);
-            cell.off(); 
-            //CellClickFix - this unbinding of event makes cells no longer clickable.  Remove?
             cell.attr('clueId', function(i, val){
               return val + '/' + root.clueCounter + '-' + root.orientation;
             });
@@ -993,6 +979,7 @@
         $cell.removeClass('down');
         let reset = $cell.removeClass('no-reinit-on-reset');
         if(reset) $cell.prop('disabled', false);
+        $cell.prop('readOnly', false);
         $cell.addClass('cell');
       },
 
