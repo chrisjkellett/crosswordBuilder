@@ -841,6 +841,7 @@
             cell.off(); 
             cell.click(root.cellClickHandler.init.bind(root.cellClickHandler));
             cell.attr('clueId', root.clueCounter + '-' + root.orientation);
+            cell.val().toLowerCase();
           }else{
             cell.addClass('cross-point');
             const getOrientation = cell.hasClass('across') ? 'across' : 'down';

@@ -182,6 +182,7 @@ header{
     text-align:center;
     border:0;
     cursor: pointer !important;
+    text-transform: lowercase;
 }
 
 .savedWord:disabled{
