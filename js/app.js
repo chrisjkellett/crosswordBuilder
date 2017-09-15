@@ -62,7 +62,6 @@
       this.$alertConfirm.click(this.alertBoxConfirm.bind(this));
       this.$addWordBtn.click(this.renderClue.init.bind(this.renderClue));
       this.$cancelClueBtn.click(this.renderClue.cancelClue.bind(this.renderClue));
-      //this.$confirmClueBtn.click(this.confirmClue.bind(this));
       this.$confirmClueBtn.click(this.confirmClue.init.bind(this.confirmClue));
       this.$makeCrossword.click(this.makeCrossword.init.bind(this.makeCrossword));
       this.$clueEntry.change(this.confirmClue.init.bind(this.confirmClue));
@@ -105,6 +104,7 @@
 
     alertBoxConfirm: function(){
       this.$alertBox.css('display', 'none');
+      return true;
     },
 
     increaseSize: {
@@ -216,6 +216,10 @@
         }else if(root.rows <= root.min){
           const message = 'Cannot reduce further. Minimum size for this crossword is set to 4.';
           root.alertBox(message);
+        }else{
+          this.deleteCells();
+          this.updateSettings();
+          this.updateGlobals();
         }
       },
 
@@ -225,6 +229,30 @@
             return true;
           }
         }
+      },
+
+      deleteCells: function(){
+        const row = root.$wrapper.find('#r-' + (root.rows));
+        row.remove();
+        for (let i = 1; i < root.rows; i++){
+          let row = root.$wrapper.find('#r-' + i);
+          row.children().last().remove();
+        }
+      },
+      
+      updateSettings: function(){
+        for (let id of root.reverse_reinit){
+          const $cell = root.$wrapper.find('#' + id);
+          $cell.addClass('no-reinit-on-reset');
+          $cell.off();
+          $cell.prop('disabled', 'true');
+        }
+      },
+
+      updateGlobals: function(){
+        root.rows --;
+        root.init --;
+        root.cacheCells();
       }
     },
 
@@ -909,7 +937,7 @@
   
         bindEvent: function(newItem){
           const $button = newItem.find('.delete-button');
-          $button.click(root.utilities.promptBox.bind(root.utilities));
+          $button.click(root.deleteClue.init.bind(root.deleteClue));
         },
   
         updateDOM: function(clueList, newItem){
@@ -923,13 +951,16 @@
     },
 
     deleteClue: {
-      init: function(targetId){
-        const index = this.getFromJSON(targetId);
-        this.getHTML(targetId);
-        this.getCells(index);
-        this.removeAssociatedDeadCells(index);
-        this.updateSettings(index);
-        this.removeFromJSON(index);
+      init: function(e){
+        const confirmed = root.utilities.promptBox(e.target.id);
+        if(confirmed){
+          const index = this.getFromJSON(e.target.id);
+          this.getHTML(e.target.id);
+          this.getCells(index);
+          this.removeAssociatedDeadCells(index);
+          this.updateSettings(index);
+          this.removeFromJSON(index);
+        }
       },
 
       getHTML: function(id){
@@ -1236,15 +1267,14 @@
     },
 
     utilities: {
-      promptBox: function(e){
-        const message = 'Are you sure you want to delete ' + e.target.id + ' ?';
+      promptBox: function(clueId){
+        let message = 'Are you sure you want to delete ' + clueId + ' ?';
         root.alertBox(message);
         root.$alertCancel.css('display', 'inline');
         root.$alertCancel.click(function(){
           root.$alertCancel.css('display', 'none');
           root.$alertBox.css('display', 'none');
         });
-        root.$alertConfirm.click(root.deleteClue.init.bind(root.deleteClue, e.target.id));
       }
     }
 
