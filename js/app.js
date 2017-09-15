@@ -162,52 +162,6 @@
       }
     },
 
-    // decreaseSize: function(){
-    //   function decreaseSize(){
-    //     const row = root.$wrapper.find('#r-' + (root.rows));
-    //     row.remove();
-    //     for (let i = 1; i < root.rows; i++){
-    //       let row = root.$wrapper.find('#r-' + i);
-    //       row.children().last().remove();
-    //     } 
-
-    //     for (let id of root.reverse_reinit){
-    //       const el = root.$wrapper.find('#' + id);
-    //       el.addClass('no-reinit-on-reset');
-    //       el.off();
-    //       el.prop('disabled', 'true');
-    //     }
-
-    //     root.rows --;
-    //     root.init --;
-    //     root.cacheCells();
-    //   }
-
-    //   if(this.currentIds.length > 0){
-    //     let sp = this.currentIds[this.currentIds.length - 1].split("-");
-    //     let lastRow = sp[1];
-    //     let lastCol = sp[0];
-    //     if(this.rows >= this.min){
-    //       const message = 'Reducing size would delete clues.';
-    //       this.alertBox(message);
-    //     }else if ((this.rows > this.min) && (lastCol < this.rows) && (lastRow < this.rows)){
-    //       decreaseSize();
-    //     }else if(this.rows >= this.min){
-    //       const message = 'Reducing size would delete clues.';
-    //       this.alertBox(message);
-    //     }else if (this.rows <= this.min){
-    //       const message = 'Cannot reduce further. Minimum size for this crossword is set to 4.';
-    //       this.alertBox(message);
-    //     }
-    //   }
-    //   else if(this.rows <= this.min){
-    //     const message = 'Cannot reduce further. Minimum size for this crossword is set to 4.';
-    //     this.alertBox(message);
-    //   }
-    //   else
-    //       decreaseSize();
-    // },
-
     decreaseSize: {
       init: function(){
         if(this.checkSavedCells()){
