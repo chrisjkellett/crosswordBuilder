@@ -620,14 +620,18 @@
         const sp1 = root.currentIds[0].split("-");
         const sp2 = root.currentIds[root.currentIds.length - 1].split("-");
   
-        function blackOutCell(id){
-          const cell = root.$wrapper.find('#' + id);
-          cell.removeClass('cell');
-          cell.addClass('dead-cell');
+        function blackOutCell(id, ref){
+          //if cell exists
+          if (ref < root.rows){
+            const cell = root.$wrapper.find('#' + id);
+            cell.removeClass('cell');
+            cell.addClass('dead-cell');
+            cell.prop('disabled', true);
+          }
+          //stores plus 1s in db
+          root.endPoints.push(id);
           root.deadCells.push(id);
           root.associatedDeadCells.push(id);
-          root.endPoints.push(id);
-          cell.prop('disabled', true);
         }
     
         if (root.orientation === 'across') {
@@ -637,7 +641,8 @@
           const lId = row + "-" + (l - 1);
           const rId = row + '-' + (r + 1);
     
-          if (r < root.rows) blackOutCell(rId);
+          //if (r < root.rows)
+          blackOutCell(rId, r);
           if ((l - 1) !== 0) blackOutCell(lId);    
     
         }else if (root.orientation === 'down') {
@@ -647,7 +652,8 @@
           const dId = (d + 1) + '-' + col;
           const uId = (u - 1) + '-' + col;
     
-          if (d <= root.rows) blackOutCell(dId);
+          //if (d <= root.rows) 
+          blackOutCell(dId, d);
           if ((u - 1) !== 0) blackOutCell(uId);
         }
         root.cacheCells();
