@@ -440,7 +440,13 @@
       for (let id of this.currentIds){
         let sp = id.split("-");
         cols.push(+sp[0]);
+        cols.sort(function compareNumbers(a, b) {
+          return a - b;
+        });
         rows.push(+sp[1]);
+        rows.sort(function compareNumbers(a, b) {
+          return a - b;
+        });
       }
       for (let i = cols.length - 1; i > 0; i--){
         let j = i - 1;
