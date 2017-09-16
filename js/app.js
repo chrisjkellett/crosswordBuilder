@@ -19,6 +19,7 @@
       this.associatedDeadCells = [];
       this.endPoints = [];
       this.crossPoints = [];
+      this.noreinitsonreset = [];
       this.newCrossPoint = false;
     },
 
@@ -778,7 +779,7 @@
       },
   
       saveAsJSON:{
-        newClue: function(word, reference, ids, clueEntry, crossPointCell, endPoints, crossPoints){
+        newClue: function(word, reference, ids, clueEntry, crossPointCell, endPoints, crossPoints, noreinits){
           this.word = word;
           this.reference = reference;
           this.ids = ids;
@@ -786,6 +787,7 @@
           this.crossPointCell = crossPointCell;
           this.endPoints = endPoints;
           this.crossPoints = crossPoints;
+          this.noreinits = noreinits;
         },
     
         save: function(crosspointIds){
@@ -796,6 +798,7 @@
                       crosspointIds || [],
                       root.endPoints.sort(),
                       root.crossPoints.sort(),
+                      root.noreinitsonreset.sort()
                       );
           root.json.push(clue);
           console.log(root.json);
@@ -852,6 +855,7 @@
         getAssociatedCrossPoints: function(key, crosspointIds){
           root.json[key].crossPointCell = crosspointIds;
           root.json[key].crossPoints = root.crossPoints.sort();
+          root.json[key].noreinits = root.noreinitsonreset.sort();
         }
       },
   
@@ -933,15 +937,12 @@
 
     deleteClue: {
       init: function(e){
-        const confirmed = root.utilities.promptBox(e.target.id);
-        if(confirmed){
-          const index = this.getFromJSON(e.target.id);
-          this.getHTML(e.target.id);
-          this.getCells(index);
-          this.removeAssociatedDeadCells(index);
-          this.updateSettings(index);
-          this.removeFromJSON(index);
-        }
+        const index = this.getFromJSON(e.target.id);
+        this.getHTML(e.target.id);
+        this.getCells(index);
+        this.removeAssociatedDeadCells(index);
+        this.updateSettings(index);
+        this.removeFromJSON(index);
       },
 
       getHTML: function(id){
@@ -1079,6 +1080,7 @@
         root.associatedDeadCells = [];
         root.endPoints = [];
         root.crossPoints = [];
+        root.noreinitsonreset = [];
       },
 
       validSize: function(){
@@ -1201,6 +1203,7 @@
           const cell = root.$wrapper.find('#' + id);
           cell.removeClass('no-reinit');
           cell.addClass('no-reinit-on-reset');
+          root.noreinitsonreset.push(id);
           cell.off();
           cell.prop('disabled', true);
           const i = root.noreinits.indexOf(id);
