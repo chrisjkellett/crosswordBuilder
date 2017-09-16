@@ -117,6 +117,7 @@
           this.revalidate();
           this.runNoReinits();
           this.checkinvalids();
+          this.addInvalids();
         }else{
           const message = 'Exceeds maximum grid size';
           root.alertBox(message);
@@ -158,6 +159,17 @@
           el.removeClass('no-reinit-on-reset');
           el.prop('disabled', false);
           el.click(root.cellClickHandler.init.bind(root.cellClickHandler));
+        }
+      },
+
+      addInvalids: function(){
+        for(let id of root.deadCells){
+          if(id.includes(root.rows)){
+            let cell = root.$wrapper.find('#' + id);
+            cell.removeClass('cell');
+            cell.addClass('dead-cell');
+            cell.prop('disabled', true);
+          }
         }
       }
     },
