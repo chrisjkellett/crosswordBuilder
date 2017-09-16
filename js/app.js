@@ -4,7 +4,7 @@
     settings: function(){
       this.rows = 6;
       this.init = 1;
-      this.max = 10;
+      this.max = 12;
       this.min = 4;
       this.sCurrentWord = '';
       this.clueCounter = 1;
@@ -431,14 +431,16 @@
 
 
     validateWordStructure: function(){
-      this.currentIds.sort();
+      this.currentIds.sort(function compareNumbers(a, b) {
+        return a - b;
+      });
       let cols = []; 
       let rows = [];
       let testFails, isRow, isColumn;
       for (let id of this.currentIds){
         let sp = id.split("-");
-        cols.push(parseInt(sp[0]));
-        rows.push(parseInt(sp[1]));
+        cols.push(+sp[0]);
+        rows.push(+sp[1]);
       }
       for (let i = cols.length - 1; i > 0; i--){
         let j = i - 1;
@@ -1248,7 +1250,9 @@
           root.$alertCancel.css('display', 'none');
           root.$alertBox.css('display', 'none');
         });
-      }
+      },
+
+      
     }
 
   }//end object
