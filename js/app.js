@@ -2,7 +2,7 @@
 (function(){
   const root = {
     settings: function(){
-      this.rows = 6;
+      this.rows = 10;
       this.init = 1;
       this.max = 12;
       this.min = 4;
@@ -250,7 +250,7 @@
       init: function(e){
         this.settings(e);
         this.toggleClasses();
-        //this.changeFocus();
+        this.customSort();
         this.autoSelect();
       },
 
@@ -275,6 +275,12 @@
           root.currentIds.splice(i, 1);
           this.validate(this.id);
         }
+      },
+
+      customSort: function(){
+        console.log(root.currentIds.sort(function(a, b){
+          return a.split("-")[1] - b.split("-")[1];
+        }));
       },
 
       validate: function(id){
@@ -431,9 +437,6 @@
 
 
     validateWordStructure: function(){
-      this.currentIds.sort(function compareNumbers(a, b) {
-        return a - b;
-      });
       let cols = []; 
       let rows = [];
       let testFails, isRow, isColumn;
