@@ -2,9 +2,9 @@
 (function(){
   const root = {
     settings: function(){
-      this.rows = 10;
+      this.rows = 6;
       this.init = 1;
-      this.max = 12;
+      this.max = 10;
       this.min = 4;
       this.sCurrentWord = '';
       this.clueCounter = 1;
