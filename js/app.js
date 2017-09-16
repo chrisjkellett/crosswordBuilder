@@ -278,9 +278,9 @@
       },
 
       customSort: function(){
-        console.log(root.currentIds.sort(function(a, b){
+        root.currentIds.sort(function(a, b){
           return a.split("-")[1] - b.split("-")[1];
-        }));
+        });
       },
 
       validate: function(id){
@@ -778,17 +778,14 @@
       },
   
       saveAsJSON:{
-        associatedCrossPoints: null,
-
-        newClue: function(word, reference, ids, clueEntry, hasCrossPoint, endPoints, crossPoints, associatedCrossPoints){
+        newClue: function(word, reference, ids, clueEntry, crossPointCell, endPoints, crossPoints){
           this.word = word;
           this.reference = reference;
           this.ids = ids;
           this.clueEntry = clueEntry;
-          this.hasCrossPoint = hasCrossPoint;
+          this.crossPointCell = crossPointCell;
           this.endPoints = endPoints;
           this.crossPoints = crossPoints;
-          this.associatedCrossPoints = associatedCrossPoints;
         },
     
         save: function(crosspointIds){
@@ -799,9 +796,9 @@
                       crosspointIds || [],
                       root.endPoints.sort(),
                       root.crossPoints.sort(),
-                      root.confirmClue.saveAsJSON.associatedCrossPoints);
+                      );
           root.json.push(clue);
-          console.log(clue);
+          console.log(root.json);
         },
 
         checkForCrossPoints: function(){
@@ -853,8 +850,8 @@
         },
 
         getAssociatedCrossPoints: function(key, crosspointIds){
-          root.confirmClue.saveAsJSON.associatedCrossPoints = root.json[key].crossPoints;
-          root.json[key].hasCrossPoint = crosspointIds;
+          root.json[key].crossPointCell = crosspointIds;
+          root.json[key].crossPoints = root.crossPoints.sort();
         }
       },
   
@@ -1029,7 +1026,7 @@
 
       updateSettings: function(index){
         for (let id of root.json[index].ids){
-          if(!root.json[index].hasCrossPoint.includes(id)){
+          if(!root.json[index].crossPointCell.includes(id)){
             let idIndex = root.savedCells.indexOf(id);
             root.savedCells.splice(idIndex, 1);
           }
