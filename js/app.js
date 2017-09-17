@@ -938,6 +938,7 @@
         this.updateSettings(i);
         this.updateCounter();
         this.removeFromJSON(i);
+        root.cacheCells();
         }else{
           const message = 'No clues to be deleted';
           root.alertBox(message);
@@ -1049,6 +1050,8 @@
             let cell = root.$wrapper.find('#' + id);
             cell.removeClass('no-reinit-on-reset');
             cell.prop('readOnly', true);
+            cell.off(); 
+            cell.click(root.cellClickHandler.init.bind(root.cellClickHandler));
           }
         }
       },
@@ -1063,7 +1066,7 @@
       },
 
       updateCounter: function(){
-        root.clueCounter --;
+        //root.clueCounter --;
       },
 
       removeFromJSON: function(index){
