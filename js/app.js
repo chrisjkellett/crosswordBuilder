@@ -934,7 +934,7 @@
         if (i !== -1){
           this.getHTML(i);
         this.getCells(i);
-        this.removeAssociatedDeadCells(i);
+        this.removeAssociatedDeadCells.init(i);
         this.updateSettings(i);
         this.updateCounter();
         this.removeFromJSON(i);
@@ -949,8 +949,8 @@
         html.remove();
       },
 
-      getCells: function(i){
-        const ids = root.json[i].ids;
+      getCells: function(index){
+        const ids = root.json[index].ids;
         let $cell;
         for (let i = 0; i < ids.length; i++){
           $cell = root.$wrapper.find('#' + ids[i]);
@@ -959,9 +959,10 @@
             if (i === 0) this.removeNumber($cell);
             this.updateClasses($cell);
             this.removeValue($cell);
-            this.removeAttributes($cell);
+            this.removeAttributes($cell, index);
           }else{
             $cell.removeClass('cross-point');
+            this.updateXPAttributes($cell, index);
           }
         }
       },
@@ -989,28 +990,66 @@
         $cell.val("");
       },
 
-      removeAttributes: function($cell){
+      removeAttributes: function($cell, index){
         $cell.removeAttr('data-ep');
       },
 
-      removeAssociatedDeadCells: function(index){
-        let cell;
-        for (let id of root.json[index].endPoints){
-          cell = root.$wrapper.find('#' + id);
-          cell.addClass('cell');
-          cell.removeClass('dead-cell');
-          cell.prop('disabled', false);
-          let i = root.deadCells.indexOf(id);
-          root.deadCells.splice(i, 1);
+      updateXPAttributes: function($cell, index){
+        const getAttr = $cell.attr('clueId').split("/");
+        let newAttr;
+        if(getAttr[0] === root.json[index].reference){
+          newAttr = getAttr[1];
+        }else{
+          newAttr = getAttr[0];
         }
+        $cell.attr('clueId', newAttr);
+        $cell.addClass(newAttr.split("-")[1]);
+      },
 
-        for (let id of root.json[index].crossPoints){
-          cell = root.$wrapper.find('#' + id);
-          cell.addClass('cell');
-          cell.removeClass('dead-cell');
-          cell.prop('disabled', false);
-          let i = root.deadCells.indexOf(id);
-          root.deadCells.splice(i, 1);
+      removeAssociatedDeadCells: {
+        init: function(index){
+          this.removeEndpoints(index);
+          this.removeCrossPoints(index);
+          if(index !== 0){
+            this.removeReinits(index);
+          }
+        },
+
+        removeEndpoints: function(index){
+          let cell;
+          for (let id of root.json[index].endPoints){
+            cell = root.$wrapper.find('#' + id);
+            cell.addClass('cell');
+            cell.removeClass('dead-cell');
+            cell.prop('disabled', false);
+            let i = root.deadCells.indexOf(id);
+            root.deadCells.splice(i, 1);
+          }
+        },
+
+        removeCrossPoints: function(index){
+          let cell;
+          for (let id of root.json[index].crossPoints){
+            cell = root.$wrapper.find('#' + id);
+            cell.addClass('cell');
+            cell.removeClass('dead-cell');
+            cell.prop('disabled', false);
+            let i = root.deadCells.indexOf(id);
+            root.deadCells.splice(i, 1);
+            }
+          },
+
+        removeReinits: function(index){
+          //compare arrays 
+          let prevReinits = root.json[index - 1].ids.filter(function(item){
+            return root.json[index].noreinits.includes(item);
+          });
+          //loop and change results
+          for (let id of prevReinits){
+            let cell = root.$wrapper.find('#' + id);
+            cell.removeClass('no-reinit-on-reset');
+            cell.prop('readOnly', true);
+          }
         }
       },
 
