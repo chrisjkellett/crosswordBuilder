@@ -35,6 +35,7 @@
       this.$crossword = this.$wrapper.find('#crossword');
       this.$increaseBtn = this.$wrapper.find('#increaseBtn');
       this.$decreaseBtn = this.$wrapper.find('#decreaseBtn');
+      this.$undoBtn = this.$wrapper.find('#undoBtn');
       this.$allCells = this.$wrapper.find('.cell');
       this.$alertBox = this.$wrapper.find('#alertBox');
       this.$clueBox = this.$wrapper.find('#clueBox');
@@ -60,6 +61,7 @@
       this.$crossword.keypress(this.renderByEnter.bind(this));
       this.$increaseBtn.click(this.increaseSize.init.bind(this.increaseSize));
       this.$decreaseBtn.click(this.decreaseSize.init.bind(this.decreaseSize));
+      this.$undoBtn.click(this.undoClue.init.bind(this.undoClue));
       this.$alertConfirm.click(this.alertBoxConfirm.bind(this));
       this.$addWordBtn.click(this.renderClue.init.bind(this.renderClue));
       this.$cancelClueBtn.click(this.renderClue.cancelClue.bind(this.renderClue));
@@ -901,7 +903,6 @@
         init: function(){
           const clueList = this.getClueList();
           const newItem = this.createElement();
-          this.bindEvent(newItem);
           this.updateDOM(clueList, newItem);
         },
   
@@ -913,16 +914,8 @@
         createElement: function(){
           const newItem = $(`<div id="${root.clueCounter}-${root.orientation}" class="clue-wrapper"\>
                           <p class="font-clue">${root.clueCounter}. ${root.$clueEntry.val() || '-'}</p>\
-                          <div>\
-                            <span class="delete-button glyphicon glyphicon-trash" id="${root.clueCounter}-${root.orientation}"></span>\
-                          </div>\
                         </div>`);
           return newItem;
-        },
-  
-        bindEvent: function(newItem){
-          const $button = newItem.find('.delete-button');
-          $button.click(root.deleteClue.init.bind(root.deleteClue));
         },
   
         updateDOM: function(clueList, newItem){
@@ -935,33 +928,29 @@
       }
     },
 
-    deleteClue: {
+    undoClue: {
       init: function(e){
-        const index = this.getFromJSON(e.target.id);
-        this.getHTML(e.target.id);
-        this.getCells(index);
-        this.removeAssociatedDeadCells(index);
-        this.updateSettings(index);
-        this.removeFromJSON(index);
+        const i = root.json.length - 1;
+        if (i !== -1){
+          this.getHTML(i);
+        this.getCells(i);
+        this.removeAssociatedDeadCells(i);
+        this.updateSettings(i);
+        this.updateCounter();
+        this.removeFromJSON(i);
+        }else{
+          const message = 'No clues to be deleted';
+          root.alertBox(message);
+        }
       },
 
-      getHTML: function(id){
-        const html = root.$clueList.find('#' + id);
+      getHTML: function(i){
+        const html = root.$clueList.find('#' + root.json[i].reference);
         html.remove();
       },
 
-      getFromJSON: function(id){
-        let getIndex;
-        $.each(root.json, function(key, value){
-            if (value.reference === id){
-              getIndex = key;
-            }
-          });
-          return getIndex;
-      },
-
-      getCells: function(index){
-        const ids = root.json[index].ids;
+      getCells: function(i){
+        const ids = root.json[i].ids;
         let $cell;
         for (let i = 0; i < ids.length; i++){
           $cell = root.$wrapper.find('#' + ids[i]);
@@ -1032,7 +1021,10 @@
             root.savedCells.splice(idIndex, 1);
           }
         }
-        console.log(root.savedCells);
+      },
+
+      updateCounter: function(){
+        root.clueCounter --;
       },
 
       removeFromJSON: function(index){
@@ -1249,20 +1241,6 @@
       }//end helperFunctions.deadCellsForCrossPoint
     
     },
-
-    utilities: {
-      promptBox: function(clueId){
-        let message = 'Are you sure you want to delete ' + clueId + ' ?';
-        root.alertBox(message);
-        root.$alertCancel.css('display', 'inline');
-        root.$alertCancel.click(function(){
-          root.$alertCancel.css('display', 'none');
-          root.$alertBox.css('display', 'none');
-        });
-      },
-
-      
-    }
 
   }//end object
 
