@@ -942,6 +942,7 @@
             this.removeFromJSON(i);
             root.cacheCells();
             root.alertCancel();
+            this.resetAlertMods();
           }
         }else{
           const message = 'No clues to be deleted';
@@ -1106,9 +1107,9 @@
         root.json.splice(index, 1);
       },
 
-      alert: function(e){
-        const message = 'Coming to version 1.3';
-        root.alertBox(message);
+      resetAlertMods: function(){
+        root.$alertCancel.html('Ok');
+        root.$alertConfirm.css('display', 'none');
       }
     },
 
