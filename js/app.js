@@ -803,7 +803,6 @@
                       root.noreinitsonreset.sort()
                       );
           root.json.push(clue);
-          console.log(root.json);
         },
 
         checkForCrossPoints: function(){
@@ -996,9 +995,23 @@
             this.removeValue($cell);
             this.removeAttributes($cell, index);
           }else{
+            if (i === 0 && this.numberFromOtherClue($cell)){
+              this.removeNumber($cell);
+            }
             $cell.removeClass('cross-point');
             this.updateXPAttributes($cell, index);
           }
+        }
+      },
+
+      numberFromOtherClue: function($cell, index){
+        const getAttr = $cell.attr('clueId').split("/");
+        const ref1 = getAttr[0].split("-")[0];
+        const ref2 = getAttr[1].split("-")[0];
+        if(ref1 !== ref2){
+          return true;
+        }else{
+          return false;
         }
       },
 
