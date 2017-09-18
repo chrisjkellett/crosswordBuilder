@@ -576,6 +576,7 @@
         this.captureText();
         this.addClueAndReference();
         this.togglePromptBox('block');
+        root.$clueEntry.focus();
       },
 
       disableButtons: function(b1, b2){
@@ -1079,13 +1080,25 @@
           let cell;
           for (let id of root.json[index].crossPoints){
             cell = root.$wrapper.find('#' + id);
-            cell.addClass('cell');
-            cell.removeClass('dead-cell');
-            cell.prop('disabled', false);
-            let i = root.deadCells.indexOf(id);
-            root.deadCells.splice(i, 1);
+            if(this.notDependentCrossPoint(id)){
+              cell.addClass('cell');
+              cell.removeClass('dead-cell');
+              cell.prop('disabled', false);
+              let i = root.deadCells.indexOf(id);
+              root.deadCells.splice(i, 1);
             }
-          },
+          }
+        },
+
+        notDependentCrossPoint: function(id){
+          $.each(root.json, function(key, value){
+            if (!value.crossPoints.includes(id)){
+              return false;
+            }else{
+              return true;
+            }
+          });
+        },
 
         removeReinits: function(index){
           //compare arrays 
