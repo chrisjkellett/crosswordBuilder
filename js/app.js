@@ -42,8 +42,8 @@
       this.$insertClue = this.$wrapper.find('#insertClue');
       this.$insertReference = this.$wrapper.find('#insertReference');
       this.$alertMessage = this.$wrapper.find('#alertMessage');
-      this.$alertConfirm = this.$wrapper.find('#okAlert');
-      this.$alertCancel = this.$wrapper.find('#cancelAlert');
+      this.$alertCancel = this.$wrapper.find('#alertCancel');
+      this.$alertConfirm = this.$wrapper.find('#alertConfirm');
       this.$addWordBtn = this.$wrapper.find('#addWordBtn');
       this.$confirmClueBtn = this.$wrapper.find('#confirmClue');
       this.$clueEntry = this.$wrapper.find('#clueEntry');
@@ -62,7 +62,8 @@
       this.$increaseBtn.click(this.increaseSize.init.bind(this.increaseSize));
       this.$decreaseBtn.click(this.decreaseSize.init.bind(this.decreaseSize));
       this.$undoBtn.click(this.undoClue.init.bind(this.undoClue));
-      this.$alertConfirm.click(this.alertBoxConfirm.bind(this));
+      this.$alertCancel.click(this.alertCancel.bind(this));
+      this.$alertConfirm.click(this.undoClue.init.bind(this.undoClue, true));
       this.$addWordBtn.click(this.renderClue.init.bind(this.renderClue));
       this.$cancelClueBtn.click(this.renderClue.cancelClue.bind(this.renderClue));
       this.$confirmClueBtn.click(this.confirmClue.init.bind(this.confirmClue));
@@ -105,9 +106,8 @@
     },
 
 
-    alertBoxConfirm: function(){
+    alertCancel: function(){
       this.$alertBox.css('display', 'none');
-      return true;
     },
 
     increaseSize: {
@@ -929,18 +929,51 @@
     },
 
     undoClue: {
-      init: function(e){
+      init: function(e, confirmed){
         const i = root.json.length - 1;
         if (i !== -1){
-          this.getHTML(i);
-        this.getCells(i);
-        this.removeAssociatedDeadCells.init(i);
-        this.updateSettings(i);
-        this.updateCounter();
-        this.removeFromJSON(i);
-        root.cacheCells();
+          this.promptToDelete.init(i);
+          if(confirmed){
+            this.getHTML(i);
+            this.getCells(i);
+            this.removeAssociatedDeadCells.init(i);
+            this.updateSettings(i);
+            this.updateCounter();
+            this.removeFromJSON(i);
+            root.cacheCells();
+            root.alertCancel();
+          }
         }else{
           const message = 'No clues to be deleted';
+          root.alertBox(message);
+        }
+      },
+
+      promptToDelete: {
+        init: function(i){
+          this.modCancel();
+          this.addConfirm();
+          this.showAlert(this.getClueId(i));
+        },
+
+        modCancel: function(){
+          root.$alertCancel.html('Cancel');
+        },
+
+        addConfirm: function(){
+          root.$alertConfirm.css('display', 'inline');
+        },
+
+        getClueId: function(i){
+          if (i !== -1){
+            return root.json[i].reference;
+          }else{
+            return -1;
+          }
+        },
+
+        showAlert: function(clueId){
+          const message = 'Are you sure you want to delete ' + clueId + '?';
           root.alertBox(message);
         }
       },

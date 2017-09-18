@@ -373,7 +373,7 @@ input[disabled]{
   left: 10%;
 }
 
-#cancelAlert{
+#alertConfirm{
     display: none;
 }
 
