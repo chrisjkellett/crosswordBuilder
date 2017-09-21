@@ -474,10 +474,10 @@
             isColumn = true;
         }
 
-        this.update(testFails, isRow, isColumn, mustCross);
+        this.update(testFails, isRow, isColumn);
       },
 
-      update: function(testFails, isRow, isColumn, mustCross){
+      update: function(testFails, isRow, isColumn){
         if(testFails){
           root.$addWordBtn.attr('disabled', true);
         }else if(isRow){
