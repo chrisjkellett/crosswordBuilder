@@ -80,6 +80,7 @@
         this.$crossword.append(newItem);
       }
       this.makeCells();
+      root.$wrapper.find("input:first").focus();
     },
 
 
@@ -110,11 +111,14 @@
 
     alertCancel: function(){
       this.$alertBox.css('display', 'none');
+      return true;
     },
 
     shortcuts: function(e){
       if(e.key === 'Escape'){
-        root.escapeValidation();
+        if(root.$alertBox.css('display') === 'none') root.escapeValidation();
+        if(root.$alertBox.css('display') !== 'none') root.alertCancel();
+
       }else if (e.ctrlKey && e.key === 'ArrowUp'){
         root.increaseSize.init();
         if (root.$wrapper.find(":focus").length === 0){
