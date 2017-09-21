@@ -287,6 +287,7 @@
       },
 
       validate: function(id){
+        root.validateByCrossPoint(id);
         root.validateGrid(id);
         root.validateWordLength();
         root.validateWordStructure.init();
@@ -358,7 +359,22 @@
 
     },
 
-    validateGrid: function(id){
+    validateByCrossPoint: function(id){
+      const sp = id.split("-");
+      let cols;
+      if(root.json.length > 0 && root.currentIds.length === 1 && root.orientation === 'across'){
+        const prevId = id[0]  + "-" + (+sp[1] - 1);
+        const prevCell = root.$wrapper.find('#' + prevId);
+        prevCell.addClass('selected');
+        prevCell.readOnly = true;
+        root.currentIds.push(prevId);
+      }
+
+
+    },
+
+    validateGrid: function(id, ref){
+      console.log(ref);
       const sp = id.split("-");
       const col = sp[0];
       const row = sp[1];
@@ -366,8 +382,9 @@
         let $sp = cell.id.split("-");
         let $col = $sp[0];
         let $row = $sp[1];
-        if (!(row === $row || col === $col) || cell.className.includes('dead'))
+        if (!(row === $row || col === $col)){
           cell.disabled = true;
+        }
       }
     },
 
@@ -1176,6 +1193,7 @@
       },
 
       resetSettings: function(){
+        root.orientation = root.orientation === 'across' ? 'down' : 'across';
         root.currentIds = [];
         root.$clueEntry.val(" ");
         root.clueCounter ++;
