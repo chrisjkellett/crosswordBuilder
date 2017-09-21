@@ -31,6 +31,7 @@
     },
 
     cacheDOM: function(){
+      this.$window = $(window);
       this.$wrapper = $('#crosswordWrapper');
       this.$crossword = this.$wrapper.find('#crossword');
       this.$increaseBtn = this.$wrapper.find('#increaseBtn');
@@ -55,6 +56,7 @@
 
 
     bindEvents: function(){
+      this.$window.keydown(this.shortcuts.bind(this));
       this.$crossword.keyup(this.cellInputHandler.init.bind(this.cellInputHandler));
       this.$crossword.keyup(this.navigateGrid.bind(this));
       this.$crossword.keypress(this.validateInput.bind(this));
@@ -108,6 +110,40 @@
 
     alertCancel: function(){
       this.$alertBox.css('display', 'none');
+    },
+
+    shortcuts: function(e){
+      if(e.key === 'Escape'){
+        root.escapeValidation();
+      }else if (e.ctrlKey && e.key === 'ArrowUp'){
+        root.increaseSize.init();
+        if (root.$wrapper.find(":focus").length === 0){
+          root.$wrapper.find('input:first').focus();
+        }
+      }else if (e.ctrlKey && e.key === 'ArrowDown'){
+        root.decreaseSize.init();
+        if (root.$wrapper.find(":focus").length === 0){
+          root.$wrapper.find('input:first').focus();
+        }
+      }else if (e.ctrlKey && e.key === 'Z'){
+        root.undoClue.init();
+      }
+    },
+
+    escapeValidation: function(){
+      let isSaved;
+      for (let id of root.currentIds){
+        let cell = root.$wrapper.find('#' + id);
+        if (!cell.hasClass('savedWord')){
+          cell.val('');
+        }else{
+          root.cellClickHandler.validate(id, false);
+        }
+        cell.removeClass('selected');
+        cell.blur();
+      }
+      root.currentIds = [];
+      root.validateReset();
     },
 
     increaseSize: {
@@ -227,22 +263,22 @@
 
 
     navigateGrid: function(e){
-      if (e.keyCode === 37){
+      if (e.keyCode === 37 && e.ctrlKey === false){
         const i = this.$allCells.index(e.target);
         const item = this.$allCells.get(i - 1);
         item.focus();
       }
-      else if (e.keyCode === 38){
+      else if (e.keyCode === 38 && e.ctrlKey === false){
         const i = this.$allCells.index(e.target);
         const item = this.$allCells.get(i - this.rows);
         item.focus();
       }
-      else if (e.keyCode === 39){
+      else if (e.keyCode === 39 && e.ctrlKey === false){
         const i = this.$allCells.index(e.target);
         const item = this.$allCells.get(i + 1);
         if (item ? item.focus() : console.log('cannot go further'));
       }
-      else if (e.keyCode === 40){
+      else if (e.keyCode === 40 && e.ctrlKey === false){
         const i = this.$allCells.index(e.target);
         const item = this.$allCells.get(i + this.rows);
         if (item ? item.focus() : console.log('cannot go further'));
@@ -971,24 +1007,26 @@
 
     undoClue: {
       init: function(e, confirmed){
-        const i = root.json.length - 1;
-        if (i !== -1){
-          this.promptToDelete.init(i);
-          if(confirmed){
-            this.getHTML(i);
-            this.getCells(i);
-            this.removeAssociatedDeadCells.init(i);
-            this.updateSettings(i);
-            this.updateCounter();
-            this.removeFromJSON(i);
-            root.cacheCells();
-            root.alertCancel();
-            this.resetAlertMods();
-          }
-        }else{
-          const message = 'No clues to be deleted';
-          root.alertBox(message);
-        }
+        const message = 'undo feature coming to v1.4';
+        root.alertBox(message);
+        // const i = root.json.length - 1;
+        // if (i !== -1){
+        //   this.promptToDelete.init(i);
+        //   if(confirmed){
+        //     this.getHTML(i);
+        //     this.getCells(i);
+        //     this.removeAssociatedDeadCells.init(i);
+        //     this.updateSettings(i);
+        //     this.updateCounter();
+        //     this.removeFromJSON(i);
+        //     root.cacheCells();
+        //     root.alertCancel();
+        //     this.resetAlertMods();
+        //   }
+        // }else{
+        //   const message = 'No clues to be deleted';
+        //   root.alertBox(message);
+        // }
       },
 
       promptToDelete: {
