@@ -287,8 +287,10 @@
       },
 
       validate: function(id){
-        root.validateByCrossPoint(id);
         root.validateGrid(id);
+        root.validateByCrossPoint(id);
+        root.currentIds.sort();
+        console.log(root.currentIds);
         root.validateWordLength();
         root.validateWordStructure.init();
         root.validateReset();
@@ -325,7 +327,7 @@
           this.cell.readOnly = true;
           root.currentIds.push(this.id);
           this.validate(this.id, true);
-        }else if (this.isSelected && this.isSaved){
+        }else if (this.isSelected && this.isSaved && root.currentIds.length === 1){
           this.cell.classList.remove('selected');
           const i = root.currentIds.indexOf(this.id);
           root.currentIds.splice(i, 1);
@@ -367,14 +369,23 @@
         const prevCell = root.$wrapper.find('#' + prevId);
         prevCell.addClass('selected');
         prevCell.readOnly = true;
-        root.currentIds.push(prevId);
+        if(!root.currentIds.includes(prevId)){
+          root.currentIds.push(prevId);
+        }
+        root.cellClickHandler.validate(prevId, true);
+      }else if(root.json.length > 0 && root.currentIds.length === 1 && root.orientation === 'down'){
+        const prevId = (+sp[0] - 1)  + "-" + sp[1];
+        const prevCell = root.$wrapper.find('#' + prevId);
+        prevCell.addClass('selected');
+        prevCell.readOnly = true;
+        if(!root.currentIds.includes(prevId)){
+          root.currentIds.push(prevId);
+        }
+        root.cellClickHandler.validate(prevId, true);
       }
-
-
     },
 
     validateGrid: function(id, ref){
-      console.log(ref);
       const sp = id.split("-");
       const col = sp[0];
       const row = sp[1];
