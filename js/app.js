@@ -289,7 +289,7 @@
       validate: function(id){
         root.validateGrid(id);
         root.validateWordLength();
-        root.validateWordStructure();
+        root.validateWordStructure.init();
         root.validateReset();
         root.validationCounter ++;
       },
@@ -335,7 +335,7 @@
       validate: function(id, required){
         root.validateGrid(id);
         root.validateWordLength();
-        root.validateWordStructure();
+        root.validateWordStructure.init();
         if(required ? root.setNoReinits.init(id) : root.resetNoReinits(id));
         root.validationCounter ++;
         if(root.json.length > 1 && !this.isSelected) root.validateByAxis.init(id);
@@ -438,40 +438,53 @@
         this.$addWordBtn.removeAttr('disabled');
     },
 
+    validateWordStructure: {
+      init: function(){
+        let cols = []; 
+        let rows = [];
+        for (let id of root.currentIds){
+          let sp = id.split("-");
+          //push column reference to cols array
+          cols.push(+sp[0]);
+          cols.sort(function compareNumbers(a, b) {
+            return a - b;
+          });
 
-    validateWordStructure: function(){
-      let cols = []; 
-      let rows = [];
-      let testFails, isRow, isColumn;
-      for (let id of this.currentIds){
-        let sp = id.split("-");
-        cols.push(+sp[0]);
-        cols.sort(function compareNumbers(a, b) {
-          return a - b;
-        });
-        rows.push(+sp[1]);
-        rows.sort(function compareNumbers(a, b) {
-          return a - b;
-        });
-      }
-      for (let i = cols.length - 1; i > 0; i--){
-        let j = i - 1;
-        if (cols[i] - cols[j] > 1)
-          testFails = true;
-        else if (rows[i] - rows[j] > 1)
-          testFails = true;
-        else if (cols[i] - cols[j] === 0)
-          isRow = true;
-        else if (rows[i] - rows[j] === 0)
-          isColumn = true;
-      }
-      if(testFails)
-        this.$addWordBtn.attr('disabled', true);
-      else if(isRow){
-        this.orientation = 'across';
-      }
-      else if(isColumn){
-        this.orientation = 'down';
+          //push rows reference to rows array
+          rows.push(+sp[1]);
+          rows.sort(function compareNumbers(a, b) {
+            return a - b;
+          });
+        }
+
+        this.run(cols, rows);
+      },
+
+      run: function(cols, rows){
+        let testFails, isRow, isColumn;
+        for (let i = cols.length - 1; i > 0; i--){
+          let j = i - 1;
+          if (cols[i] - cols[j] > 1)
+            testFails = true;
+          else if (rows[i] - rows[j] > 1)
+            testFails = true;
+          else if (cols[i] - cols[j] === 0)
+            isRow = true;
+          else if (rows[i] - rows[j] === 0)
+            isColumn = true;
+        }
+
+        this.update(testFails, isRow, isColumn, mustCross);
+      },
+
+      update: function(testFails, isRow, isColumn, mustCross){
+        if(testFails){
+          root.$addWordBtn.attr('disabled', true);
+        }else if(isRow){
+          root.orientation = 'across';
+        }else if(isColumn){
+          root.orientation = 'down';
+        }
       }
     },
 
